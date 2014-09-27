@@ -19,10 +19,13 @@
 	$app->get('/department/:deptId/semester/:semId/section/:secId','getSectionById');
 	$app->get('/department/:deptId/semester/:semId/section/:secId/batch','getAllBatch');
 	$app->get('/department/:deptId/semester/:semId/section/:secId/batch/:batchId','getBatchById');
+	$app->get('/branch/', 'getBranch');
 	//Get Methods End Here
 	
 	//Post Methods of Department,Batch,Semester,Section
 	$app->post('/department','addDepartment');
+	
+	$app->post('/branch/', 'addBranch');
 	
 	//Delete methods of Department..
 	$app->delete('/department/:deptId', 'deleteDepartment');
@@ -32,10 +35,9 @@
 	$app->run();
 	
 	
-
 	
-	//function to get all department start here
-	function getAllDepartment() {
+//function to get all department start here
+function getAllDepartment() {
     $sql = "SELECT * FROM department";
     try {
         $db = getConnection();
@@ -48,6 +50,23 @@
 		echo 'header("Server Error");';
     }
 }//function to get all department ends here
+
+
+function getBranch(){
+		
+	$sql = "SELECT * FROM branch";
+    try {
+        $db = getConnection();
+        $stmt = $db->query($sql);
+        $dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        echo json_encode($dept);
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+		echo 'header("Server Error");';
+    }
+	
+}
 
 
 	//function to get department by id start here
@@ -227,6 +246,31 @@ function addDepartment() {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
 }//function to add department end here
+
+
+//Add batch to database..
+	function addBranch(){
+		$request = \Slim\Slim::getInstance()->request();
+    	$dept = json_decode($request->getBody());
+		$sql = "INSERT INTO branch (department_id, semester_id, section_name, batch_id) VALUES (:department_id, :semester_id, :section_name, :batch_id)";
+		
+	try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("department_id", $dept->department_id);
+		$stmt->bindParam("semester_id", $dept->semester_id);
+		$stmt->bindParam("batch_id", $dept->batch_id);
+		$stmt->bindParam("section_name", $dept->section_name);
+        $stmt->execute();
+        $dept->id = $db->lastInsertId();
+        $db = null;
+        echo json_encode($dept);
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+		
+}//Function ends for addBranch
+
 
 
 //function to add Semester start here

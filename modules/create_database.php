@@ -20,6 +20,7 @@
 				username VARCHAR(50) NOT NULL,
 				password VARCHAR(40) NOT NULL,
 				department_id INT ,
+				session_id VARCHAR(30),
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);
@@ -30,7 +31,7 @@
 				id INT AUTO_INCREMENT NOT NULL ,
 				department_id INT NOT NULL,
 				semester_id INT NOT NULL,
-				section_id INT NOT NULL,
+				section_name INT NOT NULL,
 			 	batch_id INT NOT NULL,
 				PRIMARY KEY(id)
 			);";

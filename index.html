@@ -59,7 +59,7 @@
             <div>
             
             	<!--DIV FOR DISPAYING STATISTICS-->
-            	<div class="col-md-8 statistics  ">
+            	<div id="jecrc-main-screen" class="col-md-8 statistics  ">
                 	<div class="col-md-12">
                     	<h4>Wednesday</h4>
                     	<span >August 20</span>
@@ -299,31 +299,31 @@
                     	<h4 class="blue-text semAddHeading">Add Section</h4>
                         <div id="section-btn" class="btn-group" data-toggle="buttons">
   							<label class="btn btn-primary ">
-    							<input type="radio" name="options" id="1" value="A" > A
+    							<input type="radio" name="options" id_="1" value="A" > A
   							</label>
   							<label class="btn btn-primary">
-    							<input type="radio" name="options" value="B"  id="2"> B
+    							<input type="radio" name="options" value="B"  id_="2"> B
   							</label>
   							<label class="btn btn-primary">
-    							<input type="radio" name="options" value="C" id="3"> C
+    							<input type="radio" name="options" value="C" id_="3"> C
   							</label>
                             <label class="btn btn-primary">
-    							<input type="radio" name="options" value="D" id="4"> D
+    							<input type="radio" name="options" value="D" id_="4"> D
   							</label>
                             <label class="btn btn-primary">
-    							<input type="radio" name="options" value="E" id="5"> E
+    							<input type="radio" name="options" value="E" id_="5"> E
   							</label>
                             <label class="btn btn-primary">
-    							<input type="radio" name="options" value="F" id="6"> F
+    							<input type="radio" name="options" value="F" id_="6"> F
   							</label>
                              <label class="btn btn-primary">
-    							<input type="radio" name="options" value="G" id="7"> G
+    							<input type="radio" name="options" value="G" id_="7"> G
   							</label>
                              <label class="btn btn-primary">
-    							<input type="radio" name="options" value="H" id="8"> H
+    							<input type="radio" name="options" value="H" id_="8"> H
   							</label>
                              <label class="btn btn-primary">
-    							<input type="radio" name="options" value="I" id="9"> I
+    							<input type="radio" name="options" value="I" id_="9"> I
   							</label>
                             
 						</div>
@@ -397,6 +397,27 @@
 </div><!--End of container-fluid div-->
 
 
+<!--Template for  single NavLink-->
+<script type="text/template" id="branch-template">
+		<div class="col-md-12">
+		  <div class="col-md-12">
+		  <h4><%= department %></h4>
+		  <hr>
+		  <% _.each(years, function(year){ %>
+		  	<div class="col-md-3">
+		  		<h4 class="yearname"> <%= year.yearname %> </h4>
+		  		<hr>
+			
+			   	<% _.each(year.branches, function(branch){ %>
+            		<h5 class="alert <%= app.Global.alertType[app.Global.randomNumber(0,4)] %>  batch_display" > <%= branch.name %>  </h5>
+       	 	   <% }); %>
+			</div>
+		  	<% }); %> 
+			              
+      		</div>      
+    	</div>
+</script>
+
 
 
 
@@ -405,9 +426,7 @@
 <script src="static/jquery/jquery-1.7.2.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script type="text/javascript" src="static/bootstrap/js/bootstrap.js"></script>
-<!--<script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
-<script src="http://documentcloud.github.com/backbone/backbone-min.js"></script>
-<script src="static/js/Backbone.localStorage-master/backbone.localStorage-min.js"></script>-->
+
 <script type="text/javascript" src="static/dependencies/underscore-min.js"></script>
 <script type="text/javascript" src="static/dependencies/backbone-min.js"></script>
 <script type="text/javascript" src="static/dependencies/backbone.localStorage-min.js"></script>

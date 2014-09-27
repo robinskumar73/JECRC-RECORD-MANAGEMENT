@@ -62,7 +62,7 @@
             <div>
             
             	<!--DIV FOR DISPAYING STATISTICS-->
-            	<div class="col-md-8 statistics  col-xs-12 ">
+            	<div  class="col-md-8 statistics  col-xs-12 ">
                 	<div class="col-md-12">
                     	<div class="col-md-12">
                     	<h4>CSE</h4>
@@ -70,7 +70,7 @@
                         <div class="col-md-3">
                         <h4 class="yearname">I YEAR</h4>
                         <hr>
-                        	<h5 class="alert alert-success batch_display" role="alert">1CSA</h5>
+                        	<a class="alert h5 alert-success batch_display"  role="alert">1CSA</a>
                           <h5 class="alert alert-danger batch_display" role="alert">1CSB</h5>
                            <h5 class="alert alert-warning batch_display" role="alert">1CSC</h5>
                             <h5 class="alert alert-info batch_display" role="alert">1CSD</h5>
