@@ -30,6 +30,10 @@ app.Views.Department = Backbone.View.extend({
 	  "click #Dept-Cancel" : "cancel_department"
     },
 	
+	
+	
+
+	
 	//function for creating department...
 	createDepartment: function(){
 		//checking the value of input box..
@@ -76,6 +80,7 @@ app.Views.Department = Backbone.View.extend({
     	},
 		success: function(model){
 			console.log("Successfully added department to database..");
+			displayMessage("Successfully added department to database..");
 			app.Global.selDeptModel = model;
 		}
 		});
@@ -142,6 +147,7 @@ app.Views.Department = Backbone.View.extend({
 				},
 				success:function(model,response){
 					console.log('Successfully deleted department..');
+					displayMessage('Successfully deleted department..');
 				}
 			});
 			/*
@@ -195,6 +201,7 @@ var revertDeptToInitial =  function(){
 }
 
 var dept_views = new app.Views.Department();
+//dept_views.render();
 
 
 //---------------------------------------------------VIEWS ENDS FOR DEPARTMENT---------------------------------------------
@@ -349,6 +356,7 @@ $(document).on('click','#publish-batch',function(e){
     				},
 					success: function(model){
 						console.log("Successfully added branch to database..");
+						displayMessage("Successfully added branch to database..");
 						hideBatch();
 						hideSection();
 						$('#infoScreen').addClass('hide');
@@ -460,7 +468,7 @@ app.Views.Branch = Backbone.View.extend({
 			var section_name = branchModel.get("section_name");
 			var batch_id =  branchModel.get("batch_id");
 			branch.id = id;
-			var name = semester_id + this.dept_name + section_name + batch_id;
+			var name = semester_id + ' - '+ this.dept_name +' - '+ section_name + batch_id;
 			branch.name = name;
 			//now push to branches array
 			branch_array.push(branch);

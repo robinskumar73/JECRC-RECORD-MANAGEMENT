@@ -14,7 +14,12 @@ app.Model.Department = Backbone.Model.extend({
 	defaults:{
 		id:null,
 		name:'NOT ASSIGNED'
-	}
+	},
+	
+	//adding autogeneration..
+	label: function () {
+        return this.get("name");
+    }
 });
 
 

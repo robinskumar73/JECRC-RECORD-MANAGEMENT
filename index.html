@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>JECRC</title>
+<link href="static/customstyle/typeahead.css" rel="stylesheet">
 <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="static/customstyle/mystyle.css" rel="stylesheet">
 <link rel="icon" type="image/png" href="#" >
@@ -257,7 +258,7 @@
                    <div id="DepartmentCreate" class="col-sm-12 ">
                    		<button id="Dept-Cancel" type="button" class="close hide"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                    		<h3 id="dept-screen" class="col-sm-12 infoScreenHeader hide" style="margin-top:2px;"></h3>
-						<input type="text" id="Department" class="form-control jecrc-dept-entry" placeholder="Department Name">
+						<input type="text" id="Department" class="form-control typeahead jecrc-dept-entry" placeholder="Department Name">
     					<button type="button" id="create-dept" class="btn btn-primary jecrc-create-btn">Create</button>
                         
 
@@ -429,7 +430,7 @@
 
 <script type="text/javascript" src="static/dependencies/underscore-min.js"></script>
 <script type="text/javascript" src="static/dependencies/backbone-min.js"></script>
-<script type="text/javascript" src="static/dependencies/backbone.localStorage-min.js"></script>
+<script type="text/javascript" src="static/typeahead.js"></script>
 <!--Now loading MVC related files -->
 <script type="text/javascript" src="static/js/models/jecrc-model.js"></script>
 <script type="text/javascript" src="static/js/collections/jecrc-collection.js"></script>

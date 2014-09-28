@@ -21,6 +21,9 @@
 				password VARCHAR(40) NOT NULL,
 				department_id INT ,
 				session_id VARCHAR(30),
+				admin INT NOT NULL DEFAULT \'0\',
+				email_address VARCHAR(100) ,
+				status VARCHAR(20),
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);
