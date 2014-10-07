@@ -1,22 +1,24 @@
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>JECRC</title>
-<link href="static/customstyle/typeahead.css" rel="stylesheet">
-<link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="static/customstyle/mystyle.css" rel="stylesheet">
-<link href="static/customstyle/loading_bar.css" rel="stylesheet">
-<link rel="icon" type="image/png" href="#" >
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<!--Adjusting for Mobile View-->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<?php
 
-</head>
+include_once 'modules/loginscript/include/processes.php';
+$Login_Process = new Login_Process;
+if($Login_Process->check_status($_SERVER['SCRIPT_NAME']))
+{
 
-<body>
+?>
+
+<?php
+require_once 'modules/header.php';
+?>
+
+<?php
+//Show this only if user is admin..
+ if ($_SESSION['admin'] == 1){
+	
+?>
+
 <!--Element object for loading bar option-->
-<div class="windows8 center hide">
+<div id="loading-bar" class="windows8 center hide">
 	<div class="wBall" id="wBall_1">
 		<div class="wInnerBall"></div>
 	</div>
@@ -71,6 +73,7 @@
             				<li class="jecrc-nav-hide"><a href="#">Settings</a></li>
             				<li class="jecrc-nav-hide"><a href="#">Profile</a></li>
           				</ul> 
+                        <a id="Login" class="navbar-text navbar-right jecrc-nav-dept" href="modules/loginscript/include/processes.php?log_out=true">Logout</a>
           				<a class="navbar-text navbar-right jecrc-nav-dept" href="#">+ Create Department </a>
         			</div>
             	</div><!--End of NAVBAR ROW DIV-->
@@ -418,46 +421,18 @@
 </div><!--End of container-fluid div-->
 
 
-<!--Template for  single NavLink-->
-<script type="text/template" id="branch-template">
-		<div class="col-md-12">
-		  <div class="col-md-12">
-		  <h4><%= department %></h4>
-		  <hr>
-		  <% _.each(years, function(year){ %>
-		  	<div class="col-md-3">
-		  		<h4 class="yearname"> <%= year.yearname %> </h4>
-		  		<hr>
-			
-			   	<% _.each(year.branches, function(branch){ %>
-            		<h5 class="alert <%= app.Global.alertType[app.Global.randomNumber(0,4)] %>  batch_display" > <%= branch.name %>  </h5>
-       	 	   <% }); %>
-			</div>
-		  	<% }); %> 
-			              
-      		</div>      
-    	</div>
-</script>
 
 
+<?php
+require_once 'modules/template.php';
+require_once 'modules/footer.php';
+?>
 
-
-<!--script area-->
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="static/jquery/jquery-1.7.2.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script type="text/javascript" src="static/bootstrap/js/bootstrap.js"></script>
-
-<script type="text/javascript" src="static/dependencies/underscore-min.js"></script>
-<script type="text/javascript" src="static/dependencies/backbone-min.js"></script>
-<script type="text/javascript" src="static/typeahead.js"></script>
-<!--Now loading MVC related files -->
-<script type="text/javascript" src="static/js/models/jecrc-model.js"></script>
-<script type="text/javascript" src="static/js/collections/jecrc-collection.js"></script>
-<script type="text/javascript"  src="static/js/views/app-pages.js"></script>
-<script type="text/javascript" src="static/js/views/jecrc-view.js"></script>
-<script type="text/javascript" src="static/js/routers/jecrc-routers.js"></script>
-<script type="text/javascript" src="static/js/app-main/jecrc-app-main.js"></script>    
-<script type="text/javascript" src="static/customscript/myscript.js"></script>
-</body>
-</html>
+<?php
+ }
+	 else{
+		 echo "Error: You are not authorised to view this page..";
+	 	header('Location: modules/faculty.php');
+ 	}
+}
+?>

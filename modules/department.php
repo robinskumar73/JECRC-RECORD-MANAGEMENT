@@ -34,7 +34,21 @@
 	
 	$app->run();
 	
-	
+?>
+
+<?php
+
+include_once 'loginscript/include/processes.php';
+$Login_Process = new Login_Process;
+$Login_Process->check_status($_SERVER['SCRIPT_NAME']);
+
+?>
+
+
+
+
+<?php
+
 	
 //function to get all department start here
 function getAllDepartment() {
@@ -251,8 +265,10 @@ function addDepartment() {
 //Add batch to database..
 	function addBranch(){
 		$request = \Slim\Slim::getInstance()->request();
-    	$dept = json_decode($request->getBody());
-		$sql = "INSERT INTO branch (department_id, semester_id, section_name, batch_id) VALUES (:department_id, :semester_id, :section_name, :batch_id)";
+    	$dept = json_decode($request->getBody());	
+		
+		//Now inserting to branch table...
+		$sql = "INSERT INTO  `branch` (department_id, semester_id, section_name, batch_id) VALUES (:department_id, :semester_id, :section_name, :batch_id)";
 		
 	try {
         $db = getConnection();
@@ -268,6 +284,68 @@ function addDepartment() {
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
+			
+		//checking data to class table..
+		
+		$sql = "SELECT * FROM `class` WHERE  department_id = $dept->department_id AND `section_name` = '$dept->section_name'  AND `semester_id` = $dept->semester_id ";
+		$class_id = 0;
+		try 
+		{
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->execute();
+        	$dept1 = $stmt->fetchObject();
+			$class_id = $db->lastInsertId();
+			$db = null;
+		}
+		catch(PDOException $e)
+		{
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}
+		
+		if(empty($dept1))
+		{
+			//Insert data to class table...	
+			$sql = "INSERT INTO class (department_id, section_name, semester_id) VALUES (:department_id, :section_name, :semester_id)";
+				
+			try 
+			{
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("department_id", $dept->department_id);
+				$stmt->bindParam("semester_id", $dept->semester_id);
+				$stmt->bindParam("section_name", $dept->section_name);
+				$stmt->execute();
+				$dept->id = $db->lastInsertId();
+				$class_id = $dept->id;
+				$db = null;
+			}
+			catch(PDOException $e)
+			{
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+		}
+		
+		//Now insert to lab table...
+		$sql = "INSERT INTO `attendance`.`lab` (`id`, `class_id`, `batch_id`) VALUES (NULL,:class_id,:batch_id);";
+		try 
+		{
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("class_id",$class_id);
+			$stmt->bindParam("batch_id", $dept->batch_id);
+			$stmt->execute();
+			$db = null;
+		}
+		catch(PDOException $e)
+		{
+			
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}
+		
+			
+		
+	
 		
 }//Function ends for addBranch
 

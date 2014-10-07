@@ -1,49 +1,68 @@
 <?
+include 'include/mail.php';
+include 'include/constants.php';
 include_once 'include/processes.php';
 $Login_Process = new Login_Process;
 $New = $Login_Process->Register($_POST, $_POST['process']);
 ?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>JECRC - Login Script</title>
-<link href="include/style.css" rel="stylesheet" type="text/css">
+
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Password Reset</title>
+	<link href="../../static/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+	<link href="../../static/customstyle/mystyle.css" type="text/css" rel="stylesheet">
+</head>
+
 <body>
+	<div class="container-fluid">
+    	<div class="row">
+        	<div class="col-md-12 col-xs-12">
+            	<img src="../../images/logo.jpg">
+            </div><!--Div for Image end here--> 
+        </div><!--Div for first row end here-->
+
+        
+        <div class="row">
+        	<div class="col-md-6 col-xs-12 col-md-offset-3 login">
+
+
+
 
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
-<div class="right" style="margin-top:-8px; margin-right:-6px;"><a href="main.php">Log In</a></div>
+<div class="right" style="margin-top:-8px; margin-right:-6px;"><a href="../login.php">Log In</a></div>
 <h1>Register</h1>
-<div class="red">
+
+<div class="red bg-danger">
 <?php  echo $New; ?>
 </div>
+<br />
 
-<div class="label">First Name:</div>
-<input name="first_name" type="text" class="field" value="<? echo $_POST['first_name']; ?>" />
+<input placeholder="First Name" name="first_name" type="text" class="field form-control" value="<? echo $_POST['first_name']; ?>" />
+<br />
 
-<div class="label">Last Name:</div>
-<input name="last_name" type="text" class="field" value="<? echo $_POST['last_name']; ?>" />
+<input placeholder="Last Name" name="last_name" type="text" class="field form-control" value="<? echo $_POST['last_name']; ?>" /><br />
 
-<div class="label">Email Address:</div>
-<input name="email_address" type="text" class="field" value="<? echo $_POST['email_address']; ?>" />
+<input placeholder="Email Address" name="email_address" type="text" class="field form-control" value="<? echo $_POST['email_address']; ?>" />
+<br />
 
-<div class="label">Department ID:</div>
-<input name="department_id" type="text" class="field" value="<? echo $_POST['department_id']; ?>" />
-
-<br /><br />
-<div class="label">Password:</div>
-<input name="pass1" type="password" class="field"/>
-
-<div class="label">Repeat Password:</div>
-<input name="pass2" type="password" class="field"/>
+<input placeholder="Department Id" name="department_id" type="text" class="field form-control" value="<? echo $_POST['department_id']; ?>" />
 
 <br /><br />
-<div class="label">Username:</div>
-<input name="username" type="text" class="field" value="<? echo $_POST['username']; ?>" />
 
+<input placeholder="Password" name="pass1" type="password" class="field form-control"/>
+<br />
+<input placeholder="Confirm Password" name="pass2" type="password" class="field form-control"/>
+
+<br /><br />
+
+<input placeholder="Username" name="username" type="text" class="field form-control" value="<? echo $_POST['username']; ?>" />
+<br />
 <div class="right">
-  <input name="process" type="submit" id="process" value="Register"/>
+  <input name="process" type="submit" class="button btn btn-success" id="process" value="Register"/>
 </div>
 
 </form>

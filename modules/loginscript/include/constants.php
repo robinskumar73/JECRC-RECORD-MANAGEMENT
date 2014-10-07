@@ -16,9 +16,9 @@ define("DBTBLE","faculty");
 # Location Infomation
 
 // Path of script with trailing slashes
-define("Script_Path","");
+define("Script_Path","/Manage/");
 // URL of script (no trailing slash)
-define("Script_URL","");
+define("Script_URL","http://localhost");
 
 # System Infomation
 

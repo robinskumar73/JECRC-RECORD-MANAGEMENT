@@ -27,7 +27,8 @@ app.Views.Department = Backbone.View.extend({
 	  //Event for thumb-up
       "click #create-dept"   : "createDepartment",
 	  "keypress #Department"   : "handleKeyPress",
-	  "click #Dept-Cancel" : "cancel_department"
+	  "click #Dept-Cancel" : "cancel_department",
+	 
     },
 	
 	
@@ -107,6 +108,8 @@ app.Views.Department = Backbone.View.extend({
 			this.createDepartment();
 		}
 	},
+	
+	
 	
 	cancel_department:function(e){
 		//remove the collection...
@@ -355,7 +358,6 @@ $(document).on('click','#publish-batch',function(e){
 						
     				},
 					success: function(model){
-						console.log("Successfully added branch to database..");
 						displayMessage("Successfully added branch to database..");
 						hideBatch();
 						hideSection();
@@ -364,8 +366,11 @@ $(document).on('click','#publish-batch',function(e){
 						$('#dept-screen').addClass('hide');
 						$('#Dept-Cancel').addClass('hide');
 						$('#Department').removeClass('hide');
+						
 						$('#Department').val('');
 						$('#create-dept').removeClass('hide');
+						$('#DepartmentCreate').removeClass('hide');
+						$("span.twitter-typeahead").removeClass('hide')
 					}	
 				});
 			}
@@ -387,12 +392,40 @@ app.Views.Branch = Backbone.View.extend({
 		this.dept_name = app.Global.Department.findWhere({"id": dept_id}).get("name");
 		this.year = ["I YEAR", "II YEAR", "III YEAR", "IV YEAR"];
 		this.branchTemplate =  _.template( $("#branch-template").html() );	
+		app.Global.dept = false;
 	},
 	
 	el: $("#jecrc-main-screen"),
 	
+	events: {
+		 "click h4#branch-template-department-name" : "showDepartmentReport",
+		 "click h4#branch-template-year-name" : "showDepartmentYearReport"	,
+		 "click h5#branch-template-branch-name" : "showDepartmentBranchName"
+	},
 	
 	
+	//For navigate to show department report function...
+	showDepartmentReport: function(e){
+		//Show loading bar..
+		app.Global.showLoadingBar();
+		app.Global.Router.navigate("report/department/" + this.dept_name , {trigger: true});	
+	},
+	
+	showDepartmentYearReport: function(e){
+		//Show loading bar..
+		app.Global.showLoadingBar();
+		var element = e.target;
+		app.Global.Router.navigate("report/department/" + this.dept_name + "/" + $(element).html() , {trigger: true});	
+	},
+	
+	showDepartmentBranchName: function(e){
+		//Show loading bar..
+		app.Global.showLoadingBar();
+		var element = e.target;
+		var branch = parseBranch($(element).html());
+		//app.Global.Router.navigate("report/department/" + this.dept_name + "/" + $(element).html() , {trigger: true});
+		app.Global.Router.navigate("report/department/" + this.dept_name + "/semester/" + branch[0] + "/section/" + branch[2], {trigger:true});	
+	},
 	
 	
 	
@@ -435,8 +468,7 @@ app.Views.Branch = Backbone.View.extend({
 				}
 			}
 			
-			//TEMP branch 
-			app.Global.y =  temp.branches;	
+			app.Global.section_added = [];
 			temp.branches = this.branchArray( temp.branches );
 			//Adding year to yearArray..
 			
@@ -468,10 +500,16 @@ app.Views.Branch = Backbone.View.extend({
 			var section_name = branchModel.get("section_name");
 			var batch_id =  branchModel.get("batch_id");
 			branch.id = id;
-			var name = semester_id + ' - '+ this.dept_name +' - '+ section_name + batch_id;
-			branch.name = name;
-			//now push to branches array
-			branch_array.push(branch);
+			var name = semester_id + ' - '+ this.dept_name +' - '+ section_name ;
+			//pushinf only if value is not present alreadt..
+			if(app.Global.section_added.indexOf(name) === -1 )
+			{
+				//Now pushing this name to array...
+				app.Global.section_added.push(name);
+				branch.name = name;
+				//now push to branches array
+				branch_array.push(branch);
+			}
 		}
 		return branch_array;
 	}
@@ -491,18 +529,26 @@ app.Global.randomNumber = function(min, max) {
 
 var getYear = function(id){
 	var x = {
-		1:1,
-		2:1,
-		3:2,
-		4:2,
-		5:3,
-		6:3,
-		7:4,
-		8:4	
+		1:"I YEAR",
+		2:"I YEAR",
+		3:"II YEAR",
+		4:"II YEAR",
+		5:"III YEAR",
+		6:"III YEAR",
+		7:"IV YEAR",
+		8:"IV YEAR"	
 	}
 	return x.id;
 }
 
+
+var parseBranch = function(branchName){
+	console.log(branchName);
+	var patt = /([0-9])\s*\-\s*([a-zA-Z]+)\s*\-\s*([a-zA-Z])/
+	var value = patt.exec(	branchName );
+	value = value.splice(1);
+	return value;
+}
 
 
 

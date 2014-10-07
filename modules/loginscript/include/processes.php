@@ -1,7 +1,7 @@
 <?php
 error_reporting (E_ERROR | 0);
-include 'mail.php';
-include 'constants.php';
+include 'loginscript/include/mail.php';
+include 'loginscript/include/constants.php';
 
 if(isset($_GET['log_out'])) {
 	$Login_Process = new Login_Process;
@@ -18,7 +18,6 @@ class Login_Process {
 	}
 
 	function query($sql) {
-
 		$this->connect_db();
 		$sql = mysql_query($sql);
 		$num_rows = mysql_num_rows($sql);
@@ -50,7 +49,7 @@ class Login_Process {
 		if(isset($_COOKIE[$this->cookie_user]) && isset($_COOKIE[$this->cookie_pass])){
 			$this->log_in($_COOKIE[$this->cookie_user], $_COOKIE[$this->cookie_pass], 'true', $page, 'cookie'); 
 		} else if(isset($_SESSION['username'])) { 	
-			if(!$page) { $page = Script_Path."main.php"; }
+			if(!$page) { $page = Script_Path."index.php"; }
 					header("Location: http://".$_SERVER['HTTP_HOST'].$page); 
 		} else {
 		    return true;
@@ -63,8 +62,11 @@ class Login_Process {
 		session_start();
 
 		if(!isset($_SESSION['username'])){
-			header("Location: http://".$_SERVER['HTTP_HOST'].Script_Path."index.php?page=".$page); 
+			//echo "http://".$_SERVER['HTTP_HOST'].$page;
+			header("Location: http://".$_SERVER['HTTP_HOST']."/Manage/modules/login.php?page=".$page); 
 		}
+		else 
+			return true;
 	}
 
 	function log_in($username, $password, $remember, $page, $submit) {
@@ -94,12 +96,20 @@ class Login_Process {
 		}			
 			$this->query("UPDATE ".DBTBLE." SET last_loggedin = '".date ("d/m/y G:i:s")."' WHERE username = '$username'");
 		
-		if(!$page) { $page = Script_Path."main.php"; }
+		if(!$page) {
+			 $page = Script_Path."index.php"; 
+			 if( $query['result']['admin'] == 0)
+			 {
+				 $page = Script_Path."modules/faculty.php";
+			 }
+		}
+			
 			
 		if ($page == 'false') {
 				return true;
 		} else {
 				header("Location: http://".$_SERVER['HTTP_HOST'].$page); 
+				
 		}
 		
 		}
@@ -111,7 +121,7 @@ class Login_Process {
 	
 			ini_set("session.gc_maxlifetime", Session_Lifetime); 
 			session_start();
-
+			$_SESSION['id']			   = $query['result']['id'];
 			$_SESSION['first_name']    = $query['result']['first_name'];
 			$_SESSION['last_name']     = $query['result']['last_name'];
 			$_SESSION['email_address'] = $query['result']['email_address'];
@@ -144,7 +154,7 @@ class Login_Process {
     	$this->set_cookie($username, $password, '-');
 
 		if(!isset($header)) {
-			header('Location: ../index.php');
+			header('Location: ../../login.php');
 		} else {
 			return true;
 		}

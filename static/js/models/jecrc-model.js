@@ -76,7 +76,6 @@ app.Model.Faculty = Backbone.Model.extend({
 		first_name:'',
 		last_name:'',
 		username:'',
-		session_id:null,
 		department_id:null	
 	}
 });

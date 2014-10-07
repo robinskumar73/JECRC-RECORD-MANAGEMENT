@@ -1,38 +1,11 @@
 <?php
-	require_once('database_connection.php');
-	$error_msg = "";
-	
-	if(!isset($_COOKIE['id']))
-		{
-			if(isset($_POST['submit']))
-			{
-				$dbc = mysqli_connect(HOST,USERNAME,PASSWORD,DATABASE) or die('Connection Failed');
-				$user_username = mysqli_real_escape_string($dbc,trim($_POST['username']));
-				$user_password = mysqli_real_escape_string($dbc,trim($_POST['password']));
-				if(!empty($user_username) && !empty($user_password))
-				{
-					$query = "SELECT id,username FROM faculty WHERE username='$user_username' AND password=SHA('$user_password')";
-					$data = mysqli_query($dbc,$query);
-					
-					if(mysqli_num_rows($data) == 1)
-					{
-						$row = mysqli_fetch_array($data);
-						setcookie('id',$row['id']);
-						setcookie('username',$row['username']);
-					}
-					else
-					{
-						$error_msg = "Sorry, you must enter a correct username and password to log in";
-					}
-				}
-				else
-				{
-					$error_msg = "Sorry, you must enter your username or password to log in";
-				}
-			}
-			
-		}
+include_once 'loginscript/include/processes.php';
+$Login_Process = new Login_Process;
+$Login_Process->check_login($_GET['page']);
+$Login = $Login_Process->log_in($_POST['user'], $_POST['pass'], $_POST['remember'], $_POST['page'], $_POST['submit']); 
 ?>
+
+
 
 <html>
 <head>
@@ -50,18 +23,36 @@
             	<img src="../images/logo.jpg">
             </div><!--Div for Image end here--> 
         </div><!--Div for first row end here-->
+
         
         <div class="row">
         	<div class="col-md-6 col-xs-12 col-md-offset-3 login">
-            	<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" role="form">
+            	<form method="post" action=" <?php echo $_SERVER['PHP_SELF']; ?>" role="form">
                 	<fieldset>
                     	<legend>Log In</legend>
+                        <br />
+                        <div class="bg-danger red"> <?php echo $Login; ?> </div>
+                        <br />
                         <label for="username">Username</label><br />
-            			<input type="text" id="username" name="username"  class="form-control"																													                          value=" <?php if(!empty($user_username)) echo $user_username; ?>" /><br />
+            			<input name="user" type="text" class="field form-control" id="user" /><br /> 																													                          
             			<label for="password">Password</label><br />
-                        <input type="password" id="password" name="password" class="form-control" /><br />
+                        <input name="pass" type="password" class="field form-control" id="pass" value="" /><br />
+                        
                     </fieldset>
-                    <input type="submit" id="submit" value="Log In" class="btn btn-success"  />
+                   
+					<div class="center">
+						<a href="loginscript/forgotpassword.php">Password Recovery</a> | <a href="loginscript/register.php">Sign Up</a>
+					</div>
+                     <br />
+                    <div class="right">
+						<label>Remember Me
+							<input name="remember" type="checkbox" value="true" />
+						</label>
+					</div>
+                    <br />
+                    <input name="page" type="hidden" value="<? echo $_GET['page']; ?>" />
+					<input name="submit" type="submit" id="submit" class="button btn btn-success" value="Log In" />
+                    
                 </form>
             </div><!--Div for Login end here-->
         </div><!--Div for second row End here-->

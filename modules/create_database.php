@@ -24,6 +24,9 @@
 				admin INT NOT NULL DEFAULT \'0\',
 				email_address VARCHAR(100) ,
 				status VARCHAR(20),
+				forgot VARCHAR(100),
+				last_loggedin DATETIME,
+				user_level INT,
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);
@@ -40,6 +43,8 @@
 			);";
 	$result = mysqli_query($dbc,$query);
 	
+	
+	
 	// CREATE TABLE DEPARTMENT
 	$query = "CREATE TABLE department
 			(
@@ -48,6 +53,29 @@
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);
+	
+	
+	
+	// CREATE TABLE DEPARTMENT
+	$query = "CREATE TABLE enteries
+			(
+				id INT AUTO_INCREMENT NOT NULL ,
+				date DATE,
+				PRIMARY KEY(id)
+			);";
+	$result = mysqli_query($dbc,$query);
+	
+	
+	
+	// CREATE TABLE DEPARTMENT
+	$query = "CREATE TABLE entry_join
+			(
+				enteries_id INT ,
+				main_entry_id INT
+			);";
+	$result = mysqli_query($dbc,$query);
+	
+	
 	
 	
 	// CREATE TABLE SECTION
@@ -75,11 +103,15 @@
 		(
 			id INT AUTO_INCREMENT NOT NULL ,
 			department_id INT NOT NULL,
-			section_id INT NOT NULL,
+			section_name CHAR NOT NULL,
 			semester_id INT NOT NULL,
 			PRIMARY KEY(id)
 		);";
 	$result = mysqli_query($dbc,$query);
+	
+	
+	
+	
 	
 	
 	//CREATE TABLE MAIN ENTRY
@@ -95,13 +127,32 @@
 	
 	
 	//CREATE TABLE CLASS ENTRY
-	$query = "CREATE TABLE class_entry
+	$query = "CREATE TABLE days_entry
 			(
 				id INT AUTO_INCREMENT NOT NULL ,
 				class_id INT NOT NULL,
 				period_id INT,
 				strength INT NOT NULL,
 				PRIMARY KEY(id)
+			);";
+	$result = mysqli_query($dbc,$query);
+	
+	
+	
+	//CREATE TABLE CLASS ENTRY
+	$query = "CREATE TABLE  `subject`
+			(
+				id INT AUTO_INCREMENT NOT NULL ,
+				subject VARCHAR(100),
+				PRIMARY KEY(id)
+			);";
+	$result = mysqli_query($dbc,$query);
+	
+	//CREATE TABLE CLASS ENTRY
+	$query = "CREATE TABLE  `lab_period_join`
+			(
+				lab_entry_id INT NOT NULL,
+				period_id INT NOT NULL,
 			);";
 	$result = mysqli_query($dbc,$query);
 	
