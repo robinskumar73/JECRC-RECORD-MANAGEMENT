@@ -1,3 +1,5 @@
+// JavaScript Document
+
 //Routers...
 //Residing everything under a global namespace "app"
 //var app = app || {};
@@ -8,55 +10,10 @@ app.Routers =  app.Routers || {};
 app.Routers = Backbone.Router.extend({
 	routes:{
 		"department/:name" : "showDepartment",
-		"report/department/:dept_name" : "showDepartmentReport"	,
-		"report/department/:dept_name/:year" : "showYearReport",
-		"report/department/:dept_name/semester/:semester_name/section/:section_name" : "showBranchReport"
+		"faculty/department/:dept_name/semester/:semester_name/section/:section_name" : "FacultyBranchEntry"
 	},
 	
 	
-	//Showing report for department..
-	showDepartmentReport: function(dept_name){
-		//Now fecthing report collection based on department..
-		var periodEntryCollection = new app.Collection.periodEntry;
-		periodEntryCollection.url = "modules/department.php/entry/department/" + dept_name; 
-		//Now fetching url..
-		periodEntryCollection.fetch({
-			error: function () {
-				app.Global.hideLoadingBar();
-				console.log('Error fetching department wise entry from database..');
-			},
-			success: function(list_array){
-				app.Global.hideLoadingBar();
-				if(periodEntryCollection.length === 0){
-					console.log("returning from department entry route as length is zero..");
-					return null;
-				}
-				//$("#jecrc-main-screen").html('');
-				console.log('Successfully fetched department wise entry data..');
-				//Getting the dates of entry in decreasing order..
-				var entry_arr  = $.unique(periodEntryCollection.pluck("days_entry_id"));
-				//app.Global.entry_model = entry_arr;
-				//Now processing each entry one by one..
-				//<div id="" class="col-md-8 statistics  ">
-				$("#jecrc-main-screen").html('');
-				app.Global.arr = [];
-				for(var i=0; i<entry_arr.length; i++)
-				{
-						//console.log("I am looping");
-						//finding the entry model one by one....
-						var entry_model_arr = periodEntryCollection.where({ "days_entry_id":entry_arr[i] });
-						//app.Global.arr.push(entry_model_arr);
-						//Now load this view..
-						var periodView = new app.Views.periodEntry({collection:entry_model_arr});
-						$("#jecrc-main-screen").append(periodView.render().el);
-				}
-				periodEntryCollection = null;
-			}
-		});
-		
-		
-		
-	},
 	
 	
 	showBranchReport: function(dept_name, semester_name, section_name ){
@@ -94,41 +51,6 @@ app.Routers = Backbone.Router.extend({
 		
 		
 	},
-	
-	
-	showYearReport: function(dept_name, year){
-		//Now fecthing report collection based on department..
-		var periodEntryCollection = new app.Collection.periodEntry;
-		periodEntryCollection.url = "modules/department.php/entry/department/" + dept_name +"/year/"+year;
-		periodEntryCollection.fetch({
-			error: function () {
-				app.Global.hideLoadingBar();
-				console.log('Error fetching department wise entry from database..');
-			},
-			success: function(list_array){
-				app.Global.hideLoadingBar();
-				console.log('Successfully fetched department wise entry data..');
-				//Getting the dates of entry in decreasing order..
-				var entry_arr  = $.unique(periodEntryCollection.pluck("days_entry_id"));
-				//app.Global.entry_model = entry_arr;
-				//Now processing each entry one by one..
-				//<div id="" class="col-md-8 statistics  ">
-				$("#jecrc-main-screen").html('');
-				app.Global.arr = [];
-				for(var i=0; i<entry_arr.length; i++)
-				{
-						//console.log("I am looping");
-						//finding the entry model one by one....
-						var entry_model_arr = periodEntryCollection.where({ "days_entry_id":entry_arr[i] });
-						//Now load this view..
-						var periodView = new app.Views.periodEntry({collection:entry_model_arr});
-						$("#jecrc-main-screen").append(periodView.render().el);
-				}
-			}
-		});
-		 
-	},
-	
 	
 	
 	showDepartment: function(name){

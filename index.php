@@ -17,24 +17,10 @@ require_once 'modules/header.php';
 	
 ?>
 
-<!--Element object for loading bar option-->
-<div id="loading-bar" class="windows8 center hide">
-	<div class="wBall" id="wBall_1">
-		<div class="wInnerBall"></div>
-	</div>
-	<div class="wBall" id="wBall_2">
-		<div class="wInnerBall"></div>
-	</div>
-	<div class="wBall" id="wBall_3">
-		<div class="wInnerBall"></div>
-	</div>
-	<div class="wBall" id="wBall_4">
-		<div class="wInnerBall"></div>
-	</div>
-	<div class="wBall" id="wBall_5">
-		<div class="wInnerBall"></div>
-	</div>
-</div>
+<?php
+include_once 'modules/loadingbar.php';
+
+?>
 
 <div class="container-fluid">
 
@@ -103,7 +89,7 @@ require_once 'modules/header.php';
                                     <tbody>
                                     	<tr>
                                         	<td>D.E</td>
-                                            <td>ECE</td>
+                                            <td colspan="3" rowspan="0">ECE  B1-Batch 10  P.K</td>
                                             <td>COMPILER</td>
                                             <td>JAVA</td>
                                             <td>EDC</td>
@@ -111,7 +97,7 @@ require_once 'modules/header.php';
                                         </tr>
                                         <tr>
                                         	<td>80</td>
-                                            <td>30</td>
+                                            <td colspan="3" rowspan="1">ECE  B2-Batch   20  R.K</td>
                                             <td>20</td>
                                             <td>90</td>
                                             <td>10</td>
@@ -119,7 +105,7 @@ require_once 'modules/header.php';
                                         </tr>
                                         <tr>
                                         	<td>P.K</td>
-                                            <td>M.K</td>
+                                            <td colspan="3" rowspan="3">ECE  B2-Batch 20  A.K</td>
                                             <td>S.K.</td>
                                             <td>U.D</td>
                                             <td>M.D</td>

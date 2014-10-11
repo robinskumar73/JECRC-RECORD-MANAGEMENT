@@ -20,7 +20,6 @@ app.Global.hideLoadingBar = function(){
 }
 
 $(document).ready(function(e) {
-	console.log(faculty);
 	app.Global.facultyModel = new app.Model.Faculty(faculty);    
 });
 

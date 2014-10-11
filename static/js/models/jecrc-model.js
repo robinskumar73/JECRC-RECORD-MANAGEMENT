@@ -16,39 +16,9 @@ app.Model.Department = Backbone.Model.extend({
 		name:'NOT ASSIGNED'
 	},
 	
-	//adding autogeneration..
-	label: function () {
-        return this.get("name");
-    }
 });
 
 
-
-app.Model.Class = Backbone.Model.extend({
-	defaults:{
-		id:null,
-		department_id:null,
-		section_id:null,
-		semester_id:null	
-	}
-});
-
-
-app.Model.ClassEntry = Backbone.Model.extend({
-	defaults:{
-		id:null,
-		class_id:null,
-		period_id:null,
-		strength:'UNDEFINED'	
-	}
-});
-
-app.Model.ClassJoin = Backbone.Model.extend({
-	defaults:{
-		main_entry_id:null,
-		class_entry_id:null
-	}
-});
 
 
 app.Model.Branch = Backbone.Model.extend({
@@ -61,14 +31,7 @@ app.Model.Branch = Backbone.Model.extend({
 	}
 });
 
-app.Model.MainEntry = Backbone.Model.extend({
-	defaults:{
-		id:null,
-		faculty_id:null,
-		date:'',
-		subject:''	
-	}
-});
+
 
 app.Model.Faculty = Backbone.Model.extend({
 	defaults:{
@@ -81,52 +44,30 @@ app.Model.Faculty = Backbone.Model.extend({
 });
 
 
-app.Model.Lab = Backbone.Model.extend({
+//Adding model information for period entry...
+app.Model.periodEntry = Backbone.Model.extend({
 	defaults:{
 		id:null,
-		class_id:null,
-		batch_id:null	
-	}
-});
-
-app.Model.LabJoin = Backbone.Model.extend({
-	defaults:{
-		lab_entry_id:null,
-		main_entry_id:null
-	}
-});
-
-app.Model.LabEntry = Backbone.Model.extend({
-	defaults:{
-		id:null,
-		lab_id:null,
-		strength:''	
+		date:"",
+		subject_name:"",
+		faculty_id:null,
+		faculty_name:"",
+		lab:0, //0 or 1
+		batch:null,
+		period:[], // must be an array containing values[]
+		strength:0,
+		department_id:null,
+		semester_id:null,
+		section_name:null,
+		
 	}
 });
 
 
 
 
-/*app.Model.Semester = Backbone.Model.extend({
-	defaults:{
-		id:null,
-		name:'NOT ASSIGNED'	
-	}
-});
 
 
-app.Model.Batch = Backbone.Model.extend({
-		defaults:{
-			id:null,
-			name:'NOT ASSIGNED'
-		}
-});
 
 
-app.Model.Section = Backbone.Model.extend({
-	defaults:{
-		id:null,
-		name:'NOT ASSIGNED'
-	}
-});
-*/
+

@@ -31,6 +31,8 @@
 			);";
 	$result = mysqli_query($dbc,$query);
 	
+	
+	
 	//CREATE TABLE  BRANCH
 	$query = "CREATE TABLE branch
 			 (
@@ -56,28 +58,6 @@
 	
 	
 	
-	// CREATE TABLE DEPARTMENT
-	$query = "CREATE TABLE enteries
-			(
-				id INT AUTO_INCREMENT NOT NULL ,
-				date DATE,
-				PRIMARY KEY(id)
-			);";
-	$result = mysqli_query($dbc,$query);
-	
-	
-	
-	// CREATE TABLE DEPARTMENT
-	$query = "CREATE TABLE entry_join
-			(
-				enteries_id INT ,
-				main_entry_id INT
-			);";
-	$result = mysqli_query($dbc,$query);
-	
-	
-	
-	
 	// CREATE TABLE SECTION
 	$query = "CREATE TABLE section
 			(
@@ -86,7 +66,7 @@
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);
-	
+	//Write insert table for writing default section..
 	
 	// CREATE TABLE SEMESTER
 	$query = "CREATE TABLE semester
@@ -96,47 +76,7 @@
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);
-	
-	
-	//CREATE TABLE CLASS
-	$query = "CREATE TABLE class
-		(
-			id INT AUTO_INCREMENT NOT NULL ,
-			department_id INT NOT NULL,
-			section_name CHAR NOT NULL,
-			semester_id INT NOT NULL,
-			PRIMARY KEY(id)
-		);";
-	$result = mysqli_query($dbc,$query);
-	
-	
-	
-	
-	
-	
-	//CREATE TABLE MAIN ENTRY
-	$query = "CREATE TABLE main_entry
-			(
-				id INT AUTO_INCREMENT NOT NULL ,
-				faculty_id INT,
-				date DATETIME,
-				subject VARCHAR(100),
-				PRIMARY KEY(id)
-			);";
-	$result = mysqli_query($dbc,$query);
-	
-	
-	//CREATE TABLE CLASS ENTRY
-	$query = "CREATE TABLE days_entry
-			(
-				id INT AUTO_INCREMENT NOT NULL ,
-				class_id INT NOT NULL,
-				period_id INT,
-				strength INT NOT NULL,
-				PRIMARY KEY(id)
-			);";
-	$result = mysqli_query($dbc,$query);
-	
+	//Write insert table for writing default semester...
 	
 	
 	//CREATE TABLE CLASS ENTRY
@@ -145,23 +85,6 @@
 				id INT AUTO_INCREMENT NOT NULL ,
 				subject VARCHAR(100),
 				PRIMARY KEY(id)
-			);";
-	$result = mysqli_query($dbc,$query);
-	
-	//CREATE TABLE CLASS ENTRY
-	$query = "CREATE TABLE  `lab_period_join`
-			(
-				lab_entry_id INT NOT NULL,
-				period_id INT NOT NULL,
-			);";
-	$result = mysqli_query($dbc,$query);
-	
-	
-	//CREATE TABLE CLASS JOIN
-	$query = "CREATE TABLE class_join
-			(
-				main_entry_id INT,
-				class_entry_id INT
 			);";
 	$result = mysqli_query($dbc,$query);
 	
@@ -176,54 +99,60 @@
 	$result = mysqli_query($dbc,$query);
 	
 	
-	//CREATE TABLE PERIOD
-	$query = "CREATE TABLE period
+	//CREATE TABLE PERIOD_ENTRY
+	$query = "CREATE TABLE period_entry
 			(
 				id INT AUTO_INCREMENT NOT NULL ,
-				period INT,
+				time TIME,
+				subject_id INT,
+				faculty_id  INT,
+				lab INT,
+				batch INT,
+				strength INT,
+				days_entry_id INT,
+				INDEX days_id (days_entry_id),
+				FOREIGN KEY (days_entry_id)
+					REFERENCES days_entry(id)
+					ON DELETE CASCADE,
+				
+				FOREIGN KEY (faculty_id)
+					REFERENCES faculty(id),
+					
+				FOREIGN KEY (subject_id)
+					REFERENCES subject(id),	
+				
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);
 	
-	
-	//CREATE TABLE LAB ENTRY
-	$query = "CREATE TABLE lab_entry
+	//CREATE TABLE DAYS_ENTRY
+	$query = "CREATE TABLE days_entry
 			(
 				id INT AUTO_INCREMENT NOT NULL ,
-				lab_id INT,
-				strength INT NOT NULL,
+				date DATE,
+				department_id INT,
+				semester_id INT,
+				section_name CHAR(2),
+				INDEX depart_id (department_id),
+				FOREIGN KEY (department_id)
+					REFERENCES department(id)
+					ON DELETE CASCADE,
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);
 	
-	
-	//CREATE TABLE LAB
-	$query = "CREATE TABLE lab
+
+	//CREATE TABLE DAYS_ENTRY
+	$query = "CREATE TABLE period_join
 			(
-				id INT AUTO_INCREMENT NOT NULL ,
-				class_id INT NOT NULL,
-				batch_id INT NOT NULL,
-				PRIMARY KEY(id)
+				period_entry_id INT,
+				FOREIGN KEY (period_entry_id)
+					REFERENCES period_entry(id)
+					ON DELETE CASCADE,
+				period INT
 			);";
 	$result = mysqli_query($dbc,$query);
-	
-	
-	//CREATE TABLE LAB PERIOD JOIN
-	$query = "CREATE TABLE lab_period_join
-			(
-				period_id INT NOT NULL,
-				lab_entry_id INT NOT NULL,
-			);";
-	$result = mysqli_query($dbc,$query);
-	
-	
-	//CREATE TABLE LAB JOIN
-	$query = "CREATE TABLE lab_join
-			(
-				lab_entry_id INT NOT NULL,
-				main_entry_id INT NOT NULL
-			);";
-	$result = mysqli_query($dbc,$query);
+
 	
 	
 	mysqli_close($dbc);

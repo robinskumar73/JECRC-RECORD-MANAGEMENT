@@ -67,6 +67,29 @@ border:1px solid #333333;
 	
 }
 
+.link{
+	color:#49c131 !important;
+	display: block;
+		
+}
+
+.alert_link{
+	
+	display: block;
+	text-decoration:none;	
+}
+
+.alert_link:hover{
+	display: block;
+	text-decoration:none;	
+}
+
+
+
+.link:hover{
+	color:#49c131 !important;
+}
+
 .jecrc-nav-dept:hover{
 	color:#2d82dc !important;
 }
