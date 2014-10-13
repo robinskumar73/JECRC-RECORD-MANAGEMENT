@@ -54,13 +54,12 @@ include_once 'modules/loadingbar.php';
           				<a class="navbar-brand" href="#">JECRC RECORD MANAGEMENT</a>
         			</div>
         			<div class="navbar-collapse collapse" >
-          				<ul class="nav navbar-nav navbar-right">
-            				<li class="jecrc-nav-hide"><a href="#">Dashboard</a></li>
-            				<li class="jecrc-nav-hide"><a href="#">Settings</a></li>
-            				<li class="jecrc-nav-hide"><a href="#">Profile</a></li>
+          				<ul id="collapse-nav-bar" class="nav navbar-nav navbar-right">
+                        	<h3 class="navbar-text jecrc-nav-hide ">Departments</h3>
+            		<!--		<li class="jecrc-nav-hide"><a href="#">Settings</a></li>-->
           				</ul> 
                         <a id="Login" class="navbar-text navbar-right jecrc-nav-dept" href="modules/loginscript/include/processes.php?log_out=true">Logout</a>
-          				<a class="navbar-text navbar-right jecrc-nav-dept" href="#">+ Create Department </a>
+          				<!--<a class="navbar-text navbar-right jecrc-nav-dept" href="#">+ Create Department </a>-->
         			</div>
             	</div><!--End of NAVBAR ROW DIV-->
      		</div><!--End of NAVBAR -->
@@ -271,7 +270,7 @@ include_once 'modules/loadingbar.php';
     					<button type="button" id="create-dept" class="btn btn-primary jecrc-create-btn">Create</button>
                         
 
-					</div>
+				    </div>
                                         
                     <div id="AddSemester" class="col-sm-12 AddSemester hide">
                     	<h4 class="blue-text semAddHeading">Add Semester</h4>

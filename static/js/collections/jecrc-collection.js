@@ -21,6 +21,10 @@ app.Collection.Branch = Backbone.Collection.extend({
 	url: '/Manage/modules/department.php/branch'
 });
 
+app.Collection.Subject = Backbone.Collection.extend({
+	model:app.Model.Subject
+});
+
 
 
 app.Collection.Faculty = Backbone.Collection.extend({

@@ -18,19 +18,18 @@ $(document).ready(function(e) {
 		dept_views.render();
 		var department = app.Global.Department.pluck("name");
 		var dept = JSON.stringify(department);
-
- 
+		
+		
 		$('#DepartmentCreate .typeahead').typeahead({
-  		hint: true,
-  		highlight: true,
-  		minLength: 1
+		  hint: true,
+		  highlight: true,
+		  minLength: 1
 		},
 		{
-  		name: 'dept',
-  		displayKey: 'value',
-  		source: substringMatcher(department)
+		  name: 'dept',
+		  displayKey: 'value',
+		  source: substringMatcher(department)
 		});
-
 	});
 
 });

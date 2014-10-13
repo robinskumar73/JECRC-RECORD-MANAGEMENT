@@ -10,55 +10,48 @@ app.Routers =  app.Routers || {};
 app.Routers = Backbone.Router.extend({
 	routes:{
 		"department/:name" : "showDepartment",
-		"faculty/department/:dept_name/semester/:semester_name/section/:section_name" : "FacultyBranchEntry"
+		"department/:dept_name/semester/:semester_name/section/:section_name" : "FacultyEntry"
 	},
 	
 	
 	
-	
-	showBranchReport: function(dept_name, semester_name, section_name ){
-		//Now fecthing report collection based on department..
-			var periodEntryCollection = new app.Collection.periodEntry;
-			periodEntryCollection.url = "modules/department.php/entry/department/" + dept_name +"/semester/" + semester_name + "/section/" + section_name;
-			//Now fetching data...		
-			periodEntryCollection.fetch({
-			error: function () {
-				app.Global.hideLoadingBar();
-				console.log('Error fetching department wise entry from database..');
-			},
-			success: function(list_array){
-				app.Global.hideLoadingBar();
-				console.log('Successfully fetched department wise entry data..');
-				//Getting the dates of entry in decreasing order..
-				var entry_arr  = $.unique(periodEntryCollection.pluck("days_entry_id"));
-				//app.Global.entry_model = entry_arr;
-				//Now processing each entry one by one..
-				//<div id="" class="col-md-8 statistics  ">
-				$("#jecrc-main-screen").html('');
-				app.Global.arr = [];
-				for(var i=0; i<entry_arr.length; i++)
-				{
-						//console.log("I am looping");
-						//finding the entry model one by one....
-						var entry_model_arr = periodEntryCollection.where({ "days_entry_id":entry_arr[i] });
-						//Now load this view..
-						var periodView = new app.Views.periodEntry({collection:entry_model_arr});
-						$("#jecrc-main-screen").append(periodView.render().el);
-						$(".report-dept-info").addClass('hide');
-				}
-			}
-		});
+	FacultyEntry : function(dept_name, semester_name, section_name ){
+		  if(app.Global.Department.length === 0)
+		  {
+			  app.Global.Department.fetch({
+				  error: function () {
+					  console.log('Error fetching department..');
+				  },
+				  success: function(){
+					  FacultyBranchEntry(dept_name, semester_name, section_name ); 
+				  }
+			  });
+		  }
+		  else{
+			  
+			 FacultyBranchEntry(dept_name, semester_name, section_name ); 
+		  }
 		
 		
 	},
 	
 	
+	
+	
+	
+	//ROuter for displaying dapartment...
 	showDepartment: function(name){
-		
-		//Showing loading bar..
-		app.Global.showLoadingBar();
 		//fetching branch and storing it in collection...
-		app.Global.Branch.fetch({
+		fetchBranch(name);		
+	}
+});
+
+//Fetching branch...
+var fetchBranch = function(name){
+	$("#faculty-entry-record").empty();
+	//Showing loading bar...
+	app.Global.showLoadingBar();
+	app.Global.Branch.fetch({
 		error: function () {
 			app.Global.hideLoadingBar();
 			console.log('Error fetching branch from database..');
@@ -81,27 +74,18 @@ app.Routers = Backbone.Router.extend({
 						app.Global.render_department(name);
 					}
 				});
-				console.log("returning null");
 			}
 			else
 			{
 				//Just call department..
-				console.log('Simply calling department..');
+				
 				app.Global.render_department(name);
 			}
 			
 			
 		}
-	
-		
 	});
-	
-		
-	}
-	
-	
-	
-});
+}
 
 
 
@@ -119,7 +103,137 @@ app.Global.render_department =  function(name){
 		app.Global.hideLoadingBar();	
 }
 
+
+
+
+var FacultyBranchEntry =  function(dept_name, semester_name, section_name ){
+		    app.Global.showLoadingBar();
+		    //Now fecthing report collection based on department..
+			var periodEntryCollection = new app.Collection.periodEntry;
+			//Getting the today date for finding the entry..
+			var today_date = getTodayDate();
+			periodEntryCollection.url = "department.php/faculty/department/" + dept_name +"/semester/" + semester_name + "/section/" + section_name;
+			
+			//displaying todayPeriodEntry
+			periodDisplay(dept_name, semester_name, section_name, periodEntryCollection );
+		
+		
+}
+
+
+//Function for showing Period render and showing Entry form display form....
+var periodDisplay = function( dept_name, semester_name, section_name, Periodcollection ){
+	//Now fetching data...		
+	Periodcollection.fetch({
+		  error: function () {
+			  app.Global.hideLoadingBar();
+			  console.log('Error fetching department wise entry from database..');
+		  },
+		  success: function(list_array){
+			  app.Global.hideLoadingBar();
+			  console.log('Successfully fetched faculty today entry data..');
+			  $("#faculty-display-screen").empty();
+			  var entry_arr  = $.unique(Periodcollection.pluck("days_entry_id"));
+			  console.log(entry_arr);
+			  if(entry_arr.length)
+			  {
+				  //Now processing each entry one by one..
+				  //<div id="" class="col-md-8 statistics  ">
+				  $("#faculty-display-screen").html('');
+				 
+				  
+				  for(var i=0; i<entry_arr.length; i++)
+				  {
+						  //finding the entry model one by one....
+						  var entry_model_arr = Periodcollection.where({ "days_entry_id":entry_arr[i] });
+						  //Now load this view..
+						  console.log("Getting the entry model arr length");
+						  
+						  var periodView = new app.Views.periodEntry({collection:entry_model_arr});
+						  //app.Global.x = periodView;
+						  $("#faculty-display-screen").append(periodView.render().el);
+				  }
+			  }//End of if
+			  else{
+				  //load this view..
+				  var periodView = new app.Views.periodEntry({collection:[]});
+				  $("#faculty-display-screen").append(periodView.render().el);	
+			  }
+			  
+			  
+			  //Calling period Entry function..
+			  PeriodEntryRender(dept_name, semester_name, section_name, Periodcollection);
+		  
+		  }
+	});	
+	
+}//Function ends for periodDisplay..
+
+
+//Function for Entry Form 
+var PeriodEntryRender = function(dept_name, semester_name, section_name, Periodcollection){
+	
+	//Rendering faculty view..
+	var dept_model = app.Global.Department.findWhere({"name": dept_name});
+	if(dept_model === undefined){
+		app.Global.Department.fetch({
+			error: function () {
+				console.log('Error fetching department..');
+			},
+			success: function(){
+				console.log('Successfully fecthed department data..');
+				//calling dapartment...	
+				var dept_model = app.Global.Department.findWhere({"name": dept_name});
+				
+				var infoObject = {
+					//semester_name, section_name
+					"department_name"  : dept_model.get("name"),
+					"department_id"    : dept_model.get("id"),
+					"semester_id"      : semester_name,
+					"section_name"     : section_name 	
+				}
+				
+				var periodModel = new app.Model.periodEntry(infoObject);
+			
+				console.log("Rendering the Faculty Entry data..")
+				var facultyEntry = new app.Views.FacultyEntry({
+					model		 : periodModel,				
+					collection   : Periodcollection
+					
+				});
+				
+				facultyEntry.render();
+			}
+		});
+	}
+	else{
+		var infoObject = {
+			//semester_name, section_name
+			"department_name"  : dept_model.get("name"),
+			"department_id"    : dept_model.get("id"),
+			"semester_id"      : semester_name,
+			"section_name"     : section_name 	
+		}
+		console.log("I am rendering period entry");
+		var periodModel = new app.Model.periodEntry(infoObject);
+		var facultyEntry = new app.Views.FacultyEntry({
+			model		 : periodModel,				
+			collection   : Periodcollection
+			
+		});
+		
+		//Appending view to window..
+		$("#faculty-entry-record").html(facultyEntry.render().el);
+	}	
+	
+	
+}//Function ends for PeriodEntryRender
+
+
+
 $(document).ready(function(e) {
-   app.Global.Router = new app.Routers();
-   Backbone.history.start(); 
+    app.Global.Router = new app.Routers();
+	Backbone.history.start({root: "/Manage/"}); 
 });
+
+

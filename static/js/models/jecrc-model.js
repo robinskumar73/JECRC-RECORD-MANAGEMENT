@@ -44,6 +44,14 @@ app.Model.Faculty = Backbone.Model.extend({
 });
 
 
+app.Model.Subject = Backbone.Model.extend({
+	defaults:{
+		id:null,
+		subject:''
+	}
+});
+
+
 //Adding model information for period entry...
 app.Model.periodEntry = Backbone.Model.extend({
 	defaults:{
@@ -59,6 +67,7 @@ app.Model.periodEntry = Backbone.Model.extend({
 		department_id:null,
 		semester_id:null,
 		section_name:null,
+		days_entry_id:""
 		
 	}
 });

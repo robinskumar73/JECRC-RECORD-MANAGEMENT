@@ -96,6 +96,10 @@ app.Views.Department = Backbone.View.extend({
 		for(var i = 0; i< len ; i++)
 		{
 			$("#nav-dept-bar").append('<li><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
+			//Adding to collapse nav bar..
+			$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
+			//collapse-nav-bar
+			
 		}
 		return this;
 		
@@ -390,6 +394,8 @@ app.Views.periodEntry = Backbone.View.extend({
 			console.log("returning from period entry view initialize");
 			return null;
 		}
+		
+		
 		//For checking the lab table..
 		this.lab = {row0:null,row1:null,row2:null};
 		
@@ -500,7 +506,7 @@ app.Views.periodEntry = Backbone.View.extend({
 				  }
 				  
 				  //Adding lab entry..
-				  this.subjectList.append("<td colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
+				  this.subjectList.append("<td style='text-align: center;' colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
 					  
 			}//End of if-else..
 		}//End of for loop..
@@ -511,6 +517,26 @@ app.Views.periodEntry = Backbone.View.extend({
 
 
 
+//-------------------------VIEW FOR FACULTY ENTRY--------------------------
+app.Views.FacultyEntry = Backbone.View.extend({
+	
+	el:$("#faculty-entry-record"),
+	
+	initialize: function(){
+		//get the department name from model..
+		
+	
+		this.dept_name    =  this.model.get("name");
+		this.Template     =   _.template( $("#faculty-entry-form").html() );
+		this.form 	      =  this.Template( {"department": this.dept_name} );
+	},
+	
+	render:function(){
+		$(this.el).empty();
+		$(this.el).append(this.form);
+		return this;	
+	}
+});
 
 //-------------------------VIEW FOR BRANCH---------------------------------
 //View for Adding Branch...
@@ -525,44 +551,13 @@ app.Views.Branch = Backbone.View.extend({
 		var dept_id = this.collection.at(0).get("department_id");
 		this.dept_name = app.Global.Department.findWhere({"id": dept_id}).get("name");
 		this.year = ["I YEAR", "II YEAR", "III YEAR", "IV YEAR"];
-		this.branchTemplate =  _.template( $("#branch-template").html() );
-		console.log(this.branchTemplate);	
+		this.branchTemplate =  _.template( $("#branch-template").html() );	
 		app.Global.dept = false;
 	},
 	
 	el: $("#jecrc-main-screen"),
 	
-	events: {
-		 //"click h4#branch-template-department-name" : "showDepartmentReport",
-		 //"click h4#branch-template-year-name" : "showDepartmentYearReport"	,
-		 //"click h5#branch-template-branch-name" : "showDepartmentBranchName"
-	},
-	
-	
-	//For navigate to show department report function...
-	showDepartmentReport: function(e){
-		//Show loading bar..
-		app.Global.showLoadingBar();
-		app.Global.Router.navigate("report/department/" + this.dept_name , {trigger: true});	
-	},
-	
-	showDepartmentYearReport: function(e){
-		//Show loading bar..
-		app.Global.showLoadingBar();
-		var element = e.target;
-		app.Global.Router.navigate("report/department/" + this.dept_name + "/" + $(element).html() , {trigger: true});	
-	},
-	
-	showDepartmentBranchName: function(e){
-		//Show loading bar..
-		app.Global.showLoadingBar();
-		var element = e.target;
-		var branch = parseBranch($(element).html());
-		//app.Global.Router.navigate("report/department/" + this.dept_name + "/" + $(element).html() , {trigger: true});
-		app.Global.Router.navigate("report/department/" + this.dept_name + "/semester/" + branch[0] + "/section/" + branch[2], {trigger:true});	
-	},
-	
-	
+		
 	
 	render: function(){
 		
@@ -746,7 +741,10 @@ var getSqlDate = function(year, month, day){
 var getTodayDate = function(){
 	var d = new Date();
 	var date  = d.getDate();
+	//JAvascript month 0-11
 	var month = d.getMonth();
+	//converting to sql format month 1-12
+	month=month+1;
 	var year  = d.getFullYear();
 	return getSqlDate(year, month, date);	
 }

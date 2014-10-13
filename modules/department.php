@@ -12,10 +12,12 @@
 
 // Get Methods of Department,Batch,Section,Semester
 	$app->get('/department', 'getAllDepartment');
+	$app->get('/subject/:key', 'getSubject');
 	$app->get('/department/:deptId','getDepartmentById');
 	$app->get('/entry/department/:dept_name/semester/:sem/section/:sec_name','getEntryBysection');
 	$app->get('/entry/department/:dept_name','getEntryBydept');
 	$app->get('/entry/department/:dept_name/year/:year','getEntryByYear');
+	$app->get('/faculty/department/:dept_name/semester/:semester_name/section/:section_name', 'getFacultyTodayEntry');
 	
 	$app->get('/department/:deptId/semester/:semId','getSemesterById');
 	$app->get('/department/:deptId/semester/:semId/section','getAllSection');
@@ -88,9 +90,27 @@ function getBranch(){
 }
 
 
+  function getSubject($key){
+	  $sql = "SELECT * FROM `subject` WHERE `subject` LIKE :key LIMIT 0, 30 ";
+	  	$key = $key."%";
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("key", $key);
+			$stmt->execute();
+			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+			$db = null;
+			echo json_encode($dept);
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			echo 'header("Server Error");';
+		}
+  }
+
+
   //function to get department by id start here
   function getDepartmentById($deptId) {
-		$sql = "SELECT department_name FROM department WHERE id=:deptId";
+		$sql = "SELECT name FROM department WHERE id=:deptId";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);
@@ -104,6 +124,38 @@ function getBranch(){
 			echo 'header("Server Error");';
 		}
     }//function to get department by id end here
+	
+	
+	function getDepartmentNameById($deptId) {
+		$sql = "SELECT name FROM department WHERE id=:deptId";
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("deptId", $deptId);
+			$stmt->execute();
+			$dept = $stmt->fetchObject();
+			$db = null;
+			return $dept->name;
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			echo 'header("Server Error");';
+		}
+    }//function to get department by id end here
+	
+	
+	
+	
+	//get faculty entry by date..
+	//faculty/department/:dept_name/semester/:semester_name/section/:section_name/date/:today_date', 'getFacultyTodayEntry'
+	function getFacultyTodayEntry($dept_name, $semester_name, $section_name)
+	{
+		//$dept_id = getDepartmentId($dept_name);
+		$dept = days_entry_by_section_and_date($semester_name, $section_name, $dept_name );
+		$dept_ = process_days_entry_obj($dept);
+		echo json_encode($dept_);		
+	}
+
+	
 	
 	
 	//Get days entry by section..
@@ -131,15 +183,17 @@ function getBranch(){
 	{
 		//$dept_id = getDepartmentId($dept_name);
 		$dept = days_entry_by_year($year, $dept_name);
-		$dept = process_days_entry_obj($dept);
+		$dept_ = process_days_entry_obj($dept);
 		
-		echo json_encode($dept);
+		echo json_encode($dept_);
 		
 	}
 	
 	
 	function process_days_entry_obj($days_entry_array)
 	{
+		//creating an array..
+		$days_array = array();
 		foreach( $days_entry_array as $dept_one )
 		{	  
 			  $dept_id = $dept_one->id;
@@ -163,7 +217,12 @@ function getBranch(){
 						  $dept_one->strength     =  $period_data->strength;
 						  $dept_one->id           =  $period_data->id;
 						  $dept_one->period		  =  getPeriod($period_data->id);
-						  $dept_one->days_entry_id=  $period_data->days_entry_id; 	
+						  $dept_one->days_entry_id=  $period_data->days_entry_id; 
+						  
+						  //Creating a clone dept_one
+						  $resp = clone($dept_one);
+						  //Pushing to days_array array
+						  array_push($days_array, $resp);	
 				  }
 				  	  
 			  }
@@ -174,9 +233,38 @@ function getBranch(){
 			  }
 		}//End of foreach loop	
 		//return 
-		return $days_entry_array;
+		return $days_array;
 		
 	}
+	
+	//Getting days entry by date and section...
+	function days_entry_by_section_and_date($semester_name, $section_name, $dept_name )
+	{
+		$dept_id = getDepartmentId($dept_name);
+		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name AND date=CURDATE()";
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("semester_id", $semester_name);
+			$stmt->bindParam("section_name", $section_name);
+			$stmt->bindParam("dept_id", $dept_id);
+			//$stmt->bindParam("today_date",  $today_date );
+			$stmt->execute();
+			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+			$db = null;
+			
+			return $dept;
+			
+			
+		}
+		catch(PDOException $e) 
+		{
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}	
+			
+		
+	}
+	
 	
 	//Getting days entry by section...
 	function days_entry_by_section($sem, $sec_name, $dept_name )
@@ -459,7 +547,7 @@ function getPeriod($period_entry_id){
 	
 	
 	//function to get all batch start here
-		function getAllBatch($deptId,$semId,$secId) {
+	function getAllBatch($deptId,$semId,$secId) {
 			$sql = "SELECT batch_name
 					FROM batch
 					WHERE id = ( SELECT batch_id FROM branch
@@ -534,22 +622,29 @@ function getPeriod($period_entry_id){
 		$request = \Slim\Slim::getInstance()->request();
     	$dept = json_decode($request->getBody());
 		//Now inserting to branch table...
-		$sql = "INSERT INTO  `days_entry` (date, department_id, section_name, semester_id) VALUES (NOW(), :department_id, :section_name, :semester_id)";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("department_id", $dept->department_id);
-			$stmt->bindParam("semester_id", $dept->semester_id);
-			$stmt->bindParam("section_name", $dept->section_name);
-			$stmt->execute();
-			$days_entry_id = $db->lastInsertId();
-			$db = null;
-		} catch(PDOException $e) {
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		if($dept->days_entry_id == '')
+		{
+			$sql = "INSERT INTO  `days_entry` (date, department_id, section_name, semester_id) VALUES (NOW(), :department_id, :section_name, :semester_id)";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("department_id", $dept->department_id);
+				$stmt->bindParam("semester_id", $dept->semester_id);
+				$stmt->bindParam("section_name", $dept->section_name);
+				$stmt->execute();
+				$days_entry_id = $db->lastInsertId();
+				$db = null;
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+		}
+		else{
+			//Just update the $days_entry_id variable..
+			$days_entry_id = $dept->days_entry_id;			
 		}
 		
 		//get subject id..
-		$subject_id =  getSubjectId($dept->subjectName);
+		$subject_id =  getSubjectId($dept->subject_name);
 		
 		
 		//Now inserting data to periodEntry
@@ -591,8 +686,11 @@ function getPeriod($period_entry_id){
 			
 		}
 		//End of foreach loop...
+		//echo json_encode($dept);
+		//sending new updated entry to server...
+		$dept_name = getDepartmentNameById($dept->department_id);
+		//getFacultyTodayEntry($dept_name,  $dept->semester_id, $dept->section_name);
 		 echo json_encode($dept);
-		
 	}
 	//End of addEntrybySection function
 
@@ -615,6 +713,7 @@ function getPeriod($period_entry_id){
         $stmt->execute();
         $dept->id = $db->lastInsertId();
         $db = null;
+		//returning this...
         echo json_encode($dept);
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';

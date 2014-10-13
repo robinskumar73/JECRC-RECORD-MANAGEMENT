@@ -52,6 +52,14 @@ include_once 'loadingbar.php';
             
       <!--DIV FOR DISPAYING STATISTICS-->      	
       <div id="jecrc-main-screen"  class="col-md-8 statistics  col-xs-12 ">
+     
+           <div id="faculty-display-screen">
+           		<!--Faculty display screen to be pasted here-->
+           </div>
+           
+           <div id="faculty-entry-record">
+           		<!--Faculty entry form to be pasted here
+           </div> 
            
 	  </div><!--DIV ENDS FOR DISPAYING STATISTICS-->
 

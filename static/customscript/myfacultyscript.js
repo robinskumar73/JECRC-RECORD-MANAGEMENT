@@ -13,25 +13,6 @@ $(document).ready(function(e) {
 			console.log('Successfully fecthed department data..');	
 		}
 	});
-	
-	/*$.when(fetching).done(function(){
-		dept_views.render();
-		var department = app.Global.Department.pluck("name");
-		var dept = JSON.stringify(department);
-
- 
-		$('#DepartmentCreate .typeahead').typeahead({
-  		hint: true,
-  		highlight: true,
-  		minLength: 1
-		},
-		{
-  		name: 'dept',
-  		displayKey: 'value',
-  		source: substringMatcher(department)
-		});
-
-	});*/
 
 });
 
@@ -59,7 +40,31 @@ var substringMatcher = function(strs) {
     cb(matches);
   };
 };
+
+
+var typeAhead = function(){
+	//"/Manage/modules/department.php/subject/"+ value_;
+	/*$('#jecrc-div-entry-typeahead .typeahead').typeahead({
+				hint: true,
+				highlight: true,
+				minLength: 1
+			  },
+			  {
+				name:'subject' ,
+				displayKey: 'value',
+				source: substringMatcher(app.Global.Subjects.pluck("subject"))
+			  }
+		);
+	*/
+	$('#jecrc-div-entry-typeahead .typeahead').typeahead({
+		name: 'typeahead',
+		//remote: '/Manage/modules/department.php/subject/%QUERY',
+		local: ['Audi', 'BMW', 'Bugatti', 'Ferrari', 'Ford', 'Lamborghini', 'Mercedes Benz', 'Porsche', 'Rolls-Royce', 'Volkswagen'],
+		minLength: 1, // send AJAX request only after user type in at least 3 characters
+    });
+	
+	console.log("I am returning");	
+}
  
+	
 
-
-// JavaScript Document

@@ -13,6 +13,8 @@ $Login_Process->check_status($_SERVER['SCRIPT_NAME']);
 <title>JECRC</title>
 <link href="../static/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
 <link href="../static/customstyle/mystyle.css" type="text/css" rel="stylesheet">
+<link href="../static/selectize/selectize.css" type="text/css" rel="stylesheet">
+<link href="../static/selectize/selectize-bootstrap2.css" type="text/css" rel="stylesheet">
 <link rel="icon" type="image/png" href="#" >
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <!--Adjusting for Mobile View-->

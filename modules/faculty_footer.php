@@ -1,6 +1,7 @@
 
 <?php
 require_once 'faculty_template.php';
+require_once 'faculty_body_template.php';
 ?>
 
 <script>
@@ -42,12 +43,13 @@ var faculty = {
 <script src="static/js/Backbone.localStorage-master/backbone.localStorage-min.js"></script>-->
 <script type="text/javascript" src="../static/dependencies/underscore-min.js"></script>
 <script type="text/javascript" src="../static/dependencies/backbone-min.js"></script>
-<script type="text/javascript" src="../static/dependencies/backbone.localStorage-min.js"></script>
+
+
 <!--Now loading MVC related files -->
 <script type="text/javascript" src="../static/js/models/jecrc-model.js"></script>
 <script type="text/javascript" src="../static/js/collections/jecrc-collection.js"></script>
 <script type="text/javascript"  src="../static/js/views/app-pages.js"></script>
-<script type="text/javascript" src="../static/js/views/jecrc-view.js"></script>
+<script type="text/javascript" src="../static/js/views/jecrc-faculty-view.js"></script>
 <script type="text/javascript" src="../static/js/routers/faculty-routers.js"></script>
 <script type="text/javascript" src="../static/js/app-main/jecrc-app-main.js"></script>    
 <script type="text/javascript" src="../static/customscript/myfacultyscript.js"></script>
