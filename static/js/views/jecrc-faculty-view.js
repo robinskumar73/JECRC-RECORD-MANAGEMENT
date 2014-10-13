@@ -400,7 +400,14 @@ app.Views.periodEntry = Backbone.View.extend({
 		else
 		{
 			//For checking the lab table..
-			this.lab = {row0:null,row1:null,row2:null};
+			this.lab = {	
+				row0:null,
+				row1:null,
+				row2:null
+			};
+			/*{period:[], lab:{}, id=[]  } */
+			//For storing lab period information..
+			this.LabPeriodAdd = [];
 			
 			this.periodList   = $("<tr/>");
 			this.subjectList  = $("<tr/>");
@@ -429,7 +436,7 @@ app.Views.periodEntry = Backbone.View.extend({
 		
 		
 		//inserting period data..
-		this.addToList(this.collection);
+		//this.addToList(this.collection);
 		//Now adding date..
 		this.addBody(this.day, this.parse_date);
 		//Adding headers...
@@ -440,6 +447,10 @@ app.Views.periodEntry = Backbone.View.extend({
 		body_.append(this.subjectList);
 		body_.append(this.strengthList);
 		body_.append(this.teacherList);
+		
+		//populating table data..
+		this.addToList(this.collection);
+		
 		this.table.append(body_);
 		return this;	
 	},
@@ -467,22 +478,77 @@ app.Views.periodEntry = Backbone.View.extend({
 	addToList: function(modelArray){
 		for(var i=0; i<modelArray.length; i++){
 			var periodModel = modelArray[i];
-			//console.log("I am checking for lab..");
+			
+			
 			if(periodModel.get("lab") === "0")
 			{
 				   //console.log("I am inside if lab= false..");				
 				  //Adding period
-				  this.periodList.append("<th>" + periodModel.get("period")[0] + "</th>");
+				  //Insert lab period..
+				  for(var j = 0; j<periodModel.get("period").length; j++)
+				  {
+					  //Adding period...
+					  this.periodList.append("<th>" + periodModel.get("period")[j] + "</th>");
+				  }//End of for loop of entering period..
+				  
+				  var periodLen   = periodModel.get("period").length;
+				  
+				  //this.periodList.append("<th>" + periodModel.get("period")[0] + "</th>");
+				  
 				  //Adding subject..
-				  this.subjectList.append("<td>" + periodModel.get("subject_name") + "</td>");
+				  this.subjectList.append("<td colspan='" +periodLen + "' >" + periodModel.get("subject_name") + "</td>");
 				  //Adding subject list..
-				  this.strengthList.append("<td>" + periodModel.get("strength") + "</td>");
+				  this.strengthList.append("<td  colspan='" +periodLen + "' >" + periodModel.get("strength") + "</td>");
 				  //adding teacher list..
-				  this.teacherList.append( "<td>" + getInitialFacultyName( periodModel.get("faculty_name") ) + "</td>" );
+				  this.teacherList.append( "<td colspan='" +periodLen + "' >" + getInitialFacultyName( periodModel.get("faculty_name") ) + "</td>" );
 			}
 			else
 			{
-				  if(this.lab["row0"] === null)
+				
+				  var currentLab = null;
+				  var currentId  = [];
+				  //First check for lab period..
+			      /*{period:[], lab:{}, id=[]  } */
+			      for(var x = 0; x < this.LabPeriodAdd.length; x++ )
+			      {
+						var lab_        = this.LabPeriodAdd[x].lab;
+						var period_     = this.LabPeriodAdd[x].period;
+						//Now matching period with current given period in the model..
+						var givenPeriod = periodModel.get("period");
+						//Now matching both period..
+						if ($(period_).not(givenPeriod).length == 0 && $(givenPeriod).not(period_).length == 0 )
+						{
+							//current lab value 
+							currentLab = lab_;
+							currentId  = this.LabPeriodAdd[x].id;
+							break;	
+						}
+				
+				   }
+				   
+				   //Now inserting values of current lab value is null...
+				   if (currentLab === null){
+						//Insert value to initialize this current period..
+						var lab_        = {	row0:null, row1:null, row2:null };
+						var period_     = periodModel.get("period");
+						//Adding to LabPeriodAdd object
+						//Now updating the currentLab value..
+						currentLab = lab_;
+						//Now setting an random ids to lab elements for fetching..
+						var id0 = app.Global.randomNumber(999,999999);
+						var id1 = app.Global.randomNumber(999,999999);
+						var id2 = app.Global.randomNumber(999,999999);
+						
+						currentId = [id0, id1, id2];
+						
+						this.LabPeriodAdd.push({ "period":period_, "lab": lab_, "id": currentId });
+					   
+				   }
+				   
+				  
+				  
+				
+				  if(currentLab["row0"] === null)
 				  {
 					  //Insert lab period..
 					  for(var j = 0; j<periodModel.get("period").length; j++)
@@ -499,32 +565,44 @@ app.Views.periodEntry = Backbone.View.extend({
 				  var periodLen   = periodModel.get("period").length;
 				  
 				  //Now checking for row-to-fill data...
-				  if(this.lab["row0"] === null)
+				  if(currentLab["row0"] === null)
 				  {	
-				  	  
+				  	  console.log("Inside row0");
 					  row="0";
 					   //Adding lab entry..
-				  	  this.subjectList.append("<td  colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
-					  this.lab["row0"] = true;
+				  	  this.subjectList.append("<td id='"+ currentId[0] +"'  colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
+					 
+					  //Appending dummy list
+					   this.strengthList.append("<td id='"+ currentId[1] +"'  colspan='" +periodLen + "'  rowspan='" + "1" + "'  >" + " -------  " + "</td>" );
+					   this.teacherList.append("<td  id='"+ currentId[2] +"'  colspan='" +periodLen + "'  rowspan='" + "2" + "'  >" + " ------- " + "</td>" );
+					   
+					  //Setting up flags..
+					  currentLab["row0"] = true;
 					  
 				  }
-				  else if (this.lab["row1"] === null)
+				  else if (currentLab["row1"] === null  )
 				  {
+					  console.log("Inside row1");
 					  
+					  var element = this.strengthList.find("td#" + currentId[1]);
+					  $(element).html(subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName);
 					  row="1";
-					  this.strengthList.append("<td  colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
-					  this.lab["row1"] = true;
+					 
+					  currentLab["row1"] = true;
 				  }
 				  else
 				  {
-					 
+					  console.log("Inside row2");
 					  row="2";
-					  this.teacherList.append("<td  colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
-					  this.lab["row2"] = true;
+					  //Finding element..
+					  var element = this.teacherList.find("td#" + currentId[2]);
+					  $(element).html(subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName);
+					  
+					  currentLab["row2"] = true;
 					  //reset stats..
-					  this.lab["row0"] = null;
-					  this.lab["row1"] = null;
-					  this.lab["row2"] = null;
+					  currentLab["row0"] = null;
+					  currentLab["row1"] = null;
+					  currentLab["row2"] = null;
 				  }
 				  
 				 
@@ -585,7 +663,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		$(this.el).empty();
 		$(this.el).append(this.form);
 		//$('input.form-control.jecrc-dept-entry.typeahead').typeahead({
-		console.log("Inside facultyEntry render");
+
 		return this;	
 	},
 	
