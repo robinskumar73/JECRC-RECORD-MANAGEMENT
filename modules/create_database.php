@@ -141,6 +141,26 @@
 			);";
 	$result = mysqli_query($dbc,$query);
 	
+	//CREATE TABLE FOR FACULTY_LOG ENTRY..DEFAULT \'0\'
+	$query = "CREATE  TABLE faculty_log
+			 (
+			 	`id` INT AUTO_INCREMENT NOT NULL,
+				`date` DATE,
+				`time` TIME,
+				`entry_type` enum ('update','create','delete', 'password', 'entry', 'subject') NOT NULL,
+				`info_entry_id`  INT,
+				`faculty_id`  INT NOT NULL,
+				`info` VARCHAR(200),
+				`sub_info` VARCHAR(100),
+				
+				FOREIGN KEY (faculty_id)
+					REFERENCES faculty(id)
+					ON DELETE CASCADE,
+                
+				PRIMARY KEY(id)
+				
+			  );";
+	
 
 	//CREATE TABLE DAYS_ENTRY
 	$query = "CREATE TABLE period_join
@@ -152,8 +172,5 @@
 				period INT
 			);";
 	$result = mysqli_query($dbc,$query);
-
-	
-	
 	mysqli_close($dbc);
 ?>

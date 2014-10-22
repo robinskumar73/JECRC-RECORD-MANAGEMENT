@@ -410,7 +410,7 @@ function getSubjectName($subject_id){
 }
 
 //Getting the subject name..
-function getSubjectId($subject_name){
+function getSubjectId($subject_name, $faculty_id){
 	$sql = "SELECT id FROM subject WHERE subject = :subject_name";
 		try {
 			$db = getConnection();
@@ -436,11 +436,33 @@ function getSubjectId($subject_name){
 				$stmt->execute();
 				$dept = $db->lastInsertId();
 				$db = null;
-				return $dept;
+				
 			} catch(PDOException $e) {
 				echo '{"error":{"text":'. $e->getMessage() .'}}';
 			}
+			
+			//Now adding faculty log entry ..
+			$sql = "INSERT INTO `attendance`.`faculty_log` (`id`, `date`, `time`, `entry_type`, `info_entry_id`, `faculty_id`, `info`, `sub_info` ) VALUES (NULL, CURDATE(), CURTIME(), \"subject\", :subject_id, :faculty_id, :message, :subMessage);";
+			
+			try {
+				$db 		= getConnection();
+				$stmt 		= $db->prepare($sql);
+				$message 	= "Subject has been created.";
+				$stmt->bindParam("faculty_id", $faculty_id);
+				$stmt->bindParam("subject_id", $dept);
+				$stmt->bindParam("message", $message);
+				$stmt->bindParam("subMessage", $subject_name);
+				$stmt->execute();
+				$db = null;
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+			
+			//Returning the department...
+			return $dept;
+				
 		}
+		
 		else{
 			return $dept->id;
 		}	
@@ -663,7 +685,7 @@ function getPeriod($period_entry_id){
 		}
 		
 		//get subject id..
-		$subject_id =  getSubjectId($dept->subject_name);
+		$subject_id =  getSubjectId($dept->subject_name, $dept->faculty_id);
 		
 		
 		//Now inserting data to periodEntry
@@ -704,11 +726,32 @@ function getPeriod($period_entry_id){
 			}
 			
 		}
-		//End of foreach loop...
+		
+		//Now adding FACULTY ENTRY LOG---
+		$sql = "INSERT INTO `attendance`.`faculty_log` (`id`, `date`, `time`, `entry_type`, `info_entry_id`, `faculty_id`, `info`, `sub_info`) VALUES (NULL, CURDATE(), CURTIME(), \"entry\", :period_id, :faculty_id, :message, :sub_info);";
+		
+		try {
+			$db          = getConnection();
+			$stmt        = $db->prepare($sql);
+			if($dept->lab == 0)
+				$message     = 'Class entry done for '.$dept->semester_id . getDepartmentNameById($dept->department_id) .'-'.$dept->section_name;
+			else
+				$message     = 'Lab entry done for '.$dept->semester_id . getDepartmentNameById($dept->department_id) .'-'.$dept->section_name.$dept->batch;
+				
+			$stmt->bindParam("faculty_id", $dept->faculty_id);
+			$stmt->bindParam("period_id", $dept->id);
+			$stmt->bindParam("message", $message);
+			$stmt->bindParam("sub_info", $dept->subject_name);
+			$stmt->execute();
+			$db = null;
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}
+		
+		
 		//echo json_encode($dept);
 		//sending new updated entry to server...
 		$dept_name = getDepartmentNameById($dept->department_id);
-		//getFacultyTodayEntry($dept_name,  $dept->semester_id, $dept->section_name);
 		 echo json_encode($dept);
 	}
 	//End of addEntrybySection function
