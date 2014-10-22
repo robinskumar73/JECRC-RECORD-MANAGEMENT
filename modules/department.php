@@ -419,11 +419,30 @@ function getSubjectId($subject_name){
 			$stmt->execute();
 			$dept = $stmt->fetchObject();
 			$db = null;
-			return $dept->id;
+			//return $dept->id;
 		}
 		catch(PDOException $e) 
 		{
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}	
+		
+		if(!$dept){
+			//Insert object first..
+			$sql = "INSERT INTO `attendance`.`subject` (`id`, `subject`) VALUES (NULL, :subject_name);";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("subject_name", $subject_name);
+				$stmt->execute();
+				$dept = $db->lastInsertId();
+				$db = null;
+				return $dept;
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+		}
+		else{
+			return $dept->id;
 		}	
 }
 

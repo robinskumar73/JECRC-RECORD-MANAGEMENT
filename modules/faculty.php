@@ -43,13 +43,15 @@ include_once 'loadingbar.php';
             				<li class="jecrc-nav-hide"><a href="#">Profile</a></li>
           				</ul> 
                         <a id="Login" class="navbar-text navbar-right jecrc-nav-dept" href="loginscript/include/processes.php?log_out=true">Logout</a>
+                        <a href="#" class="navbar-text h4 navbar-right jecrc-nav-dept " style="margin-right:40px"  onclick="window.print(); return false;"><span class="glyphicon glyphicon-print"><span style="padding-left:6px">Print</span></span></a>
           			</div>
             	</div><!--End of NAVBAR ROW DIV-->
      		</div><!--End of NAVBAR -->
             
        <!----Start of another row --->
       <div>
-            
+      
+        
       <!--DIV FOR DISPAYING STATISTICS-->      	
       <div id="jecrc-main-screen"  class="col-md-8 statistics  col-xs-12 ">
      
@@ -58,7 +60,7 @@ include_once 'loadingbar.php';
            </div>
            
            <div id="faculty-entry-record">
-           		<!--Faculty entry form to be pasted here
+           		<!--Faculty entry form to be pasted here-->
            </div> 
            
 	  </div><!--DIV ENDS FOR DISPAYING STATISTICS-->

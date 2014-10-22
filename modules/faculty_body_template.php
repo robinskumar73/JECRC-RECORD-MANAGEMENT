@@ -1,8 +1,11 @@
 <script id="faculty-entry-form" type="text/template">
 	<div class="col-md-12" >
 		<h4 id="faculty_attendance_heading4"> <%- department %></h4>
-		<!--For displaying info and results-->
-        <p id="dept-info-box" class="text-danger col-sm-12 hide" style="text-align:center"></p>
+		
+        <p id="dept-info-box"> <!--For displaying info and results--> </p>
+		
+		
+		
 		<div class="col-md-12 jecrc-stats">
 			<div id="jecrc-div-entry-typeahead">
 				<input type="text" id="jecrc-subject-entry" class="form-control jecrc-dept-entry" placeholder="Subject Name">
@@ -31,6 +34,7 @@
 						  <label class="btn btn-primary">
 							  <input type="radio" name="options" value="3"> 3
 						  </label>
+						  
 						  <label class="btn btn-primary">
 							  <input type="radio" name="options" value="4"> 4
 						  </label>
@@ -76,4 +80,14 @@
 			</div>
 		</div><!--DIV END FOR jecrc-stats-->
 	</div>
+</script>
+
+
+<script id="display-info" type="text/template">
+	<div id="dept-display-box" class="alert <%= typeInfo %> fade in" role="alert">
+      		<button type="button" class="close" data-dismiss="alert">
+				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
+			</button>
+      		<%= message %>
+    </div>
 </script>

@@ -7,15 +7,13 @@
 
 //Residing everything under a global namespace "app"
 var app = app || {};
-
 //Creating an object for Views....
 app.Views = app.Views || {};
-
 //Now create a global variable accesing department list..
 app.Global = app.Global || {};
 
-app.Global.Department = new app.Collection.Department;
-app.Global.Branch = new app.Collection.Branch;
+
+
 app.Global.DepartmentPresentAlready = false;
 
 //Now creating a views structure for VOTES FLAG 

@@ -43,6 +43,7 @@ var faculty = {
 <script src="static/js/Backbone.localStorage-master/backbone.localStorage-min.js"></script>-->
 <script type="text/javascript" src="../static/dependencies/underscore-min.js"></script>
 <script type="text/javascript" src="../static/dependencies/backbone-min.js"></script>
+<script type="text/javascript" src="../static/selectize.js-master/dist/js/standalone/selectize.min.js"></script>
 
 
 <!--Now loading MVC related files -->

@@ -5,6 +5,16 @@
 	src:url(../bootstrap/fonts/Lato/Lato-Regular.ttf);
 }
 
+/*Setting up print page*/
+@media print
+{
+body * { visibility: hidden; }
+#jecrc-main-screen * { visibility: visible; }
+#faculty-entry-record * {visibility:hidden;} 
+}
+
+
+
 /* -------------------------------------------NAVBAR-------------------------------------------*/
 
 body{
@@ -316,11 +326,13 @@ border:1px solid #333333;
 	
 }
 
-.statistics span::before{
+#faculty-display-screen span::before{
 	content:"-";
 	font-size:20px;
 	font-weight:100;
 }
+
+
 
 .jecrc-stats{
 	border-width:0px 0px 0px 1px;
@@ -336,3 +348,12 @@ border:1px solid #333333;
 	cursor:pointer;
 	cursor: hand;
 }
+
+
+/*---------------------------Adding style for Autoincremnet box----------------------------*/
+
+
+.auto-name{
+	color:#262626 !important;	
+}
+

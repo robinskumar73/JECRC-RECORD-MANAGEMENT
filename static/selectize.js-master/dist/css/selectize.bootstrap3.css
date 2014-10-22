@@ -34,9 +34,11 @@
   padding: 3px 12px;
   border-bottom: 1px solid #d0d0d0;
   background: #f8f8f8;
+  /*
   -webkit-border-radius: 4px 4px 0 0;
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
+  */
 }
 .selectize-dropdown-header-close {
   position: absolute;
@@ -89,9 +91,11 @@
   display: inline-block;
   padding: 1px 0 0 0;
   border-left: 1px solid rgba(0, 0, 0, 0);
+  /*
   -webkit-border-radius: 0 2px 2px 0;
   -moz-border-radius: 0 2px 2px 0;
   border-radius: 0 2px 2px 0;
+  */
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -127,7 +131,9 @@
   display: inline-block;
 }
 .selectize-input {
+	
   border: 1px solid #cccccc;
+  border-width: 1px 0px 1px;
   padding: 6px 12px;
   display: inline-block;
   width: 100%;
@@ -139,9 +145,9 @@
   box-sizing: border-box;
   -webkit-box-shadow: none;
   box-shadow: none;
-  -webkit-border-radius: 4px;
+  /*-webkit-border-radius: 4px;
   -moz-border-radius: 4px;
-  border-radius: 4px;
+  border-radius: 4px;*/
 }
 .selectize-control.multi .selectize-input.has-items {
   padding: 5px 12px 2px;
@@ -158,9 +164,10 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 .selectize-input.dropdown-active {
-  -webkit-border-radius: 4px 4px 0 0;
+ /* -webkit-border-radius: 4px 4px 0 0;
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
+  */
 }
 .selectize-input > * {
   vertical-align: baseline;
@@ -178,7 +185,7 @@
   border: 0 solid rgba(0, 0, 0, 0);
 }
 .selectize-control.multi .selectize-input > div.active {
-  background: #428bca;
+  background: #428bca !important;
   color: #ffffff;
   border: 0 solid rgba(0, 0, 0, 0);
 }
@@ -236,19 +243,23 @@
   box-sizing: border-box;
   -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  -webkit-border-radius: 0 0 4px 4px;
+  /*-webkit-border-radius: 0 0 4px 4px;
   -moz-border-radius: 0 0 4px 4px;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px;*/
 }
 .selectize-dropdown [data-selectable] {
   cursor: pointer;
   overflow: hidden;
+ 
 }
 .selectize-dropdown [data-selectable] .highlight {
-  background: rgba(255, 237, 40, 0.4);
+  /*background: rgba(255, 237, 40, 0.4);
+  background-color:#428bca;*/
   -webkit-border-radius: 1px;
   -moz-border-radius: 1px;
   border-radius: 1px;
+  color:#000000;
+  font-weight:bold;
 }
 .selectize-dropdown [data-selectable],
 .selectize-dropdown .optgroup-header {
@@ -258,7 +269,7 @@
   border-top: 0 none;
 }
 .selectize-dropdown .optgroup-header {
-  color: #777777;
+  color: #262626;
   background: #ffffff;
   cursor: default;
 }
@@ -271,6 +282,7 @@
 }
 .selectize-dropdown .create {
   color: rgba(51, 51, 51, 0.5);
+  color:#261E25;
 }
 .selectize-dropdown-content {
   overflow-y: auto;
@@ -280,6 +292,7 @@
 .selectize-control.single .selectize-input,
 .selectize-control.single .selectize-input input {
   cursor: pointer;
+  
 }
 .selectize-control.single .selectize-input.input-active,
 .selectize-control.single .selectize-input.input-active input {
@@ -323,9 +336,11 @@
   background: #ffffff;
   border: 1px solid #cccccc;
   border: 1px solid rgba(0, 0, 0, 0.15);
+  /*
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  */
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
 }
@@ -342,7 +357,7 @@
   height: 1px;
   margin: 9px 0;
   overflow: hidden;
-  background-color: #e5e5e5;
+  background-color: #262626;
   margin-left: -12px;
   margin-right: -12px;
 }
@@ -356,9 +371,10 @@
   min-height: 34px;
 }
 .selectize-input.dropdown-active {
-  -webkit-border-radius: 4px;
+  /*-webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  */
 }
 .selectize-input.dropdown-active::before {
   display: none;
@@ -395,7 +411,16 @@
   background: none;
   -webkit-box-shadow: none;
   box-shadow: none;
+  /*
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
+  */
+}
+
+
+/*custom editing*/
+.selectize-dropdown-content div{
+	color:#000000 !important;	
+	
 }

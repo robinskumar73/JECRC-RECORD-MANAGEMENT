@@ -109,7 +109,7 @@
 				lab INT,
 				batch INT,
 				strength INT,
-				days_entry_id INT,
+				days_entry_id INT NOT NULL,
 				INDEX days_id (days_entry_id),
 				FOREIGN KEY (days_entry_id)
 					REFERENCES days_entry(id)
@@ -130,9 +130,9 @@
 			(
 				id INT AUTO_INCREMENT NOT NULL ,
 				date DATE,
-				department_id INT,
-				semester_id INT,
-				section_name CHAR(2),
+				department_id INT NOT NULL,
+				semester_id INT NOT NULL,
+				section_name CHAR(2) NOT NULL,
 				INDEX depart_id (department_id),
 				FOREIGN KEY (department_id)
 					REFERENCES department(id)
@@ -145,7 +145,7 @@
 	//CREATE TABLE DAYS_ENTRY
 	$query = "CREATE TABLE period_join
 			(
-				period_entry_id INT,
+				period_entry_id INT NOT NULL,
 				FOREIGN KEY (period_entry_id)
 					REFERENCES period_entry(id)
 					ON DELETE CASCADE,

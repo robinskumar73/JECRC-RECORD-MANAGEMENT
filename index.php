@@ -58,7 +58,10 @@ include_once 'modules/loadingbar.php';
                         	<h3 class="navbar-text jecrc-nav-hide ">Departments</h3>
             		<!--		<li class="jecrc-nav-hide"><a href="#">Settings</a></li>-->
           				</ul> 
+                       
                         <a id="Login" class="navbar-text navbar-right jecrc-nav-dept" href="modules/loginscript/include/processes.php?log_out=true">Logout</a>
+                        
+                         <a href="#" class="navbar-text h4 navbar-right jecrc-nav-dept " style="margin-right:40px"  onclick="window.print(); return false;"><span class="glyphicon glyphicon-print"><span style="padding-left:6px">Print</span></span></a>
           				<!--<a class="navbar-text navbar-right jecrc-nav-dept" href="#">+ Create Department </a>-->
         			</div>
             	</div><!--End of NAVBAR ROW DIV-->
@@ -260,7 +263,7 @@ include_once 'modules/loadingbar.php';
             
                 
                 <!--DIV FOR CREATING DEPT AND OTHER FIELDS-->
-                <div  class="col-sm-4">
+                <div   class="col-sm-4">
                 	<!--For displaying info and results-->
                 	<p id="dept-info-box" class="text-danger col-sm-12 hide" style="text-align:center"></p>
                    <div id="DepartmentCreate" class="col-sm-12 ">

@@ -14,9 +14,6 @@ app.Views = app.Views || {};
 //Now create a global variable accesing department list..
 app.Global = app.Global || {};
 
-app.Global.Department     = new app.Collection.Department;
-app.Global.Branch         = new app.Collection.Branch;
-app.Global.Subjects       = new app.Collection.Subject;
 app.Global.DepartmentPresentAlready = false;
 
 //Now creating a views structure for VOTES FLAG 
@@ -142,7 +139,6 @@ app.Views.Department = Backbone.View.extend({
 	removeNavigationBar:function(model_){
 		//Remove only if department doesnot exist earlier..
 		if(!app.Global.DepartmentPresentAlready){
-			console.log('repetition not found');
 			//Now destroying that model from server..
 			model_.destroy({
 				error: function (model, response) {
@@ -567,7 +563,7 @@ app.Views.periodEntry = Backbone.View.extend({
 				  //Now checking for row-to-fill data...
 				  if(currentLab["row0"] === null)
 				  {	
-				  	  console.log("Inside row0");
+		
 					  row="0";
 					   //Adding lab entry..
 				  	  this.subjectList.append("<td id='"+ currentId[0] +"'  colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
@@ -582,7 +578,6 @@ app.Views.periodEntry = Backbone.View.extend({
 				  }
 				  else if (currentLab["row1"] === null  )
 				  {
-					  console.log("Inside row1");
 					  
 					  var element = this.strengthList.find("td#" + currentId[1]);
 					  $(element).html(subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName);
@@ -592,7 +587,7 @@ app.Views.periodEntry = Backbone.View.extend({
 				  }
 				  else
 				  {
-					  console.log("Inside row2");
+					 
 					  row="2";
 					  //Finding element..
 					  var element = this.teacherList.find("td#" + currentId[2]);
@@ -622,7 +617,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	//el:$("#faculty-entry-record"),
 	
 	initialize: function(){
-		console.log("Inside facultyEntry constructor");
+		
 		this["dept_name"]           =  this.model.get("department_name");
 		this["dept_id"]			    =  this.model.get("department_id");
 		this["semester_id"]         =  this.model.get("semester_id");
@@ -639,6 +634,8 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		else{
 			this.days_entry_id = "";	
 		}
+		
+	
 
 	},
 	
@@ -662,8 +659,6 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	render:function(){
 		$(this.el).empty();
 		$(this.el).append(this.form);
-		//$('input.form-control.jecrc-dept-entry.typeahead').typeahead({
-
 		return this;	
 	},
 	
@@ -691,8 +686,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	},
 	
 	saveEntry : function(){
-		console.log("Enteries getting saved...");
-		this.undelegateEvents();
+		
 		var EntryValue = this.getEntryValue();
 		if (EntryValue === null){
 			return null;	
@@ -702,15 +696,20 @@ app.Views.FacultyEntry = Backbone.View.extend({
 			var that = this;
 			//Creating period entry model...
 			var PeriodModel = new app.Model.periodEntry;
+			//Adding an error validation event listener to it..
+			//Listening to error events..
+		    this.listenTo(PeriodModel, 'invalid', this.validationFailed);
 			PeriodModel.url = "department.php/entry/department/daysEntry";
 			PeriodModel.save(EntryValue,{
 				error: function () {
-					that.displayMessage('Error saving Entry..');
-					
+					//that.displayMessage('Error saving Entry..');
+					that.displayMessage("<strong>Error:</strong> saving entry.", app.Global.alertType[0]);
 				},
 				success: function(){
-					console.log("Successfully added Entry to database..");
-					that.displayMessage("Successfully added Entry to database..");
+					//Undelecating the events..
+					that.undelegateEvents();
+					
+					that.displayMessage("<strong>Successfully</strong> saved entry to database.", app.Global.alertType[1]);
 					
 					//NOW display Batches.. of department..
 					//Look for faculty-routers.js for this function..
@@ -738,6 +737,11 @@ app.Views.FacultyEntry = Backbone.View.extend({
 
     },
 	
+	//Method if model validation fails..
+	validationFailed: function(model){
+		this.displayMessage(model.validationError, app.Global.alertType[3]);
+	},
+	
 	
 	//destroying the view....
 	resetEntryValue : function(){
@@ -754,8 +758,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		//get subject value..
 		var subject = $("#jecrc-subject-entry").val();
 		if(subject === ''){
-			this.displayMessage("Error: Subject cannot be empty.");
-			console.log("subject cannot be empty..");
+			this.displayMessage("<strong>Error:</strong> Subject cannot be empty.", app.Global.alertType[3]);
 			return null;	
 		}
 		
@@ -763,8 +766,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		if(lab){
 			batch = $("#jecrc-batch-entry input:checked").val();
 			if(batch === undefined){
-				this.displayMessage("Error: You must select a batch...");
-				console.log("Batches cannot be empty..");
+				this.displayMessage("<strong>Error:</strong> You must select a Batch.", app.Global.alertType[3]);
 				return null;	
 			}
 		}
@@ -775,15 +777,14 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		
 		var period = this.getPeriod();
 		if(period.length === 0){
-			this.displayMessage("Error: You must select appropriate period.....");
-			console.log("Error: You must select appropriate period.....");
+			this.displayMessage("<strong>Error:</strong> You must select atleast 1 Period.", app.Global.alertType[3]);
 			return null;	
 		}
 		
 		var strength = $("#jecrc-strength-entry").val();
 		if(strength === ''){
-			this.displayMessage("Error: Strength cannot be empty.");
-			console.log("Strength cannot be empty..");
+			//Displaying message with alert type danger..
+			this.displayMessage("<strong>Error:</strong> Strength cannot be empty.", app.Global.alertType[3]);
 			return null;	
 		}
 		
@@ -807,14 +808,14 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		
 	},
 	
-	
-	
 	//Function for diplaying result and console screen...
-	displayMessage : function(message){
+	displayMessage : function(message, type){
+		var Template = _.template( $("#display-info").html() );
+		this.display =  Template( {"message": message, "typeInfo": type } );
 		//Callback for success 
-		$('#dept-info-box').removeClass('hide');
-		$('#dept-info-box').html(message)
-		setTimeout(function(){$('#dept-info-box').addClass('hide');}, 4000);
+		//Now adding this info to form display ..
+		$("#dept-info-box").html(this.display);
+		//setTimeout(function(){$('.alert').alert('close');}, 5000);
 	}
 		
 	
@@ -942,6 +943,26 @@ app.Views.Branch = Backbone.View.extend({
 
 
 
+//-----------------------------------------------View for Faculty Home screen------------------------------------------
+app.Views.Home = Backbone.View.extend({
+	
+	
+	
+	
+	
+	
+	
+	
+	
+});
+
+//----------------------------------------------End of faculty home screen view------------------------
+
+
+
+
+
+
 app.Global.alertType = ["alert-danger", "alert-success", "alert-info", "alert-warning"];
 
 //function for getting random numbers...
@@ -1042,6 +1063,9 @@ var getTodayDate = function(){
 	var year  = d.getFullYear();
 	return getSqlDate(year, month, date);	
 }
+
+
+
 
 
 

@@ -69,7 +69,28 @@ app.Model.periodEntry = Backbone.Model.extend({
 		section_name:null,
 		days_entry_id:""
 		
-	}
+	},
+	
+	validate: function(attrs, options) {
+		//Now validating the subject_name..
+		var subject = attrs.subject_name;
+		var subject_pattern = /[^\d\s\w\.\-]/;
+		var strength_pattern = /[^\d]/;
+		if( subject_pattern.test( subject ) ){
+			//Error occured......
+			return "<strong>Error: </strong> Invalid characters inputted in subject. Only <strong >digits, alphabets, period(.) and spaces  </strong> are allowed for naming subject ";	
+		}
+		if( strength_pattern.test( attrs.strength ) ){
+			//Error occured......
+			return "<strong>Error:</strong>  Use only <strong>digits</strong> for strength entry";	
+		}
+		if( /[^0|1]/.test( attrs.lab ) ){
+			//Error occured......
+			return "<strong>Error:</strong>  Lab must be a <strong>boolean</strong> value.";	
+		}
+		
+	}//End of validate function..
+	
 });
 
 

@@ -1,6 +1,6 @@
 <script type="text/template"  id="faculty-table-data">
 	<h4> <%= day %> </h4>
-	  <span > <%= date %> </span>
+	  <span  > <%= date %> </span>
 	  <div class="col-md-12 jecrc-stats">
 		  <div class="table-responsive">
 			<table class="table table-striped">
