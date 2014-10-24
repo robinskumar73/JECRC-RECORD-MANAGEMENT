@@ -610,7 +610,6 @@ app.Views.periodEntry = Backbone.View.extend({
 });
 
 
-
 //-------------------------VIEW FOR FACULTY ENTRY--------------------------
 app.Views.FacultyEntry = Backbone.View.extend({
 	
@@ -821,6 +820,10 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	
 });
 
+
+
+
+
 //-------------------------VIEW FOR BRANCH---------------------------------
 //View for Adding Branch...
 app.Views.Branch = Backbone.View.extend({
@@ -944,14 +947,147 @@ app.Views.Branch = Backbone.View.extend({
 
 
 //-----------------------------------------------View for Faculty Home screen------------------------------------------
-app.Views.Home = Backbone.View.extend({
+
+app.Views.faculty_entry = Backbone.View.extend({
+	initialize:function(){
+		// Cache the template function for a single item.
+    	this.template = _.template($('#faculty_home_log').html());	
+		
+	},
+	//... is a list tag.
+    tagName:  "li",
+	// The DOM events specific to an item..
+    events: {
+      "click a#log-entry-edit"     : "editEntry",
+	  "click a#log-entry-delete"   : "deleteEntry",
+    },
+	
+	// Re-render the titles of the todo item.
+    render: function() {
+      this.$el.html(this.template(this.model.toJSON()));
+      return this;
+    },
+	
+	editEntry: function(e){
+		e.preventDefault();
+		console.log("Editing the entry..");	
+	},
+	
+	deleteEntry: function(e){
+		e.preventDefault();
+		console.log("deleting the entry..")	
+	}
+	
+});
+
+
+
+
+
+//Main app entry for the faculty page..
+app.Views.activity = Backbone.View.extend({
+	
+	//Initializing the view...
+	initialize: function(){
+		$(this.el).empty();
+		this.listenTo(this.collection, 'add', this.addOne);
+		this.listenTo(this.collection, 'reset', this.addAll);
+		this.offset = 0;
+		this.limit  = 10;
+		//{date:unorderedListelement}
+		this.daysEntryRecord = {};
+		//Now fetching from this collection and reset the collection after fecthing.....
+		this.fetchMore();
+		var that = this;
+		//Adding window scroll option for infinite scroll options...
+		$(window).scroll(_.debounce(function(){
+   			if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+       			console.log("scroll position: near  bottom!");
+				//Now fetch more collection on pagination options..
+				that.fetchMore();
+      		}
+   		},300));
+		
+	},
 	
 	
+	//Adding an function for fetching value from the 
+	fetchMore:function(){
+		var that = this;
+		//var add  = that.offset? true : false;
+		var add = true;
+		console.log("fetching more log data..." + add);
+		//showing the loading bar....
+		app.Global.showLoadingBar();
+		 
+		this.collection.fetch({
+			data: {offset: that.offset, limit:that.limit},
+			add:add,
+			//Adding an error callback...
+			error: function(collection, response, options){
+				app.Global.hideLoadingBar();
+				console.log("Error fetching collection from faculty_entry collection.");	
+			},
+			success: function(collection, response, options){
+				app.Global.hideLoadingBar();
+				console.log("Successfully fetched data of faculty_entry from server.");
+				//Now updating  the offset..
+				var length = response.length;
+				that.offset = that.offset + length;	
+			}
+		 });
+	},//End of fetch more function...
 	
+	//Adding the display element..
+	el: $("#faculty-display-screen"),
 	
+	//Handling when a logModel is added to the collection...
+	addOne: function( logModel ){
+		console.log('Adding a log entry model to view..');
+		//getting a model date..
+		var date      = logModel.get('date');
+		var day       = getDay(date);
+		var absDate   = convertDate(date);
+		
+		//Now checking if same date entry is present already.....
+		if( this.daysEntryRecord[date] === undefined )
+		{
+			var parentElement 			= $('<div class="col-md-12 col-xs-12 "></div>');
+			var dayElement	  			= $('<h4></h4>');
+			var dateElement   			= $('<span></span>');
+			var UnorderedlistElement	= $('<ul class="jecrc-stats log"></ul>')
+			//Append
+			parentElement.append(dayElement);
+			//Appending to parent
+			//Appending the parent element to the document element...
+			$(this.el).append(parentElement);
+			dayElement.append(day);
+			parentElement.append(dateElement);
+			dateElement.append(absDate);
+			parentElement.append(UnorderedlistElement);
+			//Adding entry..
+			this.daysEntryRecord[date] = UnorderedlistElement;
+				
+		}
+		//Now adding view to the entry...
+		var EntryView = new app.Views.faculty_entry({model: logModel});
+		//Now loading the view finally...
+		$(this.daysEntryRecord[date]).append( EntryView.render().el );
+	},
 	
+	//Adding all models to the collection...
+	addAll: function(){
+		//Clearing the main element...
+		//$(this.el).empty();
+		console.log('resetting  the log entry view...');
+		this.collection.each( this.addOne, this );
+	},
 	
-	
+	render: function(){
+		//Clearing the main element...
+		$(this.el).empty();
+		console.log('rendering the log entry view...');
+	}
 	
 	
 });

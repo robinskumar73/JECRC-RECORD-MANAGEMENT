@@ -1,16 +1,19 @@
 <?php
 
 	require ('../Slim/Slim.php');
-	
+	include_once 'database_connection.php';
+	include_once 'helper_department_function.php';
+	//Adding the cache for session limiter...
+	session_cache_limiter(false);
+	session_start();
 
 	\Slim\Slim::registerAutoloader();
 
 	// create new Slim instance
 	$app = new \Slim\Slim();
 	
-	
 
-// Get Methods of Department,Batch,Section,Semester
+	// Get Methods of Department,Batch,Section,Semester
 	$app->get('/department', 'getAllDepartment');
 	$app->get('/subject/:key', 'getSubject');
 	$app->get('/department/:deptId','getDepartmentById');
@@ -18,6 +21,9 @@
 	$app->get('/entry/department/:dept_name','getEntryBydept');
 	$app->get('/entry/department/:dept_name/year/:year','getEntryByYear');
 	$app->get('/faculty/department/:dept_name/semester/:semester_name/section/:section_name', 'getFacultyTodayEntry');
+	//Getting the log details for the faculty log...
+	//Here id is the faculty id..
+	$app->get('/entry/faculty/:id/daysEntry','getAllFacultyLogEntry');
 	
 	$app->get('/department/:deptId/semester/:semId','getSemesterById');
 	$app->get('/department/:deptId/semester/:semId/section','getAllSection');
@@ -35,8 +41,11 @@
 	
 	//Delete methods of Department..
 	$app->delete('/department/:deptId', 'deleteDepartment');
+	//Delete period-faculty entry
+	$app->delete('/entry/faculty/:id/daysEntry/:entryId','deleteEntry');
 	
-	
+	//Update method for updating the period entry..
+	$app->put('/entry/faculty/:id/daysEntry/:entryId', 'updateEntry');
 	
 	$app->run();
 	
@@ -44,9 +53,9 @@
 
 <?php
 
-include_once 'loginscript/include/processes.php';
-$Login_Process = new Login_Process;
-$Login_Process->check_status($_SERVER['SCRIPT_NAME']);
+	include_once 'loginscript/include/processes.php';
+	$Login_Process = new Login_Process;
+	$Login_Process->check_status($_SERVER['SCRIPT_NAME']);
 
 ?>
 
@@ -56,91 +65,62 @@ $Login_Process->check_status($_SERVER['SCRIPT_NAME']);
 <?php
 
 	
-//function to get all department start here
-function getAllDepartment() {
-    $sql = "SELECT * FROM department";
-    try {
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($dept);
-    } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
-		echo 'header("Server Error");';
-    }
-}//function to get all department ends here
-
-
-
-function getBranch(){
-		
-	$sql = "SELECT * FROM branch";
-    try {
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($dept);
-    } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
-		echo 'header("Server Error");';
-    }
-	
-}
-
-
-  function getSubject($key){
-	  $sql = "SELECT * FROM `subject` WHERE `subject` LIKE :key LIMIT 0, 30 ";
-	  	$key = $key."%";
+	//function to get all department start here
+	function getAllDepartment() {
+		$sql = "SELECT * FROM department";
 		try {
 			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("key", $key);
-			$stmt->execute();
+			$stmt = $db->query($sql);
 			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
 			$db = null;
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			echo 'header("Server Error");';
+			header("Server Error");
 		}
-  }
-
-
-  //function to get department by id start here
-  function getDepartmentById($deptId) {
-		$sql = "SELECT name FROM department WHERE id=:deptId";
+	}//function to get all department ends here
+	
+	
+	
+	function getBranch(){
+			
+		$sql = "SELECT * FROM branch";
 		try {
 			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("deptId", $deptId);
-			$stmt->execute();
-			$dept = $stmt->fetchObject();
+			$stmt = $db->query($sql);
+			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
 			$db = null;
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			echo 'header("Server Error");';
+			header("Server Error");
 		}
-    }//function to get department by id end here
+		
+	}
 	
 	
-	function getDepartmentNameById($deptId) {
-		$sql = "SELECT name FROM department WHERE id=:deptId";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("deptId", $deptId);
-			$stmt->execute();
-			$dept = $stmt->fetchObject();
-			$db = null;
-			return $dept->name;
-		} catch(PDOException $e) {
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			echo 'header("Server Error");';
-		}
-    }//function to get department by id end here
+	function getSubject($key){
+		  $sql = "SELECT * FROM `subject` WHERE `subject` LIKE :key LIMIT 0, 30 ";
+			$key = $key."%";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("key", $key);
+				$stmt->execute();
+				$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+				$db = null;
+				echo json_encode($dept);
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header("Server Error");
+			}
+	}
+
+
+ 
+	
+	
+	
 	
 	
 	
@@ -190,334 +170,28 @@ function getBranch(){
 	}
 	
 	
-	function process_days_entry_obj($days_entry_array)
-	{
-		//creating an array..
-		$days_array = array();
-		foreach( $days_entry_array as $dept_one )
-		{	  
-			  $dept_id = $dept_one->id;
-			  $date = $dept_one->date;
-			  $sql = "SELECT * FROM period_entry WHERE days_entry_id = :days_entry_id ";
-			  try {
-				  $db = getConnection();
-				  $stmt = $db->prepare($sql);
-				  $stmt->bindParam("days_entry_id", $dept_id);
-				  $stmt->execute();
-				  $period_entry_data = $stmt->fetchAll(PDO::FETCH_OBJ);
-				  $db = null;
-				  foreach($period_entry_data as $period_data){
-						  $dept_one->time = $period_data->time;
-						  
-						  $dept_one->subject_name =  getSubjectName($period_data->subject_id);
-						  $dept_one->faculty_name =  getFacultyName($period_data->faculty_id);
-						  $dept_one->faculty_id   =  $period_data->faculty_id;
-						  $dept_one->lab		  =  $period_data->lab;
-						  $dept_one->batch        =  $period_data->batch;
-						  $dept_one->strength     =  $period_data->strength;
-						  $dept_one->id           =  $period_data->id;
-						  $dept_one->period		  =  getPeriod($period_data->id);
-						  $dept_one->days_entry_id=  $period_data->days_entry_id; 
-						  
-						  //Creating a clone dept_one
-						  $resp = clone($dept_one);
-						  //Pushing to days_array array
-						  array_push($days_array, $resp);	
-				  }
-				  	  
-			  }
-			  catch(PDOException $e) 
-			  {
-				  echo '{"error":{"text":'. $e->getMessage() .'}}';
-				  echo 'header("Server Error");';
-			  }
-		}//End of foreach loop	
-		//return 
-		return $days_array;
-		
-	}
-	
-	//Getting days entry by date and section...
-	function days_entry_by_section_and_date($semester_name, $section_name, $dept_name )
-	{
-		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name AND date=CURDATE()";
+	//function to get department by id start here
+  function getDepartmentById($deptId) {
+		$sql = "SELECT name FROM department WHERE id=:deptId";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);
-			$stmt->bindParam("semester_id", $semester_name);
-			$stmt->bindParam("section_name", $section_name);
-			$stmt->bindParam("dept_id", $dept_id);
-			//$stmt->bindParam("today_date",  $today_date );
-			$stmt->execute();
-			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-			$db = null;
-			
-			return $dept;
-			
-			
-		}
-		catch(PDOException $e) 
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}	
-			
-		
-	}
-	
-	
-	//Getting days entry by section...
-	function days_entry_by_section($sem, $sec_name, $dept_name )
-	{
-		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("semester_id", $sem);
-			$stmt->bindParam("section_name", $sec_name);
-			$stmt->bindParam("dept_id", $dept_id);
-			$stmt->execute();
-			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-			$db = null;
-			
-			return $dept;
-			
-		}
-		catch(PDOException $e) 
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}	
-		
-	}
-	
-	
-	
-	
-	//Getting days entry by section...
-	function days_entry_by_dept($dept_name )
-	{
-		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("dept_id", $dept_id);
-			$stmt->execute();
-			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-			$db = null;
-			
-			return $dept;
-			
-		}
-		catch(PDOException $e) 
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}	
-		
-	}
-	
-	
-	
-	//Getting days entry by section...
-	function days_entry_by_year($year, $dept_name )
-	{
-		$dept_id = getDepartmentId($dept_name);
-		$year_int = getYear($year);
-		$sem = $year_int*2;
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id IN ( :semester_id, :semester_id_) ";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("semester_id", $year_int);
-			$stmt->bindParam("semester_id_", $sem);
-			$stmt->bindParam("dept_id", $dept_id);
-			$stmt->execute();
-			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-			$db = null;
-			
-			return $dept;
-			
-		}
-		catch(PDOException $e) 
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}	
-		
-	}
-	
-	
-	
-	function getYear($yearName)
-	{
-		switch ($yearName){
-			case "I YEAR":
-				return 1;
-				break;
-				
-			case "II YEAR":
-				return 2;
-				break;
-			
-			case "III YEAR":
-				return 3;
-				break;	
-				
-			case "IV YEAR":
-				return 4;
-				break;	
-		}
-	}
-	
-	function getDepartmentId($name){
-		//Getting department id
-		 $sql = "SELECT id FROM department WHERE name=:dept_name";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("dept_name", $name);
+			$stmt->bindParam("deptId", $deptId);
 			$stmt->execute();
 			$dept = $stmt->fetchObject();
 			$db = null;
-			$dept_id = $dept->id;
-			return $dept_id;
-		}
-		catch(PDOException $e) 
-		{
+			echo json_encode($dept);
+		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header("Server Error");
 		}
-		
-
-	}
-
-
-//Getting the subject name..
-function getSubjectName($subject_id){
-	$sql = "SELECT subject FROM subject WHERE id = :subject_id";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("subject_id", $subject_id);
-			$stmt->execute();
-			$dept = $stmt->fetchObject();
-			$db = null;
-			return $dept->subject;
-		}
-		catch(PDOException $e) 
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}	
-}
-
-//Getting the subject name..
-function getSubjectId($subject_name, $faculty_id){
-	$sql = "SELECT id FROM subject WHERE subject = :subject_name";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("subject_name", $subject_name);
-			$stmt->execute();
-			$dept = $stmt->fetchObject();
-			$db = null;
-			//return $dept->id;
-		}
-		catch(PDOException $e) 
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}	
-		
-		if(!$dept){
-			//Insert object first..
-			$sql = "INSERT INTO `attendance`.`subject` (`id`, `subject`) VALUES (NULL, :subject_name);";
-			try {
-				$db = getConnection();
-				$stmt = $db->prepare($sql);
-				$stmt->bindParam("subject_name", $subject_name);
-				$stmt->execute();
-				$dept = $db->lastInsertId();
-				$db = null;
-				
-			} catch(PDOException $e) {
-				echo '{"error":{"text":'. $e->getMessage() .'}}';
-			}
-			
-			//Now adding faculty log entry ..
-			$sql = "INSERT INTO `attendance`.`faculty_log` (`id`, `date`, `time`, `entry_type`, `info_entry_id`, `faculty_id`, `info`, `sub_info` ) VALUES (NULL, CURDATE(), CURTIME(), \"subject\", :subject_id, :faculty_id, :message, :subMessage);";
-			
-			try {
-				$db 		= getConnection();
-				$stmt 		= $db->prepare($sql);
-				$message 	= "Subject has been created.";
-				$stmt->bindParam("faculty_id", $faculty_id);
-				$stmt->bindParam("subject_id", $dept);
-				$stmt->bindParam("message", $message);
-				$stmt->bindParam("subMessage", $subject_name);
-				$stmt->execute();
-				$db = null;
-			} catch(PDOException $e) {
-				echo '{"error":{"text":'. $e->getMessage() .'}}';
-			}
-			
-			//Returning the department...
-			return $dept;
-				
-		}
-		
-		else{
-			return $dept->id;
-		}	
-}
-
-
-//Getting the faculty name
-function getFacultyName($id){
-	$sql = "SELECT first_name, last_name FROM faculty WHERE id = :id";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("id", $id);
-			$stmt->execute();
-			$dept = $stmt->fetchObject();
-			$db = null;
-			return $dept->first_name .' '. $dept->last_name;
-		}
-		catch(PDOException $e) 
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}	
-}
-
-
-
-
-//Getting period..
-function getPeriod($period_entry_id){
-	$sql = "SELECT period FROM period_join WHERE period_entry_id = :period_entry_id";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("period_entry_id", $period_entry_id);
-			$stmt->execute();
-			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-			$db = null;
-			$period_arr = array();
-			foreach($dept as $period_id){
-				array_push($period_arr, $period_id->period);	
-			}
-			return $period_arr;
-		}
-		catch(PDOException $e) 
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}	
+	}//function to get department by id end here	
 	
 	
-}
-
-
-
-
 	
+	
+	
+
 	//function to get semester by id start here
 		function getSemesterById($deptId,$semId) {
 			$sql = " SELECT semester_name FROM semester
@@ -535,7 +209,7 @@ function getPeriod($period_entry_id){
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			echo 'header("Server Error");';
+			header("Server Error");
 		}
 	}//function to get semester by id end here
 	
@@ -557,7 +231,7 @@ function getPeriod($period_entry_id){
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			echo 'header("Server Error");';
+			header("Server Error");
 		}
 	}//function to get all section end here
 	
@@ -582,7 +256,7 @@ function getPeriod($period_entry_id){
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			echo 'header("Server Error");';
+			header("Server Error");
 		}
 	}//function to get section by id end here
 	
@@ -607,9 +281,11 @@ function getPeriod($period_entry_id){
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			echo 'header("Server Error");';
+			header("Server Error");
 		}
 	}//function to get all batch end here
+
+
 
 
 	//function to get batch by id start here
@@ -634,9 +310,12 @@ function getPeriod($period_entry_id){
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			echo 'header("Server Error");';
+			header("Server Error");
 		}
 	}//function to get batch by id end here
+
+
+
 
 	//function to add department start here
 	function addDepartment() {
@@ -654,6 +333,7 @@ function getPeriod($period_entry_id){
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header ('Server Error');
 		}
 	}//function to add department end here
 
@@ -667,6 +347,9 @@ function getPeriod($period_entry_id){
 		{
 			$sql = "INSERT INTO  `days_entry` (date, department_id, section_name, semester_id) VALUES (NOW(), :department_id, :section_name, :semester_id)";
 			try {
+				$dept->semester_id  = htmlspecialchars(trim($dept->semester_id));
+				$dept->section_name = htmlspecialchars(trim($dept->section_name));
+				 
 				$db = getConnection();
 				$stmt = $db->prepare($sql);
 				$stmt->bindParam("department_id", $dept->department_id);
@@ -677,6 +360,7 @@ function getPeriod($period_entry_id){
 				$db = null;
 			} catch(PDOException $e) {
 				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header ('Server Error');
 			}
 		}
 		else{
@@ -684,48 +368,72 @@ function getPeriod($period_entry_id){
 			$days_entry_id = $dept->days_entry_id;			
 		}
 		
-		//get subject id..
-		$subject_id =  getSubjectId($dept->subject_name, $dept->faculty_id);
-		
-		
-		//Now inserting data to periodEntry
-		$sql = "INSERT INTO `attendance`.`period_entry` (`id`, `time`, `subject_id`, `faculty_id`, `lab`, `batch`, `strength`, `days_entry_id`) VALUES (NULL, CURTIME(), :subject_id, :faculty_id, :lab, :batch, :strength, :days_entry_id)";
-		
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("subject_id", $subject_id);
-			$stmt->bindParam("faculty_id", $dept->faculty_id);
-			$stmt->bindParam("lab", $dept->lab);
-			$stmt->bindParam("batch", $dept->batch);
-			$stmt->bindParam("strength", $dept->strength);
-			$stmt->bindParam("days_entry_id", $days_entry_id);
-			$stmt->execute();
-			$dept->id = $db->lastInsertId();
-			$db = null;
-		} catch(PDOException $e) {
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		//First matching for validation..
+		if( numberMatch(trim($dept->strength)) && numberMatch(trim($dept->lab)) && numberMatch(trim($dept->batch)) )
+		{
+			
+			//get subject id..
+			$subject_id =  getSubjectId($dept->subject_name, $dept->faculty_id);	
+			
+			//Now inserting data to periodEntry
+			$sql = "INSERT INTO `attendance`.`period_entry` (`id`, `time`, `subject_id`, `faculty_id`, `lab`, `batch`, `strength`, `days_entry_id`) VALUES (NULL, CURTIME(), :subject_id, :faculty_id, :lab, :batch, :strength, :days_entry_id)";
+			
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("subject_id", $subject_id);
+				$stmt->bindParam("faculty_id", $dept->faculty_id);
+				$stmt->bindParam("lab", $dept->lab);
+				$stmt->bindParam("batch", $dept->batch);
+				$stmt->bindParam("strength", $dept->strength);
+				$stmt->bindParam("days_entry_id", $days_entry_id);
+				$stmt->execute();
+				$dept->id = $db->lastInsertId();
+				$db = null;
+			} catch(PDOException $e) 
+			{
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header ('Server Error');	
+			}
 		}
+		else
+		{
+			//Validation fails...
+			echo '{"error":{"text":'. 'Invalid characters in the fields.' .'}}';
+			header ('Server Error');
+			return false;	
+		}
+		
 		//Now adding period...
 		foreach($dept->period as $period)
 		{
+			//validating the period..
+			/*if( numberMatch(trim($period)) )
+			{*/
 				//Now inserting data to periodEntry
 				$sql = "INSERT INTO `attendance`.`period_join` (`period_entry_id`, `period`) VALUES (:period_entry_id, :period)";
-			try 
+				try 
+				{
+					$db = getConnection();
+					$stmt = $db->prepare($sql);
+					$stmt->bindParam("period_entry_id", $dept->id);
+					$stmt->bindParam("period", $period);
+					$stmt->execute();
+					$db = null;
+				} 
+				catch(PDOException $e)
+				{
+					echo '{"error":{"text":'. $e->getMessage() .'}}';
+					header ('Server Error');
+				}
+			/*}
+			else
 			{
-				$db = getConnection();
-				$stmt = $db->prepare($sql);
-				$stmt->bindParam("period_entry_id", $dept->id);
-				$stmt->bindParam("period", $period);
-				$stmt->execute();
-				$db = null;
-			} 
-			catch(PDOException $e)
-			{
-				echo '{"error":{"text":'. $e->getMessage() .'}}';
-			}
-			
-		}
+				echo '{"error":{"text":'. 'Invalid characters in period entry. Only digits allowed.' .'}}';
+				header ('Server Error');
+				return false;
+			}*/
+		}//End of foreach loop....
 		
 		//Now adding FACULTY ENTRY LOG---
 		$sql = "INSERT INTO `attendance`.`faculty_log` (`id`, `date`, `time`, `entry_type`, `info_entry_id`, `faculty_id`, `info`, `sub_info`) VALUES (NULL, CURDATE(), CURTIME(), \"entry\", :period_id, :faculty_id, :message, :sub_info);";
@@ -734,9 +442,9 @@ function getPeriod($period_entry_id){
 			$db          = getConnection();
 			$stmt        = $db->prepare($sql);
 			if($dept->lab == 0)
-				$message     = 'Class entry done for '.$dept->semester_id . getDepartmentNameById($dept->department_id) .'-'.$dept->section_name;
+				$message     = 'Class entry created for '.$dept->semester_id . getDepartmentNameById($dept->department_id) .'-'.$dept->section_name.'.';
 			else
-				$message     = 'Lab entry done for '.$dept->semester_id . getDepartmentNameById($dept->department_id) .'-'.$dept->section_name.$dept->batch;
+				$message     = 'Lab entry created for '.$dept->semester_id . getDepartmentNameById($dept->department_id) .'-'.$dept->section_name.$dept->batch.'.';
 				
 			$stmt->bindParam("faculty_id", $dept->faculty_id);
 			$stmt->bindParam("period_id", $dept->id);
@@ -746,15 +454,15 @@ function getPeriod($period_entry_id){
 			$db = null;
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header ('Server Error');
 		}
 		
 		
 		//echo json_encode($dept);
 		//sending new updated entry to server...
 		$dept_name = getDepartmentNameById($dept->department_id);
-		 echo json_encode($dept);
-	}
-	//End of addEntrybySection function
+		echo json_encode($dept);	
+	}//Functions ends for addEntryBysection...
 
 
     //Add batch to database..
@@ -765,79 +473,197 @@ function getPeriod($period_entry_id){
 		//Now inserting to branch table...
 		$sql = "INSERT INTO  `branch` (department_id, semester_id, section_name, batch_id) VALUES (:department_id, :semester_id, :section_name, :batch_id)";
 		
-	try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("department_id", $dept->department_id);
-		$stmt->bindParam("semester_id", $dept->semester_id);
-		$stmt->bindParam("batch_id", $dept->batch_id);
-		$stmt->bindParam("section_name", $dept->section_name);
-        $stmt->execute();
-        $dept->id = $db->lastInsertId();
-        $db = null;
-		//returning this...
-        echo json_encode($dept);
-    } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
-    }
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("department_id", $dept->department_id);
+			$stmt->bindParam("semester_id", $dept->semester_id);
+			$stmt->bindParam("batch_id", $dept->batch_id);
+			$stmt->bindParam("section_name", $dept->section_name);
+			$stmt->execute();
+			$dept->id = $db->lastInsertId();
+			$db = null;
+			echo json_encode($dept);
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header ('Server Error');
+		}
 			
 
-}//Function ends for addBranch
+	}//Function ends for addBranch
 
 
 
 
 
-//function to update department start here
-function updateDepartment($deptId) {
-    $request = Slim::getInstance()->request();
-    $body = $request->getBody();
-    $dept = json_decode($body);
-    $sql = "UPDATE branch SET name=:name, grapes=:grapes, country=:country, region=:region, year=:year, description=:description WHERE id=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("department_id", $dept->department_id);
-        $stmt->bindParam("id", $id);
-        $stmt->execute();
-        $db = null;
-        echo json_encode($dept);
-    } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
-    }
-}//function to update department end here
+	//function to update department start here
+	function updateDepartment($deptId) {
+		$request = Slim::getInstance()->request();
+		$body = $request->getBody();
+		$dept = json_decode($body);
+		$sql = "UPDATE branch SET name=:name, grapes=:grapes, country=:country, region=:region, year=:year, description=:description WHERE id=:id";
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("department_id", $dept->department_id);
+			$stmt->bindParam("id", $id);
+			$stmt->execute();
+			$db = null;
+			echo json_encode($dept);
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header ('Server Error');
+		}
+	}//function to update department end here
 
-function deleteDepartment($deptId){
-	$sql = "DELETE FROM department WHERE id=:id";
-	$sql_1 = "DELETE FROM branch WHERE department_id=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("id", $deptId);
-        $stmt->execute();
-		$db = null;
+	function deleteDepartment($deptId){
+		$sql = "DELETE FROM department WHERE id=:id";
+		$sql_1 = "DELETE FROM branch WHERE department_id=:id";
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("id", $deptId);
+			$stmt->execute();
+			$db = null;
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}
+	}//Function to delete department ends here...
+
+
+	//Function for getting the faculty log entry...
+	//entry/faculty/:id/daysEntry/:entryId','getFacultyLogEntry'
+	//collection.fetch({data: {offset: 30, limit:30}, add: true})
+	function getAllFacultyLogEntry($id)
+	{
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = json_decode($request->getBody());
+		//collection.fetch({data: {offset: 30, limit:30}, add: true})
+		//Setting the max limit faculty log fetch..
+		try 
+		{
+			$limit  = $_GET['limit'];
+			$offset = $_GET['offset'];
+			
+		}catch(ErrorException $e) 
+		{
+			$limit  = 30;
+			$offset = 0;
+		}
+		$limit = (int)(trim($limit));
+		$offset = (int)(trim($offset));
 		
-		$db = getConnection();
-		$stmt = $db->prepare($sql_1);
-        $stmt->bindParam("id", $deptId);
-        $stmt->execute();
-        $db = null;
-    } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
-    }
-}//Function to delete department ends here...
+		//OFFSET 8
+		$sql = "SELECT * FROM `faculty_log` WHERE faculty_id = :faculty_id ORDER BY date DESC LIMIT :limit OFFSET :offset ;";
+		try 
+		{
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam(":faculty_id", $id);
+			$stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
+			$stmt->bindParam(":offset", $offset,  PDO::PARAM_INT);
+			$stmt->execute();
+			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+			$db = null;
+			echo json_encode($dept);
+		} catch(PDOException $e)
+		{
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header("Server Error");
+		}
+	}//Function for getAllFacultyLogEntry ends here....
 
 
-
+	//'/entry/faculty/:id/daysEntry/:entryId','deleteEntry'
+	//function for deleting the period entry...
+	function deleteEntry($id, $entryId)
+	{
+		//Getting the current period info..
+		$period_info = getPeriodEntry($entryId);
+		//Now semester and department info..
+		$days_info   = get_days_entry($period_info->days_entry_id); 
+		
+	 	$sql = "DELETE FROM `period_entry` WHERE `id` = :id AND faculty_id = :faculty_id";
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("id", $entryId);
+			$stmt->bindParam("faculty_id", $id);
+			$stmt->execute();
+			$db = null;
+		} catch(PDOException $e) {
+			header ('Server Error');
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}
+		 
+		 $message     = 'Entry deleted for   ' . $days_info->semester_id . getDepartmentNameById($days_info->department_id) .'-'.$days_info->section_name.'.';
+		 $sub_info = getSubjectName($period_info->subject_id);
+		 
+		//Now logging the entry for the faculty...
+		entry_faculty_log("delete", $id, $message, $sub_info, 'NULL' );
+		
+	}//Function ends for delete entry..
+	
+	
+	//Function for updating Entry ...
+	// entry/faculty/:id/daysEntry/:entryId', 'updateEntry'
+	function updateEntry($id, $entryId)
+	{
+		$request = \Slim\Slim::getInstance()->request();
+		$dept = json_decode($request->getBody());
+		
+		$sql = "UPDATE `period_entry` SET \
+				  `subject_id`= :subject_id,\
+				  `lab`= :lab,\
+				  `batch`= :batch ,\
+				  `strength`= :strength,\
+				   WHERE id = :entryId AND `faculty_id` = :faculty_id" ;
+		
+		$subject_id = getSubjectId( $dept->subject_name, $id );		   
+		
+		try 
+		{
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("subject_id", $subject_id);
+			$stmt->bindParam("lab", $dept->lab);
+			$stmt->bindParam("batch", $dept->batch);
+			$stmt->bindParam("strength", $dept->strength);
+			$stmt->bindParam("entryId", $entryId);
+			$stmt->bindParam("faculty_id", $id);
+			$stmt->execute();
+			$db = null;
+		} catch(PDOException $e) {
+			header ('Server Error');
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}
+		//Updating periods...
+		updatePeriod($dept->period, $entryId);
+		
+		//Now semester and department info..
+		$days_info   = get_days_entry($dept->days_entry_id); 
+		//Writing the log entry...
+		$message     = 'Entry updated for   ' . $days_info->semester_id . getDepartmentNameById($days_info->department_id) .'-'.$days_info->section_name.'.'; 
+		//Now logging the entry for the faculty...
+		entry_faculty_log("update", $id, $message, $dept->subject_name, $dept->id );
+		
+		//sending the response..
+		echo json_encode($dept);	
+			
+	}//Function ends for updateEntry...
+  
+	
+	
+	
 	
 	function getConnection() {
-    $dbhost="127.0.0.1";
-    $dbuser="root";
-	
-    $dbpass="";
-    $dbname="attendance";
-    $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
-    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return $dbh;
-}
+		$dbhost= HOST;
+		$dbuser= USERNAME;
+		
+		$dbpass= PASSWORD;
+		$dbname= DATABASE;
+		$dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
+		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		return $dbh;
+	}
 ?>

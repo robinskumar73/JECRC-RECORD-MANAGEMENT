@@ -33,8 +33,6 @@ app.Global.hideLoadingBar = function(){
 //Function for custom selecting autocomplete ...
 customSubjectSelectize = function(elementObj){
 	
-	
-	
 	//Initializing the selectize function...
 	app.subjectSelect = $(elementObj).selectize({
 		

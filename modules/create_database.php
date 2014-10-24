@@ -116,10 +116,12 @@
 					ON DELETE CASCADE,
 				
 				FOREIGN KEY (faculty_id)
-					REFERENCES faculty(id),
+					REFERENCES faculty(id)
+					ON DELETE SET NULL,
 					
 				FOREIGN KEY (subject_id)
 					REFERENCES subject(id),	
+					ON DELETE CASCADE,
 				
 				PRIMARY KEY(id)
 			);";

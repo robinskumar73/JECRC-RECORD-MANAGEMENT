@@ -4,13 +4,18 @@
 
 $(document).ready(function(e) {
     
-
+	var entryLogCollection = new app.Collection.faculty_entry;
+	
+	//Loading the homepage view...
+	app.home = new app.Views.activity({collection : entryLogCollection});
+	
 	var fetching =   app.Global.Department.fetch({
 		error: function () {
 			console.log('Error fetching department..');
 		},
 		success: function(){
 			console.log('Successfully fecthed department data..');	
+			
 		}
 	});
 

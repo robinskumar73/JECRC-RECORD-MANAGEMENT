@@ -35,12 +35,46 @@ app.Collection.periodEntry = Backbone.Collection.extend({
 	
 	model:app.Model.periodEntry,
 	//url is used only in case of posting values...
-	url:"/entry/department/daysEntry",
+	url:"/Manage/modules/department.php/entry/department/daysEntry",
 	
 	//Sorting the collection in decreasing order of date..
 	comparator: function(periodEntryModel) {
 		return -periodEntryModel.get("date");
 	}
+});
+
+//Collection for faculty entry...
+app.Collection.faculty_entry = Backbone.Collection.extend({
+	model:app.Model.faculty_entry,
+	//Adding the url for fecthing the value from the server...
+	url:"/Manage/modules/department.php/entry/faculty/" + faculty.id + "/daysEntry",
+	
+	//Sorting the collection in decreasing order of date..
+	comparator: function(Model) {
+		return Model.get("date");
+	},
+	
+	//For getting the date wise entry object ...
+	/*
+	{
+		12-04-2014:[contains list of model of this date],
+	}
+		
+	*/
+	getDateWiseEntry: function(){
+		var dateWiseFacultyEntry = {};	
+		//Getting the list of unique dates...
+		var dateList = $.unique(this.pluck("date"));
+		//Now arraging the list according to the array...
+		for (var i = 0; i< dateList.length; i++)
+		{
+			dateWiseFacultyEntry[dateList[i]] = this.where({ date: dateList[i] });	
+		}
+		return dateWiseFacultyEntry;
+	}
+	
+	
+	
 });
 
 

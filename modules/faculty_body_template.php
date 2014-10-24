@@ -83,28 +83,22 @@
 </script>
 
 <!--Template for creating faculty entry log -->
-<script id="faculty-home-log" type="text/template">
-	<div class="col-md-12 col-xs-12 ">
-		<h4> <%- day %> </h4>
-		<span> <%- date %> </span>
-		<ul class="jecrc-stats log">
-			<li>
-				<div class="log-entry-circle"></div>
-				<blockquote  class="log-entry">
-					<p> <%- message %> </p>
-					<footer><%= typeId %>  <cite title="Source Title"> <%- typeName %> </cite></footer>
-					<div style="margin-left:8px;">
-						<a style="display:inline-block" href="#">
-						  <p class="log-entry-icon glyphicon glyphicon-edit"></p>
-						</a> 
-						<a style="display:inline-block" href="#">
-						  <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
-						</a> 
-					</div>    
-				</blockquote> 					  
-			</li>
-		</ul>
-	</div>
+<script id="faculty_home_log" type="text/template">
+	<div class="log-entry-circle"></div>
+	<blockquote  class="log-entry">
+		<p> <%- info %> </p>
+		<footer> <%- entry_type %>  <cite title="Source Title"> <%- sub_info %> </cite></footer>
+		<% if(entry_type === 'update' || entry_type === 'entry' || entry_type === 'subject') { %>
+			<div style="margin-left:8px;">
+				<a id="log-entry-edit" style="display:inline-block" href="#">
+				  <p class="log-entry-icon glyphicon glyphicon-edit"></p>
+				</a> 
+				<a id="log-entry-delete" style="display:inline-block" href="#">
+				  <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
+				</a> 
+			</div>  
+		<% } %>  
+	</blockquote> 					  
 </script>
 
 

@@ -1,15 +1,16 @@
 <?php
+include '../../database_connection.php';
 
 # Databse Infomation
 
 // Database Server (localhost)
-define("DBHOST","localhost");
+define("DBHOST",HOST);
 // Database Username
-define("DBUSER","root"); 
+define("DBUSER",USERNAME); 
 // Database Password
-define("DBPASS","");                           
+define("DBPASS",PASSWORD);                           
 // Database Name
-define("DBNAME","attendance");                     
+define("DBNAME",DATABASE);                     
 // Database Tabel
 define("DBTBLE","faculty");                          
 

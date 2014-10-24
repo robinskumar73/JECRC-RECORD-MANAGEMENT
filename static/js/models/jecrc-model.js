@@ -52,6 +52,35 @@ app.Model.Subject = Backbone.Model.extend({
 });
 
 
+//Model for faculty entry...
+app.Model.faculty_entry = Backbone.Model.extend({
+	defaults:{
+		date: '',
+		time: '',
+		entry_type:	'',
+		info_entry_id: null,
+		faculty_id: null,
+		info:	'',
+		sub_info:''	
+	},
+	
+	//Function for validating the model..
+	validate: function(attrs, options) {
+		//checking for sub_info ...
+		//checking for info...
+		var info = attrs.info;
+		var infoPattern = /[^\d\s\w\.\-]/;
+		if( infoPattern.test( info ) || infoPattern.test(sub_info) ){
+			//Error occured......
+			return "<strong>Error: </strong> Invalid characters inputted in activity log.";	
+		}
+	}//End of validate function...
+});//End of model faculty entry...
+
+
+
+
+
 //Adding model information for period entry...
 app.Model.periodEntry = Backbone.Model.extend({
 	defaults:{
