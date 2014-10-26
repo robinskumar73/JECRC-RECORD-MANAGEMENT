@@ -74,6 +74,7 @@
 	
 			  <div class="col-sm-12">
 				<input type="text" id="jecrc-strength-entry" style="margin-bottom:20px;" class="form-control jecrc-dept-entry"  placeholder="Strength">
+				
 				<input type="button" value="Save" id="faculty_save_button" class="btn btn-success faculty_button"></input>
 				<input type="button" value="Reset" id="faculty_reset_button" class="btn btn-danger faculty_button"></input>
 			  </div>
@@ -121,11 +122,34 @@
 
 <script id="entry-log-alert-body" type="text/template">
 		<h4> <%- title %> </h4>
-		<p> <%- body %> </p>
+		<p> <%= body %> </p>
 		<p>
 		  <button type="button" id="entry-action-btn" class="btn btn-danger"> <%- action %> </button>
 		  <button type="button" id="entry-close-btn" class="btn btn-default"> Cancel </button>
 		</p>
 	</div><!--End of alert box-->
 	
+</script>
+
+
+
+<script id="alert-modal" type="text/template">
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+		  <h4 class="modal-title" id="myModalLabel"><%= heading %></h4>
+		</div>
+		<div class="modal-body">
+		  <%= body %>
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		  <button type="button" class="btn btn-primary">Save changes</button>
+		</div>
+	  </div>
+	</div>
+  </div>
 </script>

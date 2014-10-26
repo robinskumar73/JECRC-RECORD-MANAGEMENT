@@ -229,7 +229,7 @@ var PeriodEntryRender = function(dept_name, semester_name, section_name, Periodc
 			collection   : Periodcollection,
 			update		 : false
 		});
-		
+		x = facultyEntry;
 		//Appending view to window..
 		$("#faculty-entry-record").html(facultyEntry.render().el);
 		

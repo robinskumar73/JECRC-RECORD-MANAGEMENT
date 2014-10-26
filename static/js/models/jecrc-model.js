@@ -79,7 +79,7 @@ app.Model.faculty_entry = Backbone.Model.extend({
 			return "<strong>Error: </strong> Invalid characters inputted in activity log.";	
 		}
 		
-		if(!attrs.info_entry_id && infoEntryIdPattern.test( attrs.info_entry_id ) )
+		if( attrs.info_entry_id && infoEntryIdPattern.test( attrs.info_entry_id ) )
 		{
 			//Error occured......
 			return "<strong>Error: </strong> Invalid characters inputted in info_entry_id.";
@@ -135,7 +135,7 @@ app.Model.periodEntry = Backbone.Model.extend({
 			//Error occured......
 			return "<strong>Error:</strong>  Lab must be a <strong>boolean</strong> value.";	
 		}
-		if(!datePattern.test(attrs.date))
+		if(attrs.date && !datePattern.test(attrs.date))
 		{
 			//Error occured......
 			return "<strong>Error: </strong> Invalid date format. Only this format is supported <strong>'yyyy-dd-mm'</strong>";

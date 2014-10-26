@@ -687,9 +687,16 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		
 		
 	},
-	
+	//Only used for updating the entry form...
 	//setting value if already present in the model...
 	setValue : function( ){
+		//Hiding the save and cancel buttons...
+		var saveBtn    = this.$el.find("#faculty_save_button");
+		var cancelBtn  = this.$el.find("#faculty_reset_button");
+		//Detaching both the buttons...
+		$(saveBtn).remove();
+		$(cancelBtn).remove();
+		
 		if( this.model.get("subject_name") ){
 			//Adding the subject firsts..	
 			this.autoSelect.addOption({
@@ -746,6 +753,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		var strengthElement = this.$el.find("#jecrc-strength-entry");
 		$(strengthElement).val( this.model.get("strength") );
 		
+		
 	},//End of save function...
 
 	saveEntry : function(){
@@ -788,6 +796,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		
 	},
 	
+	//destroying the view..
 	destroy_view: function() {
 		//COMPLETELY UNBIND THE VIEW
 		this.undelegateEvents();
@@ -1031,7 +1040,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 app.Views.alertBody = Backbone.View.extend({
 	initialize : function(){
 		this.template =  _.template( $('#"entry-log-alert-body').html() );
-		
+		//alert-modal
 		if( this.model.get('entry_type') === 'entry' || this.model.get('entry_type') === 'update' ){
 		  this.periodModel 	=  new app.Model.faculty_entry();
 		  //Now listen to this model on add...
