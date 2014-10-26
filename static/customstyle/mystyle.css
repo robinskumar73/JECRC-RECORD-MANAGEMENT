@@ -314,19 +314,19 @@ border:1px solid #333333;
 		
 }
 
-/*----------------------ADMIN PANEL STATISTICS AREA------------------------------*/
-.statistics h4{
+/*----------------------PANEL STATISTICS AREA------------------------------*/
+.statistics h4.log_day, #faculty_attendance_heading4, .statistics h4.report-dept-info{
 	color:#49c131;
 	display:inline-block;		
 }
 
-.statistics span{
+.statistics span.log_date, .statistics span.report-dept-info {
 	color:#c0c0c0;
 	font-size:16px	
 	
 }
 
-#faculty-display-screen span::before{
+#faculty-display-screen span.log_date::before, #faculty-display-screen span.report-dept-info::before{
 	content:"-";
 	font-size:20px;
 	font-weight:100;

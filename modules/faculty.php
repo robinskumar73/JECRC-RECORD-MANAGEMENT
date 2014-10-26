@@ -57,6 +57,7 @@ include_once 'loadingbar.php';
      
            <div id="faculty-display-screen">
            		<!--Faculty display screen to be pasted here-->
+                <!--
                 <div class="col-md-12 col-xs-12 ">
                   <h4>Wednesday</h4>
                   <span >August 20</span>
@@ -74,97 +75,11 @@ include_once 'loadingbar.php';
                                             <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
                                         </a> 
                                   </div>    
-                              </blockquote> 
-                                                      
-                          </li>
-                         <li>
-                          	  <div class="log-entry-circle"></div>
-                              <blockquote  class="log-entry">
-                                <p>Lab entry for 3CS1 has been created.</p>
-                                 <footer>Subject <cite title="Source Title">Compiler Lab</cite></footer>
-                                  <div style="margin-left:8px;">
-                                        <a style="display:inline-block" href="#">
-                                            <p class="log-entry-icon glyphicon glyphicon-edit"></p>
-                                        </a> 
-                                        <a style="display:inline-block" href="#">
-                                            <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
-                                        </a> 
-                                  </div>    
-                              </blockquote> 
-                                                      
-                          </li>
-                           <li>
-                          	  <div class="log-entry-circle"></div>
-                              <blockquote  class="log-entry">
-                                <p>Lab entry for 3CS1 has been created.</p>
-                                 <footer>Subject <cite title="Source Title">Compiler Lab</cite></footer>
-                                  <div style="margin-left:8px;">
-                                        <a style="display:inline-block" href="#">
-                                            <p class="log-entry-icon glyphicon glyphicon-edit"></p>
-                                        </a> 
-                                        <a style="display:inline-block" href="#">
-                                            <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
-                                        </a> 
-                                  </div>    
-                              </blockquote> 
-                                                      
-                          </li>
-                      </ul> 
-                </div>
-             <div class="col-md-12 col-xs-12 ">
-                  <h4>Thursday</h4>
-                  <span >August 21</span>
-                      <ul class="jecrc-stats log">
-                          <li>
-                          	  <div class="log-entry-circle"></div>
-                              <blockquote style="margin:0px" class="log-entry">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
-                                <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-                                  <div style="margin-left:8px;">
-                                        <a style="display:inline-block" href="#">
-                                            <p class="log-entry-icon glyphicon glyphicon-edit"></p>
-                                        </a> 
-                                        <a style="display:inline-block" href="#">
-                                            <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
-                                        </a> 
-                                  </div>    
-                              </blockquote> 
-                                                      
-                          </li>
-                          <li>
-                          	  <div class="log-entry-circle"></div>
-                              <blockquote style="margin:0px" class="log-entry">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
-                                <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-                                  <div style="margin-left:8px;">
-                                        <a style="display:inline-block" href="#">
-                                            <p class="log-entry-icon glyphicon glyphicon-edit"></p>
-                                        </a> 
-                                        <a style="display:inline-block" href="#">
-                                            <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
-                                        </a> 
-                                  </div>    
-                              </blockquote> 
-                                                      
-                          </li>
-                          <li>
-                          	  <div class="log-entry-circle"></div>
-                              <blockquote style="margin:0px" class="log-entry">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
-                                <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
-                                  <div style="margin-left:8px;">
-                                        <a style="display:inline-block" href="#">
-                                            <p class="log-entry-icon glyphicon glyphicon-edit"></p>
-                                        </a> 
-                                        <a style="display:inline-block" href="#">
-                                            <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
-                                        </a> 
-                                  </div>    
-                              </blockquote> 
-                                                      
-                          </li>
-                      </ul> 
-                </div>
+                              </blockquote>                               
+                        </li>
+                    </ul>
+                </div>-->
+          
                 <!---->
            </div>
            

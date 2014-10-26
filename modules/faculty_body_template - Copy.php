@@ -90,12 +90,12 @@
 		<footer> <%- entry_type %>  <cite title="Source Title"> <%- sub_info %> </cite></footer>
 		<% if(entry_type === 'update' || entry_type === 'entry' || entry_type === 'subject') { %>
 			<div style="margin-left:8px;">
-				<a id="log-entry-edit" style="display:inline-block" href="#">
-				  <p class="log-entry-icon glyphicon glyphicon-edit"></p>
-				</a> 
-				<a id="log-entry-delete" style="display:inline-block" href="#">
-				  <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
-				</a> 
+				  <a id="log-entry-edit" style="display:inline-block" href="#">
+					<p class="log-entry-icon glyphicon glyphicon-edit"></p>
+				  </a> 
+				  <a id="log-entry-delete" style="display:inline-block" href="#">
+					<p  class="log-entry-icon glyphicon glyphicon-trash"></p>
+				  </a>
 			</div>  
 		<% } %>  
 	</blockquote> 					  

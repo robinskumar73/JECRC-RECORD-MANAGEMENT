@@ -9,9 +9,11 @@ var app = app || {};
 //Now create a global variable accesing department list..
 app.Global = app.Global || {};
 
-app.Global.Department     = new app.Collection.Department;
-app.Global.Branch         = new app.Collection.Branch;
-app.Global.Subjects       = new app.Collection.Subject;
+//Some global variable definition...
+app.Global.Department     			= new app.Collection.Department;
+app.Global.Branch         			= new app.Collection.Branch;
+app.Global.Subjects       			= new app.Collection.Subject;
+app.Global.entryLogCollection 		= new app.Collection.faculty_entry;
 
 
 

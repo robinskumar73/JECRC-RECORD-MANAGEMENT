@@ -10,9 +10,17 @@ app.Routers =  app.Routers || {};
 app.Routers = Backbone.Router.extend({
 	routes:{
 		"department/:name" : "showDepartment",
-		"department/:dept_name/semester/:semester_name/section/:section_name" : "FacultyEntry"
+		"department/:dept_name/semester/:semester_name/section/:section_name" : "FacultyEntry",
+		"*path":	"ShowLogActivity"
 	},
 	
+	
+	
+	ShowLogActivity: function(){
+		console.log('loading the default route..');
+		//Loading the homepage view...
+		app.home = new app.Views.activity({collection : app.Global.entryLogCollection});
+	},
 	
 	
 	FacultyEntry : function(dept_name, semester_name, section_name ){

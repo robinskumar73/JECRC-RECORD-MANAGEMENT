@@ -386,7 +386,7 @@ app.Views.periodEntry = Backbone.View.extend({
 		
 		if (this.collection.length === 0){
 			var name      = faculty.first_name + " " + faculty.last_name; 
-			this.name      = getInitialFacultyName(name);
+			this.name     = getInitialFacultyName(name);
 			var date      = getTodayDate();
 			this.day      = getDay(date);
 			this.date     = convertDate(date);
@@ -411,12 +411,12 @@ app.Views.periodEntry = Backbone.View.extend({
 			this.teacherList  = $("<tr/>");
 			
 			//Inserting date
-			this.date           =  this.collection[0].get("date");
+			this.date             =  this.collection[0].get("date");
 			this.department_name  =  app.Global.Department.findWhere({ "id":this.collection[0].get("department_id") }).get("name");
-			this.section_name   =  this.collection[0].get("section_name");
-			this.semester_id    =  this.collection[0].get("semester_id");
-			this.day            =  getDay(this.date);
-			this.parse_date	    =	convertDate(this.date);
+			this.section_name     =  this.collection[0].get("section_name");
+			this.semester_id      =  this.collection[0].get("semester_id");
+			this.day              =  getDay(this.date);
+			this.parse_date	      =	convertDate(this.date);
 		}
 		
 	},//End of initialize function..
@@ -458,8 +458,8 @@ app.Views.periodEntry = Backbone.View.extend({
 		this.$el.append( "<span class='report-dept-info'>" + this.section_name + "</span><hr class='report-dept-info' style='margin-top:0px;margin-bottom:0px;'>");
 		
 		//Adding day..
-		this.$el.append( "<h4>" + day + "</h4>");
-		this.$el.append( "<span>" + date + "</span>");	
+		this.$el.append( "<h4 class='log_day'>" + day + "</h4>");
+		this.$el.append( "<span class='log_date'>" + date + "</span>");	
 		var div1   = $("<div class='col-md-12 jecrc-stats' />");
 		var div2   = $("<div class='table-responsive'/>");	
 		this.table = $("<table class='table table-striped'/>");
@@ -1053,8 +1053,8 @@ app.Views.activity = Backbone.View.extend({
 		if( this.daysEntryRecord[date] === undefined )
 		{
 			var parentElement 			= $('<div class="col-md-12 col-xs-12 "></div>');
-			var dayElement	  			= $('<h4></h4>');
-			var dateElement   			= $('<span></span>');
+			var dayElement	  			= $('<h4 class="log_day"></h4>');
+			var dateElement   			= $('<span class="log_date"></span>');
 			var UnorderedlistElement	= $('<ul class="jecrc-stats log"></ul>')
 			//Append
 			parentElement.append(dayElement);
@@ -1172,13 +1172,13 @@ var getDay = function(sqlDateString){
 	var d = new Date(sqlDateString);
 	var day = d.getDay();
 	var days = {
+		0:"Sunday",
 		1:"Monday",
 		2:"Tuesday",
 		3:"Wednesday",
 		4:"Thursday",
 		5:"Friday",
-		6:"Saturday",
-		7:"Sunday",	
+		6:"Saturday"
 	}
 	return days[day];	
 }//End of getday function..

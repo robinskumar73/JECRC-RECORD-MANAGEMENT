@@ -4,13 +4,13 @@ include '../../database_connection.php';
 # Databse Infomation
 
 // Database Server (localhost)
-define("DBHOST",HOST);
+define("DBHOST",'localhost');
 // Database Username
-define("DBUSER",USERNAME); 
+define("DBUSER",'root'); 
 // Database Password
-define("DBPASS",PASSWORD);                           
+define("DBPASS",'');                           
 // Database Name
-define("DBNAME",DATABASE);                     
+define("DBNAME",'attendance');                     
 // Database Tabel
 define("DBTBLE","faculty");                          
 

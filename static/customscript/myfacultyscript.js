@@ -3,11 +3,6 @@
 //Script Written By Robins Gupta
 
 $(document).ready(function(e) {
-    
-	var entryLogCollection = new app.Collection.faculty_entry;
-	
-	//Loading the homepage view...
-	app.home = new app.Views.activity({collection : entryLogCollection});
 	
 	var fetching =   app.Global.Department.fetch({
 		error: function () {
