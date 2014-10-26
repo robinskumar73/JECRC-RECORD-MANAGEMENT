@@ -55,6 +55,7 @@ app.Model.Subject = Backbone.Model.extend({
 //Model for faculty entry...
 app.Model.faculty_entry = Backbone.Model.extend({
 	defaults:{
+		id:null,
 		date: '',
 		time: '',
 		entry_type:	'',

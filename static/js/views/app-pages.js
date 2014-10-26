@@ -36,7 +36,7 @@ app.Global.hideLoadingBar = function(){
 customSubjectSelectize = function(elementObj){
 	
 	//Initializing the selectize function...
-	app.subjectSelect = $(elementObj).selectize({
+	subjectSelect = $(elementObj).selectize({
 		
 		//Now instantiating values for selectize..
 		theme:false  ,
@@ -99,5 +99,8 @@ customSubjectSelectize = function(elementObj){
 		$(this).on('add', update);
 		//update();
 	});
+	
+	//Now returning the object...
+	return subjectSelect;
 	
 }

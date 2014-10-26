@@ -226,15 +226,15 @@ var PeriodEntryRender = function(dept_name, semester_name, section_name, Periodc
 		var periodModel = new app.Model.periodEntry(infoObject);
 		var facultyEntry = new app.Views.FacultyEntry({
 			model		 : periodModel,				
-			collection   : Periodcollection
-			
+			collection   : Periodcollection,
+			update		 : false
 		});
 		
 		//Appending view to window..
 		$("#faculty-entry-record").html(facultyEntry.render().el);
 		
 	}	
-	customSubjectSelectize($("#jecrc-subject-entry"));
+	
 	
 }//Function ends for PeriodEntryRender
 
