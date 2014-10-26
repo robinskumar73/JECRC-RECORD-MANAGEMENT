@@ -25,7 +25,7 @@
 	//Here id is the faculty id..
 	$app->get('/entry/faculty/:id/daysEntry','getAllFacultyLogEntry');
 	//Route for fetching a peroid by its id..
-	$app->get('/entry/:id','fetchPeriod');
+	$app->get('/entry/:id','fetchPeriodEntry');
 	
 	$app->get('/department/:deptId/semester/:semId','getSemesterById');
 	$app->get('/department/:deptId/semester/:semId/section','getAllSection');
@@ -118,9 +118,9 @@
 			}
 	}
 
-	//$app->get('/entry/:id','fetchPeriod');
+	//$app->get('/entry/:id','fetchPeriodEntry');
 	//Function for fetching the period by its id.
- 	function fetchPeriod($id)
+ 	function fetchPeriodEntry($id)
 	{
 		//First fetching items from period entry....
 		$sql = "SELECT * FROM `period_entry` WHERE `id` = :id ";
