@@ -329,11 +329,11 @@
 	function getSubjectId($subject_name, $faculty_id){
 		
 		//Validation operations...
-		if(!matchSubjectName($subject_name))
+		if(!$subject_name && !matchSubjectName($subject_name))
 		{	
 			header ('Server Error');
 			echo '{"error":{"text":'. 'Invalid characters in the subject field' .'}}';
-			
+			return false;
 		}
 		else
 		{
@@ -441,10 +441,11 @@
 	function entry_faculty_log($entry_type, $faculty_id, $message, $sub_info, $info_entry_id )
 	{
 		//Now adding FACULTY ENTRY LOG---
-		$sql = "INSERT INTO `attendance`.`faculty_log` \
+		$sql = "INSERT INTO `attendance`.`faculty_log` 
 					(`id`, `date`, `time`, `entry_type`, `info_entry_id`, `faculty_id`, `info`, `sub_info`)VALUES 
 					(NULL, CURDATE(), CURTIME(), :entry_type , :info_entry_id, :faculty_id, :message, :sub_info);";
-		$subject_name = getSubjectName($days_info->subject_id);
+		//$subject_name = getSubjectName($days_info->subject_id);
+		
 		
 		try 
 		{

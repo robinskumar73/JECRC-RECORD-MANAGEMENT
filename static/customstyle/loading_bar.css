@@ -8,11 +8,12 @@ height:90px;
 }
 
 .center{
-	position: absolute;
+	position: fixed;
 	/*margin: -100px 0 0 -200px;*/
-	margin:0 auto;
+	z-index:2500;
     top: 50% !important;
     left: 50% !important;	
+	bottom: 50% !important;
 }
 
 .windows8 .wBall {

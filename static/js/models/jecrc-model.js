@@ -63,7 +63,7 @@ app.Model.faculty_entry = Backbone.Model.extend({
 		faculty_id: null,
 		info:	'',
 		sub_info:'',
-		last_update_type:null, //Will be either delete or update
+		last_update_type:null, //Will be either delete or update and error if update results in an error
 		last_updated_time:null
 	},
 	

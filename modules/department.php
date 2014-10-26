@@ -35,7 +35,7 @@
 	$app->get('/branch/', 'getBranch');
 	//Get Methods End Here
 	
-	//Post Methods of Department,Batch,Semester,Section
+	//Post Methods...
 	$app->post('/department','addDepartment');
 	$app->post('/entry/department/daysEntry','addEntryBysection');
 	
@@ -47,7 +47,9 @@
 	$app->delete('/entry/faculty/:id/daysEntry/:entryId','deleteEntry');
 	
 	//Update method for updating the period entry..
-	$app->put('/entry/faculty/:id/daysEntry/:entryId', 'updateEntry');
+	$app->put('/entry/faculty/:id/periodEntry/:entryId', 'updateEntry');
+	//Update method for updating the faculty_log entry storing the last update type...
+	$app->put('/entry/faculty/:id/daysEntry/:entryId', 'updateLog');
 	
 	$app->run();
 	
@@ -156,6 +158,8 @@
 		$dept->semester_id 		= $days_entry->semester_id; 
 		$dept->section_name 	= $days_entry->section_name;
 		$dept->date 			= $days_entry->date;
+		$dept->subject_name		= getSubjectName($dept->subject_id);
+		$dept->faculty_name		= getFacultyName($dept->faculty_id);
 		
 		//Now returning the json response.....
 		echo json_encode($dept);
@@ -648,18 +652,18 @@
 	
 	
 	//Function for updating Entry ...
-	// entry/faculty/:id/daysEntry/:entryId', 'updateEntry'
+	// entry/faculty/:id/periodEntry/:entryId', 'updateEntry'
 	function updateEntry($id, $entryId)
 	{
 		$request = \Slim\Slim::getInstance()->request();
 		$dept = json_decode($request->getBody());
 		
-		$sql = "UPDATE `period_entry` SET \
-				  `subject_id`= :subject_id,\
-				  `lab`= :lab,\
-				  `batch`= :batch ,\
-				  `strength`= :strength,\
-				   WHERE id = :entryId AND `faculty_id` = :faculty_id" ;
+		$sql = "UPDATE `period_entry` SET 
+				  `subject_id`= :subject_id,
+				  `lab`= :lab,
+				  `batch`= :batch ,
+				  `strength`= :strength
+				   WHERE `id` = :entryId AND `faculty_id` = :faculty_id" ;
 		
 		$subject_id = getSubjectId( $dept->subject_name, $id );		   
 		
@@ -693,6 +697,38 @@
 		echo json_encode($dept);	
 			
 	}//Function ends for updateEntry...
+	
+	//Route function for updating the faculty_log for storing the last_update_type
+	//'/entry/faculty/:id/daysEntry/:entryId', 'updateLog'
+	function updateLog( $id, $entryId )
+	{
+		$request = \Slim\Slim::getInstance()->request();
+		$dept = json_decode($request->getBody());
+		if( matchSubjectName( $dept->last_update_type ))
+		{
+			//Perform update operation...
+			$sql = "UPDATE `faculty_log` SET `last_update_type`= :type WHERE id=:id AND faculty_id = :faculty_id";	
+			try 
+			{
+			  $db = getConnection();
+			  $stmt = $db->prepare($sql);
+			  $stmt->bindParam("type", $dept->last_update_type);
+			  $stmt->bindParam("id", $entryId);
+			  $stmt->bindParam("faculty_id", $id);
+			  $stmt->execute();
+			  $db = null;
+			  echo json_encode($dept);
+			} catch(PDOException $e) {
+				header ('Server Error');
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}	
+		}
+		else{
+			header ('Server Error');
+			echo '{"error":{"text":'. 'Invalid characters' .'}}';
+			return false;
+		}	
+	}//Function ends for updateLog...
   
 	
 	

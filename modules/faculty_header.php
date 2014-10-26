@@ -16,6 +16,7 @@ $Login_Process->check_status($_SERVER['SCRIPT_NAME']);
 <title>JECRC</title>
 <link href="../static/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
 <link href="../static/customstyle/mystyle.css" type="text/css" rel="stylesheet">
+<link href="../static/customstyle/loading_bar.css" type="text/css" rel="stylesheet">
 <link href="../static/selectize.js-master/dist/css/selectize.bootstrap3.css" type="text/css" rel="stylesheet">
 
 <link rel="icon" type="image/png" href="#" >

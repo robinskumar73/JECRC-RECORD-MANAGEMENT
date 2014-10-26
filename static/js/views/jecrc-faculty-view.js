@@ -634,6 +634,11 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		else{
 			this.days_entry_id = "";	
 		}
+		
+		//Listening to faculty_log_model if it it is a update view....
+		//if( !this.update ){
+		//	this.listenTo(this.FacultyLogModel, 'change:last_updated_time', this.up);
+		//}
 
 	},
 	
@@ -683,10 +688,11 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		}
 		else {
 			return 0;
-		}
-		
-		
+		}	
 	},
+	
+	
+	
 	//Only used for updating the entry form...
 	//setting value if already present in the model...
 	setValue : function( ){
@@ -756,6 +762,8 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		
 	},//End of save function...
 
+
+
 	saveEntry : function(){
 		
 		var EntryValue = this.getEntryValue();
@@ -765,32 +773,64 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		else{
 			//Updating the url value for post operation..
 			var that = this;
-			//Creating period entry model...
-			var PeriodModel = new app.Model.periodEntry;
-			//Adding an error validation event listener to it..
-			//Listening to error events..
-		    this.listenTo(PeriodModel, 'invalid', this.validationFailed);
-			PeriodModel.url = "department.php/entry/department/daysEntry";
-			PeriodModel.save(EntryValue,{
-				error: function () {
-					//that.displayMessage('Error saving Entry..');
-					that.displayMessage("<strong>Error:</strong> saving entry.", app.Global.alertType[0]);
-				},
-				success: function(){
-					//Undelecating the events..
-					that.undelegateEvents();
-					
-					that.displayMessage("<strong>Successfully</strong> saved entry to database.", app.Global.alertType[1]);
-					
-					//NOW display Batches.. of department..
-					//Look for faculty-routers.js for this function..
-					//Removing the view..
-					that.destroy_view();
-					fetchBranch(that.model.get("department_name"));
-					//UPdating the URL..
-					app.Global.Router.navigate('department/' + that["dept_name"],{trigger:true});
-				}
-			});
+			if(!this.update){
+				//Creating period entry model...
+				var PeriodModel = new app.Model.periodEntry;
+				//Adding an error validation event listener to it..
+				//Listening to error events..
+				this.listenTo(PeriodModel, 'invalid', this.validationFailed);
+				PeriodModel.url = "department.php/entry/department/daysEntry";
+				PeriodModel.save(EntryValue,{
+					error: function () {
+						//that.displayMessage('Error saving Entry..');
+						that.displayMessage("<strong>Error:</strong> saving entry.", app.Global.alertType[0]);
+					},
+					success: function(){
+						//Undelecating the events..
+						that.undelegateEvents();
+						
+						that.displayMessage("<strong>Successfully</strong> saved entry to database.", app.Global.alertType[1]);
+						
+						//NOW display Batches.. of department..
+						fetchBranch(that.model.get("department_name"));
+						//UPdating the URL..
+						app.Global.Router.navigate('department/' + that["dept_name"],{trigger:true});
+						//Removing the view..
+						that.destroy_view();
+						
+					}
+				});
+			}//End of if for checking the this.update
+			else{
+				//Just update this model...
+				this.model.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/periodEntry/" + this.model.get('id') ;
+				this.model.save(EntryValue,{
+					error: function () {
+						//update faculty log model with error type update..
+						//Now updating the faculty_log model...
+						this.FacultyLogModel.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/daysEntry/" + this.FacultyLogModel.get("id");
+						//getting the date...
+						var d = new Date();
+						var time = d.getTime();
+						this.FacultyLogModel.save({ last_update_type: 'error', last_updated_time: time });
+						//Removing the view..
+						that.destroy_view();
+						
+					},
+					success: function(){
+						//Undelecating the events..
+						that.undelegateEvents();
+						//getting the date...
+						var d = new Date();
+						var time = d.getTime();
+						//Now updating the faculty_log model...
+						this.FacultyLogModel.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/daysEntry/" + this.FacultyLogModel.get("id");
+						this.FacultyLogModel.save({ last_update_type: 'update', last_updated_time: time });
+						//Removing the view..
+						that.destroy_view();
+					}
+				});
+			}//End of else of update statement
 		}
 		
 		
@@ -1020,17 +1060,31 @@ app.Views.Branch = Backbone.View.extend({
 //--------------------------------------------VIEW FOR FACULTY ALERT MESSAGE BOX--------------------------------------
 //Takes 2 argument as option - 1) model:model_for_faculty_log_entry 2) delete:boolean if true then delete button was clicked..
 app.Views.logAlertBox = Backbone.View.extend({
-		initialize: function(){
-			//Cache the template function for displaying the alert box..
-			this.template	= _.template( $('#display-info').html() );
-			//Showing the loading bar...	
-		},
-		
-		
-		//Function for rendering the logAlertBox...
-		render:function(){
+	initialize: function(){
+		//Cache the template function for displaying the alert box..
+		this.template	= _.template( $('#display-info').html() );
+		//Listening to facultyLogModel for change...
+		this.listenTo(this.model, 'change:last_updated_time', this.destroy_view);
 			
-		}
+	},
+	
+	
+	//Function for rendering the logAlertBox...
+	render:function(){
+		
+	},
+	
+	//view destructor...
+	//destroying the view..
+	destroy_view: function() {
+		//COMPLETELY UNBIND THE VIEW
+		console.info("Destroying the modal display 'logAlertBox' view.  ")
+		this.undelegateEvents();
+		$(this.el).removeData().unbind(); 
+		//Remove view from DOM
+		this.remove();  
+		Backbone.View.prototype.remove.call(this);
+	}		
 });
 
 
@@ -1039,36 +1093,89 @@ app.Views.logAlertBox = Backbone.View.extend({
 //Takes one argument model of faculty log entry...
 app.Views.alertBody = Backbone.View.extend({
 	initialize : function(){
-		this.template =  _.template( $('#"entry-log-alert-body').html() );
+		this.template =  _.template( $('#"alert-modal').html() );
 		//alert-modal
 		if( this.model.get('entry_type') === 'entry' || this.model.get('entry_type') === 'update' ){
-		  this.periodModel 	=  new app.Model.faculty_entry();
-		  //Now listen to this model on add...
-		  this.listenTo(this.periodModel, 'add', this.addPeriodEntryBody);
-		  
-		  //Adding the url for fetching the period_entry by id..
-		  var url 	= "department.php/entry/"+ this.model.get('info_entry_id');
-		  //fetching the period entry..
-		  this.fetchEntryModel(this.periodModel, url);
+			if(this.model.get('last_update_type') !== 'delete')
+			{	
+				this.periodModel 	=  new app.Model.faculty_entry();
+				
+				//Now listen to this model on add...
+				this.listenTo(this.periodModel, 'add', this.addPeriodEntryBody);
+				this.listenTo(this.model, 'change:last_updated_time', this.removeView);
+				
+				
+				//Adding the url for fetching the period_entry by id..
+				var url 	= "department.php/entry/"+ this.model.get('info_entry_id');
+				//fetching the period entry..
+				this.fetchEntryModel(this.periodModel, url);
+			}
 		}
+		//Updating the subject name
+		else if( this.model.get('entry_type') === 'subject' && this.model.get('last_update_type') !== 'delete' ){
+			//Show the subject edit for update..
+		}
+		
 	},//End of initialize function ...
+	
+	
+	events:{
+		//'click #alert_modal_close_btn' : 'closeModal',
+		'click #alert_modal_save_btn'  : 'saveModal',
+		'hide.bs.modal #myModal'	   : 'destroy_view'
+	},
+	
+	
 	
 	//Method for forming the entry body and appending to $el element on model change event...
 	addPeriodEntryBody : function( PeriodModel ){
 		//Forming template for entry form...
 		var Periodcollection = new app.Collection.periodEntry( periodModel );
-		var facultyEntry = new app.Views.FacultyEntry({
-			model		 : periodModel,				
-			collection   : Periodcollection
+		this.facultyEntry = new app.Views.FacultyEntry({
+			model		    : periodModel,				
+			collection      : Periodcollection,
+			update		    : true,
+			FacultyLogModel : this.model
 		});
 		//Rendering the faculty...
-		facultyEntry.render();
+		this.facultyEntry.render();
 		//Setting the initial values...
-		facultyEntry.setValue();
+		this.facultyEntry.setValue();
+		//Adding to the el
+		//Adding this  body to faculty
+		var heading =  "Edit your entry!";
+		var Modal = this.template({ "heading":heading, "body": this.facultyEntry.el  });
+		$(this.$el).append( Modal );
+	},
+	
+	//Rendering the view...
+	render: function(){
 		
+		
+		return this;
+	},
+	
+	//event when modal is about to close...
+	removeView: function(){
+		console.log('Modal is going to hide.Destroying the views.');
+		//First destroying the faculty update entry view...
+		if( this.facultyEntry !== undefined )
+		{
+			//destroy this view
+			this.facultyEntry.destroy_view();	
+		}
+		//Now finally destroying this view...
+		this.destroy_view();	
 	},
 	
 	
+	//Event when save entry button is pressed...
+	saveModal: function(){
+		console.log('Updating the entry data...');
+		this.facultyEntry.saveEntry();
+		//Now hiding the modal..
+		$(this.$el.find('#myModal')).modal('hide');
+	},
 	
 	getDepartmentName: function(PeriodModel){
 		//Now fetching the department name...
@@ -1098,7 +1205,22 @@ app.Views.alertBody = Backbone.View.extend({
 				console.log("Successfully fetched data of faculty_entry from server.");	
 			}
 		 });
-	}
+	},
+	
+	//view destructor...
+	//destroying the view..
+	destroy_view: function() {
+		//COMPLETELY UNBIND THE VIEW
+		console.info("Destroying the modal display 'alertBody' view.  ")
+		
+		this.undelegateEvents();
+	
+		$(this.el).removeData().unbind(); 
+	
+		//Remove view from DOM
+		this.remove();  
+		Backbone.View.prototype.remove.call(this);
+    }
 	
 	
 });
