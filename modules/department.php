@@ -24,6 +24,8 @@
 	//Getting the log details for the faculty log...
 	//Here id is the faculty id..
 	$app->get('/entry/faculty/:id/daysEntry','getAllFacultyLogEntry');
+	//Route for fetching a peroid by its id..
+	$app->get('/entry/:id','fetchPeriod');
 	
 	$app->get('/department/:deptId/semester/:semId','getSemesterById');
 	$app->get('/department/:deptId/semester/:semId/section','getAllSection');
@@ -116,8 +118,48 @@
 			}
 	}
 
-
- 
+	//$app->get('/entry/:id','fetchPeriod');
+	//Function for fetching the period by its id.
+ 	function fetchPeriod($id)
+	{
+		//First fetching items from period entry....
+		$sql = "SELECT * FROM `period_entry` WHERE `id` = :id ";
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("id", $id);
+			$stmt->execute();
+			$dept = $stmt->fetchObject();
+			$db = null;
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header("Server Error");
+		}
+		//Now fetching the days_entry..
+		$sql = "SELECT * FROM `days_entry` WHERE `id` = :id ";
+		try {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("id", $dept->days_entry_id);
+			$stmt->execute();
+			$days_entry = $stmt->fetchObject();
+			$db = null;
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header("Server Error");
+		}
+		//Now fetching the period...
+		$period = getPeriod($id);
+		//Forming the json object..
+		$dept->period 			= $period;
+		$dept->department_id 	= $days_entry->department_id;
+		$dept->semester_id 		= $days_entry->semester_id; 
+		$dept->section_name 	= $days_entry->section_name;
+		$dept->date 			= $days_entry->date;
+		
+		//Now returning the json response.....
+		echo json_encode($dept);
+	}//End of fetch period..
 	
 	
 	

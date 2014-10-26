@@ -154,6 +154,7 @@
 				`faculty_id`  INT NOT NULL,
 				`info` VARCHAR(200),
 				`sub_info` VARCHAR(100),
+				`last_update_type` enum ('update', 'delete') ,
 				
 				FOREIGN KEY (faculty_id)
 					REFERENCES faculty(id)

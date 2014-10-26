@@ -61,7 +61,9 @@ app.Model.faculty_entry = Backbone.Model.extend({
 		info_entry_id: null,
 		faculty_id: null,
 		info:	'',
-		sub_info:''	
+		sub_info:'',
+		last_update_type:null, //Will be either delete or update
+		last_updated_time:null
 	},
 	
 	//Function for validating the model..
