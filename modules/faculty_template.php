@@ -38,7 +38,8 @@
 		  <hr>
 		  <% _.each(years, function(year){ %>
 		  	<div class="col-md-3">
-		  		<a id="branch-template-year-name" href="#" class="h4 yearname link" style="cursor:pointer;"> <%= year.yearname %> </a>
+			 
+		  		<a id="branch-template-year-name" href="#" class="h4 yearname link alert-link" style="cursor:pointer;"> <%= year.yearname %> </a>
 		  		<hr>
 			
 			   	<% _.each(year.branches, function(branch){ var branch_ = parseBranch(branch.name); %>

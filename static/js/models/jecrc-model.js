@@ -70,12 +70,26 @@ app.Model.faculty_entry = Backbone.Model.extend({
 	validate: function(attrs, options) {
 		//checking for sub_info ...
 		//checking for info...
-		var info = attrs.info;
-		var infoPattern = /[^\d\s\w\.\-]/;
-		if( infoPattern.test( info ) || infoPattern.test(sub_info) ){
+		var datePattern			= /^([0-9]{4})\s*\-\s*([0-9]{1,2})\s*\-\s*([0-9]{1,2})$/;
+		var infoPattern 		= /[^\d\s\w\.\-]/;
+		var infoEntryIdPattern  = /[^\d]/;
+		if( infoPattern.test( attrs.info ) || infoPattern.test(attrs.sub_info) ){
 			//Error occured......
 			return "<strong>Error: </strong> Invalid characters inputted in activity log.";	
 		}
+		
+		if(!attrs.info_entry_id && infoEntryIdPattern.test( attrs.info_entry_id ) )
+		{
+			//Error occured......
+			return "<strong>Error: </strong> Invalid characters inputted in info_entry_id.";
+		}
+		
+		if(!datePattern.test(attrs.date))
+		{
+			//Error occured......
+			return "<strong>Error: </strong> Invalid date format. Only this format is supported <strong>'yyyy-dd-mm'</strong>";
+		}
+		
 	}//End of validate function...
 });//End of model faculty entry...
 
@@ -105,8 +119,9 @@ app.Model.periodEntry = Backbone.Model.extend({
 	validate: function(attrs, options) {
 		//Now validating the subject_name..
 		var subject = attrs.subject_name;
-		var subject_pattern = /[^\d\s\w\.\-]/;
-		var strength_pattern = /[^\d]/;
+		var datePattern				= /^([0-9]{4})\s*\-\s*([0-9]{1,2})\s*\-\s*([0-9]{1,2})$/;
+		var subject_pattern		    = /[^\d\s\w\.\-]/;
+		var strength_pattern 		= /[^\d]/;
 		if( subject_pattern.test( subject ) ){
 			//Error occured......
 			return "<strong>Error: </strong> Invalid characters inputted in subject. Only <strong >digits, alphabets, period(.) and spaces  </strong> are allowed for naming subject ";	
@@ -118,6 +133,11 @@ app.Model.periodEntry = Backbone.Model.extend({
 		if( /[^0|1]/.test( attrs.lab ) ){
 			//Error occured......
 			return "<strong>Error:</strong>  Lab must be a <strong>boolean</strong> value.";	
+		}
+		if(!datePattern.test(attrs.date))
+		{
+			//Error occured......
+			return "<strong>Error: </strong> Invalid date format. Only this format is supported <strong>'yyyy-dd-mm'</strong>";
 		}
 		
 	}//End of validate function..
