@@ -120,12 +120,10 @@ var FacultyBranchEntry =  function(dept_name, semester_name, section_name ){
 			var periodEntryCollection = new app.Collection.periodEntry;
 			//Getting the today date for finding the entry..
 			var today_date = getTodayDate();
-			periodEntryCollection.url = "department.php/faculty/department/" + dept_name +"/semester/" + semester_name + "/section/" + section_name;
+			//OLD URL periodEntryCollection.url = "department.php/faculty/department/" + dept_name +"/semester/" + semester_name + "/section/" + section_name;
 			
 			//displaying todayPeriodEntry
 			periodDisplay(dept_name, semester_name, section_name, periodEntryCollection );
-		
-		
 }
 
 
@@ -133,6 +131,12 @@ var FacultyBranchEntry =  function(dept_name, semester_name, section_name ){
 var periodDisplay = function( dept_name, semester_name, section_name, Periodcollection ){
 	//Now fetching data...		
 	Periodcollection.fetch({
+		  data:{
+			 "dept_name"	  :dept_name,  
+			 "sem"		  	  :semester_name,
+			 "sec_name"   	  :section_name ,
+			 "todayEntry" 	  :'1'
+		  },
 		  error: function () {
 			  app.Global.hideLoadingBar();
 			  console.log('Error fetching department wise entry from database..');

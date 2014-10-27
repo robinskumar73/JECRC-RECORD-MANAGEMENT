@@ -341,35 +341,37 @@ $(document).on('click','#publish-batch',function(e){
 				//Add to batch collection..
 				var val = $(btn).data('wat');
 				//Now saving the branch to  collection..
-				app.Global.Branch.create({
-					"department_id":dept.get("id"),
-					"semester_id":sem,
-					"section_name":section,
-					"batch_id":val 
-				},{
-				error: function (model, response) {
-						displayMessage('Error saving Branch..');
-						$("#Dept-Cancel").click();
-						
-						//Revert back
-						
-    				},
-					success: function(model){
-						displayMessage("Successfully added branch to database..");
-						hideBatch();
-						hideSection();
-						$('#infoScreen').addClass('hide');
-						$('#AddSemester').addClass('hide');
-						$('#dept-screen').addClass('hide');
-						$('#Dept-Cancel').addClass('hide');
-						$('#Department').removeClass('hide');
-						
-						$('#Department').val('');
-						$('#create-dept').removeClass('hide');
-						$('#DepartmentCreate').removeClass('hide');
-						$("span.twitter-typeahead").removeClass('hide')
-					}	
-				});
+				app.Global.Branch.create(
+					{
+						"department_id":dept.get("id"),
+						"semester_id":sem,
+						"section_name":section,
+						"batch_id":val 
+					},
+					{
+						error: function (model, response) 
+						{
+							displayMessage('Error saving Branch..');
+							$("#Dept-Cancel").click();
+    					},
+						success: function(model)
+						{
+							displayMessage("Successfully added branch to database..");
+							hideBatch();
+							hideSection();
+							$('#infoScreen').addClass('hide');
+							$('#AddSemester').addClass('hide');
+							$('#dept-screen').addClass('hide');
+							$('#Dept-Cancel').addClass('hide');
+							$('#Department').removeClass('hide');
+							
+							$('#Department').val('');
+							$('#create-dept').removeClass('hide');
+							$('#DepartmentCreate').removeClass('hide');
+							$("span.twitter-typeahead").removeClass('hide')
+						}	
+					}
+				);
 			}
 	});//End of each function..
 	
@@ -779,7 +781,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 				//Adding an error validation event listener to it..
 				//Listening to error events..
 				this.listenTo(PeriodModel, 'invalid', this.validationFailed);
-				PeriodModel.url = "department.php/entry/department/daysEntry";
+				//PeriodModel.url = "department.php/entry/department/daysEntry";
 				PeriodModel.save(EntryValue,{
 					error: function () {
 						//that.displayMessage('Error saving Entry..');
@@ -803,16 +805,31 @@ app.Views.FacultyEntry = Backbone.View.extend({
 			}//End of if for checking the this.update
 			else{
 				//Just update this model...
-				this.model.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/periodEntry/" + this.model.get('id') ;
+				//this.model.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/periodEntry/" + this.model.get('id') ;
+				/*NOTE INSTEAD OF PASSING EXTRA VALUE THROUGH URL WE ARE USING HEADER TO KEEP THE INTERFACE CLEAN*/
 				this.model.save(EntryValue,{
+					 headers:{
+								//Sending the faculty headers with headers..
+							 	faculty_id:this.model.get('faculty_id')
+							 },
 					error: function () {
 						//update faculty log model with error type update..
 						//Now updating the faculty_log model...
-						this.FacultyLogModel.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/daysEntry/" + this.FacultyLogModel.get("id");
+						//this.FacultyLogModel.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/daysEntry/" + this.FacultyLogModel.get("id");
+						//NOTE SENDING THE EXTRA PARAMS THROUGH HEADERS AND NOT WITH URL TO KEEP THE INTERFACE CLEAN...
 						//getting the date...
 						var d = new Date();
 						var time = d.getTime();
-						this.FacultyLogModel.save({ last_update_type: 'error', last_updated_time: time });
+						this.FacultyLogModel.save({
+							 last_update_type: 'error',
+							 last_updated_time: time },{
+							 headers:{
+								 //Sending the faculty headers with headers..
+							 	faculty_id:this.model.get('faculty_id'),
+							 },
+							 success:function(){console.log("Successfully updated period entry to server.");},
+							 error:function(){console.log("Error updating period entry to server.");}
+						});
 						//Removing the view..
 						that.destroy_view();
 						
@@ -824,8 +841,15 @@ app.Views.FacultyEntry = Backbone.View.extend({
 						var d = new Date();
 						var time = d.getTime();
 						//Now updating the faculty_log model...
-						this.FacultyLogModel.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/daysEntry/" + this.FacultyLogModel.get("id");
-						this.FacultyLogModel.save({ last_update_type: 'update', last_updated_time: time });
+						//this.FacultyLogModel.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/daysEntry/" + this.FacultyLogModel.get("id");
+						this.FacultyLogModel.save({
+							 last_update_type: 'update',
+							 last_updated_time: time,
+							 headers:{
+								 //Sending the faculty headers with headers..
+							 	faculty_id:this.model.get('faculty_id'),
+							 }, 
+						});
 						//Removing the view..
 						that.destroy_view();
 					}
@@ -1098,7 +1122,8 @@ app.Views.alertBody = Backbone.View.extend({
 		if( this.model.get('entry_type') === 'entry' || this.model.get('entry_type') === 'update' ){
 			if(this.model.get('last_update_type') !== 'delete')
 			{	
-				this.periodModel 	=  new app.Model.faculty_entry();
+				//Creating a model for fetching an period of given id;
+				this.periodModel 	=  new app.Model.periodEntry({ id: this.model.get('info_entry_id') });
 				
 				//Now listen to this model on add...
 				this.listenTo(this.periodModel, 'add', this.addPeriodEntryBody);
@@ -1106,14 +1131,18 @@ app.Views.alertBody = Backbone.View.extend({
 				
 				
 				//Adding the url for fetching the period_entry by id..
-				var url 	= "department.php/entry/"+ this.model.get('info_entry_id');
+				//OLD URL var url 	= "department.php/entry/"+ this.model.get('info_entry_id');
 				//fetching the period entry..
-				this.fetchEntryModel(this.periodModel, url);
+				//this.fetchEntryModel(this.periodModel, url);
+				this.fetchEntryModel(this.periodModel);
 			}
 		}
 		//Updating the subject name
 		else if( this.model.get('entry_type') === 'subject' && this.model.get('last_update_type') !== 'delete' ){
 			//Show the subject edit for update..
+			this.subjectModel 	=  new app.Model.Subject();				
+			//Now listen to this model on add...
+			this.listenTo(this.subjectModel, 'add', this.addSubjectEntryBody);
 		}
 		
 	},//End of initialize function ...
@@ -1187,22 +1216,22 @@ app.Views.alertBody = Backbone.View.extend({
 	
 	
 	//Model for fetching the entry from the database...
-	fetchEntryModel: function(Periodmodel, fetchUrl){
+	fetchEntryModel: function( Periodmodel ){
 		var that = this;
 		//Showing the loading bar...
 		app.Global.showLoadingBar();
-		model.url = fetchUrl;
-		model.fetch({
+		//model.url = fetchUrl;
+		Periodmodel.fetch({
 			//Adding an error callback...
 			error: function( model, response, options ){
 				//Hiding the loading bar....
 				app.Global.hideLoadingBar();
-				console.log("Error fetching collection from faculty_entry collection.");	
+				console.log("Error fetching collection from period_entry from server...");	
 			},
 			success: function( model, response, options ){
 				//Hiding the loading bar...
 				app.Global.hideLoadingBar();
-				console.log("Successfully fetched data of faculty_entry from server.");	
+				console.log("Successfully fetched data of period_entry from server.");	
 			}
 		 });
 	},
@@ -1312,7 +1341,7 @@ app.Views.activity = Backbone.View.extend({
 		app.Global.showLoadingBar();
 		 
 		this.collection.fetch({
-			data: {offset: that.offset, limit:that.limit},
+			data: {offset: that.offset, limit:that.limit, faculty_id: faculty.id },
 			add:add,
 			//Adding an error callback...
 			error: function(collection, response, options){

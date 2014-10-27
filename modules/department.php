@@ -1,56 +1,92 @@
 <?php
-
 	require ('../Slim/Slim.php');
 	include_once 'database_connection.php';
 	include_once 'helper_department_function.php';
 	//Adding the cache for session limiter...
 	session_cache_limiter(false);
 	session_start();
-
 	\Slim\Slim::registerAutoloader();
-
-	// create new Slim instance
 	$app = new \Slim\Slim();
 	
 
-	// Get Methods of Department,Batch,Section,Semester
+	//------------------------------------------DEPARTMENT AREA------------------------------------------------------------
+	//GET
 	$app->get('/department', 'getAllDepartment');
-	$app->get('/subject/:key', 'getSubject');
 	$app->get('/department/:deptId','getDepartmentById');
+	//POST
+	$app->post('/department','addDepartment');
+	//DELETE
+	$app->delete('/department/:deptId', 'deleteDepartment');
+	
+	
+	
+	//--------------------------------------------SUBJECT AREA---------------------------------------------------------------
+	//GET
+	$app->get('/subject/:key', 'getSubject');
+	$app->post('/subject', 'addSubject');
+	
+	
+	//------------------------------------------PERIOD ENTRY AREA------------------------------------------------------------
+	//OLD ROUTES-----
+	/*
+	//GET
+	$app->get('/entry/:id','fetchPeriodEntry');
 	$app->get('/entry/department/:dept_name/semester/:sem/section/:sec_name','getEntryBysection');
 	$app->get('/entry/department/:dept_name','getEntryBydept');
 	$app->get('/entry/department/:dept_name/year/:year','getEntryByYear');
 	$app->get('/faculty/department/:dept_name/semester/:semester_name/section/:section_name', 'getFacultyTodayEntry');
-	//Getting the log details for the faculty log...
-	//Here id is the faculty id..
-	$app->get('/entry/faculty/:id/daysEntry','getAllFacultyLogEntry');
-	//Route for fetching a peroid by its id..
-	$app->get('/entry/:id','fetchPeriodEntry');
+	//POST
+	$app->post('/entry/department/daysEntry','addEntryBysection');
 	
+	//DELETE
+	$app->delete('/entry/faculty/:id/daysEntry/:entryId','deleteEntry');
+	//PUT
+	$app->put('/entry/faculty/:id/periodEntry/:entryId', 'updateEntry');
+	*/
+	
+	//NEW ROUTES
+	//GET
+	$app->get('/period/entry','getPeriodClassEntry');
+	$app->get('/period/entry/:id','fetchPeriodEntry');
+	//POST
+	$app->post('/period/entry','addEntryBysection');
+	//PUT
+	$app->put('/period/entry/:id','updateEntry');
+	//DELETE
+	$app->delete('/period/entry/:id','deleteEntry');
+	
+	
+	//------------------------------------------FACULTY LOG  AREA------------------------------------------------------------
+	
+	/*//OLD ROUTES
+	//GET
+	$app->get('/entry/faculty/:id/daysEntry','getAllFacultyLogEntry');
+	//PUT
+	$app->put('/entry/faculty/:id/daysEntry/:entryId', 'updateLog');
+	*/
+	
+	//NEW ROUTES
+	//GET
+	$app->get('/faculty/activity','getAllFacultyLogEntry'); //faculty/activity?id=faculty_id&offset=0&limit=30
+	//PUT
+	$app->put('/faculty/activity/:entryId','updateLog');
+
+	
+	
+	
+	//-------------------------------------------BRANCH ENTRY AREA-----------------------------------------------------------------
+	//GET
+	$app->get('/branch/', 'getBranch');
+	$app->post('/branch/', 'addBranch');
+	
+	//KACHRA-----------------------------------------------------------------------------------------------------------------------
 	$app->get('/department/:deptId/semester/:semId','getSemesterById');
 	$app->get('/department/:deptId/semester/:semId/section','getAllSection');
 	$app->get('/department/:deptId/semester/:semId/section/:secId','getSectionById');
 	$app->get('/department/:deptId/semester/:semId/section/:secId/batch','getAllBatch');
 	$app->get('/department/:deptId/semester/:semId/section/:secId/batch/:batchId','getBatchById');
-	$app->get('/branch/', 'getBranch');
-	//Get Methods End Here
-	
-	//Post Methods...
-	$app->post('/department','addDepartment');
-	$app->post('/entry/department/daysEntry','addEntryBysection');
-	
-	$app->post('/branch/', 'addBranch');
-	
-	//Delete methods of Department..
-	$app->delete('/department/:deptId', 'deleteDepartment');
-	//Delete period-faculty entry
-	$app->delete('/entry/faculty/:id/daysEntry/:entryId','deleteEntry');
-	
-	//Update method for updating the period entry..
-	$app->put('/entry/faculty/:id/periodEntry/:entryId', 'updateEntry');
-	//Update method for updating the faculty_log entry storing the last update type...
-	$app->put('/entry/faculty/:id/daysEntry/:entryId', 'updateLog');
-	
+
+	//RUNNING THE APPLICATION
 	$app->run();
 	
 ?>
@@ -170,7 +206,7 @@
 	
 	
 	
-	
+	/*
 	//get faculty entry by date..
 	//faculty/department/:dept_name/semester/:semester_name/section/:section_name/date/:today_date', 'getFacultyTodayEntry'
 	function getFacultyTodayEntry($dept_name, $semester_name, $section_name)
@@ -180,21 +216,70 @@
 		$dept_ = process_days_entry_obj($dept);
 		echo json_encode($dept_);		
 	}
-
+	*/
 	
 	
 	
 	//Get days entry by section..
-	function getEntryBysection($dept_name, $sem, $sec_name)
+	//OLD URL '/entry/department/:dept_name/semester/:sem/section/:sec_name','getEntryBysection'
+	//NEW URL '/period/entry','getPeriodEntry''
+	//Removing the arguments $dept_name, $sem, $sec_name
+	//Changing the getEntryBysection($dept_name, $sem, $sec_name) to getPeriodClassEntry
+	function getPeriodClassEntry()
 	{
+		if( isset($_GET['dept_name']) && isset($_GET['sem']) && isset($_GET['sec_name']) && isset($_GET['todayEntry']) ) {
+			//Fetch period entry for today's date only..	
+			//$dept_id = getDepartmentId($dept_name);
+			$dept_name      = $_GET['dept_name'];
+			$semester_name	= $_GET['sem'];
+			$section_name   = $_GET['sec_name'];
+			
+			$dept = days_entry_by_section_and_date($semester_name, $section_name, $dept_name );
+			$dept_ = process_days_entry_obj($dept);
+			echo json_encode($dept_);		
+				
+		}
+		elseif( isset($_GET['dept_name']) && isset($_GET['sem']) && isset($_GET['sec_name']) ){	
+			//FETCH PERIOD ENTRY FOR SECTION WISE...	
+			//$dept_id = getDepartmentId($dept_name);
+			$dept_name = $_GET['dept_name'];
+			$sem	   = $_GET['sem'];
+			$sec_name  = $_GET['sec_name'];
+			
+			$dept = days_entry_by_section($sem, $sec_name, $dept_name );
+			$dept = process_days_entry_obj($dept);
+			
+			echo json_encode($dept);
+		}
+		elseif(  isset($_GET['dept_name']) && isset($_GET['year']) ){
+			//FETCH PERIOD ENTRY YEAR WISE...
+			//$dept_id = getDepartmentId($dept_name);
+			
+			$dept_name = $_GET['dept_name'];
+			$year	   = $_GET['year'];
+			
+			$dept = days_entry_by_year($year, $dept_name);
+			$dept_ = process_days_entry_obj($dept);
 		
-		//$dept_id = getDepartmentId($dept_name);
-		$dept = days_entry_by_section($sem, $sec_name, $dept_name );
-		$dept = process_days_entry_obj($dept);
-		
-		echo json_encode($dept);		
+			echo json_encode($dept_);
+			
+		}
+		elseif( isset($_GET['dept_name']) ){
+			//FETCH PERIOD ENTRY BY DEPARTMENT WISE...
+			//$dept_id = getDepartmentId($dept_name);
+			$dept_name = $_GET['dept_name'];
+			$dept = days_entry_by_dept($dept_name);
+			$dept = process_days_entry_obj($dept);
+			
+			echo json_encode($dept);
+		}
+		else{
+			echo '{"error":{"text":"Invalid Route."}}';
+			header("Server Error");	
+		}
 	}
 	
+	/*
 	function getEntryBydept($dept_name)
 	{
 		//$dept_id = getDepartmentId($dept_name);
@@ -205,6 +290,7 @@
 		
 	}
 	
+	
 	function getEntryByYear($dept_name, $year)
 	{
 		//$dept_id = getDepartmentId($dept_name);
@@ -214,6 +300,7 @@
 		echo json_encode($dept_);
 		
 	}
+	*/
 	
 	
 	//function to get department by id start here
@@ -382,6 +469,16 @@
 			header ('Server Error');
 		}
 	}//function to add department end here
+	
+	//DUMMY
+	function addSubject(){
+		$request = \Slim\Slim::getInstance()->request();
+		$dept = json_decode($request->getBody());
+		$headers = $request->headers->get('param_1');
+		print_r ($headers);
+		
+	}
+	
 
 
 	//addEntrybySection function
@@ -578,9 +675,10 @@
 
 
 	//Function for getting the faculty log entry...
-	//entry/faculty/:id/daysEntry/:entryId','getFacultyLogEntry'
-	//collection.fetch({data: {offset: 30, limit:30}, add: true})
-	function getAllFacultyLogEntry($id)
+	//OLD URL - 	'entry/faculty/:id/daysEntry/:entryId','getFacultyLogEntry'
+	//NEW URL - 	'/faculty/activity','getAllFacultyLogEntry'
+	//collection.fetch({data: {offset: 30, limit:30, faculty_id:id_of_faculty}, add: true})
+	function getAllFacultyLogEntry()
 	{
 		$request = \Slim\Slim::getInstance()->request();
 		$request_data = json_decode($request->getBody());
@@ -598,25 +696,28 @@
 		}
 		$limit = (int)(trim($limit));
 		$offset = (int)(trim($offset));
-		
-		//OFFSET 8
-		$sql = "SELECT * FROM `faculty_log` WHERE faculty_id = :faculty_id ORDER BY date DESC LIMIT :limit OFFSET :offset ;";
-		try 
+		if( isset($_GET['faculty_id']) )
 		{
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam(":faculty_id", $id);
-			$stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
-			$stmt->bindParam(":offset", $offset,  PDO::PARAM_INT);
-			$stmt->execute();
-			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-			$db = null;
-			echo json_encode($dept);
-		} catch(PDOException $e)
-		{
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			header("Server Error");
-		}
+			$id = $_GET['faculty_id'];
+			//OFFSET 8
+			$sql = "SELECT * FROM `faculty_log` WHERE faculty_id = :faculty_id ORDER BY date DESC LIMIT :limit OFFSET :offset ;";
+			try 
+			{
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam(":faculty_id", $id);
+				$stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
+				$stmt->bindParam(":offset", $offset,  PDO::PARAM_INT);
+				$stmt->execute();
+				$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+				$db = null;
+				echo json_encode($dept);
+			} catch(PDOException $e)
+			{
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header("Server Error");
+			}
+		}//End of if clause..
 	}//Function for getAllFacultyLogEntry ends here....
 
 
@@ -652,59 +753,68 @@
 	
 	
 	//Function for updating Entry ...
-	// entry/faculty/:id/periodEntry/:entryId', 'updateEntry'
-	function updateEntry($id, $entryId)
+	// '/period/entry/:id','updateEntry'
+	// faculty_id is send through header..
+	function updateEntry($id)
 	{
 		$request = \Slim\Slim::getInstance()->request();
 		$dept = json_decode($request->getBody());
-		
-		$sql = "UPDATE `period_entry` SET 
-				  `subject_id`= :subject_id,
-				  `lab`= :lab,
-				  `batch`= :batch ,
-				  `strength`= :strength
-				   WHERE `id` = :entryId AND `faculty_id` = :faculty_id" ;
-		
-		$subject_id = getSubjectId( $dept->subject_name, $id );		   
-		
-		try 
+		$faculty_id = $request->headers->get('faculty_id');
+		if($faculty_id)
 		{
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("subject_id", $subject_id);
-			$stmt->bindParam("lab", $dept->lab);
-			$stmt->bindParam("batch", $dept->batch);
-			$stmt->bindParam("strength", $dept->strength);
-			$stmt->bindParam("entryId", $entryId);
-			$stmt->bindParam("faculty_id", $id);
-			$stmt->execute();
-			$db = null;
-		} catch(PDOException $e) {
-			header ('Server Error');
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-		}
-		//Updating periods...
-		updatePeriod($dept->period, $entryId);
-		
-		//Now semester and department info..
-		$days_info   = get_days_entry($dept->days_entry_id); 
-		//Writing the log entry...
-		$message     = 'Entry updated for   ' . $days_info->semester_id . getDepartmentNameById($days_info->department_id) .'-'.$days_info->section_name.'.'; 
-		//Now logging the entry for the faculty...
-		entry_faculty_log("update", $id, $message, $dept->subject_name, $dept->id );
-		
-		//sending the response..
-		echo json_encode($dept);	
+			$sql = "UPDATE `period_entry` SET 
+					  `subject_id`= :subject_id,
+					  `lab`= :lab,
+					  `batch`= :batch ,
+					  `strength`= :strength
+					   WHERE `id` = :entryId AND `faculty_id` = :faculty_id" ;
 			
+			$subject_id = getSubjectId( $dept->subject_name, $faculty_id );		   
+			
+			try 
+			{
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("subject_id", $subject_id);
+				$stmt->bindParam("lab", $dept->lab);
+				$stmt->bindParam("batch", $dept->batch);
+				$stmt->bindParam("strength", $dept->strength);
+				$stmt->bindParam("entryId", $id);
+				$stmt->bindParam("faculty_id", $faculty_id);
+				$stmt->execute();
+				$db = null;
+			} catch(PDOException $e) {
+				header ('Server Error');
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+			//Updating periods...
+			updatePeriod($dept->period, $id);
+			
+			//Now semester and department info..
+			$days_info   = get_days_entry($dept->days_entry_id); 
+			//Writing the log entry...
+			$message     = 'Entry updated for   ' . $days_info->semester_id . getDepartmentNameById($days_info->department_id) .'-'.$days_info->section_name.'.'; 
+			//Now logging the entry for the faculty...
+			entry_faculty_log("update", $faculty_id, $message, $dept->subject_name, $dept->id );
+			
+			//sending the response..
+			echo json_encode($dept);
+			
+		}//IF STATEMENT ENDS...
 	}//Function ends for updateEntry...
 	
+	
+	
+	
 	//Route function for updating the faculty_log for storing the last_update_type
-	//'/entry/faculty/:id/daysEntry/:entryId', 'updateLog'
-	function updateLog( $id, $entryId )
+	//OLD URL '/entry/faculty/:id/daysEntry/:entryId', 'updateLog'
+	//NEW ROUTE faculty/activity/:entryId','updateLog'
+	function updateLog( $entryId )
 	{
 		$request = \Slim\Slim::getInstance()->request();
 		$dept = json_decode($request->getBody());
-		if( matchSubjectName( $dept->last_update_type ))
+		$faculty_id = $request->headers->get('faculty_id');
+		if( matchSubjectName( $dept->last_update_type ) && $faculty_id )
 		{
 			//Perform update operation...
 			$sql = "UPDATE `faculty_log` SET `last_update_type`= :type WHERE id=:id AND faculty_id = :faculty_id";	
@@ -714,7 +824,7 @@
 			  $stmt = $db->prepare($sql);
 			  $stmt->bindParam("type", $dept->last_update_type);
 			  $stmt->bindParam("id", $entryId);
-			  $stmt->bindParam("faculty_id", $id);
+			  $stmt->bindParam("faculty_id", $faculty_id);
 			  $stmt->execute();
 			  $db = null;
 			  echo json_encode($dept);

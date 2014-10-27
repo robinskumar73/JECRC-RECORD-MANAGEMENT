@@ -52,6 +52,7 @@ app.Model.Subject = Backbone.Model.extend({
 });
 
 
+
 //Model for faculty entry...
 app.Model.faculty_entry = Backbone.Model.extend({
 	defaults:{
@@ -66,6 +67,8 @@ app.Model.faculty_entry = Backbone.Model.extend({
 		last_update_type:null, //Will be either delete or update and error if update results in an error
 		last_updated_time:null
 	},
+	
+	urlRoot:"/Manage/modules/department.php/faculty/activity",
 	
 	//Function for validating the model..
 	validate: function(attrs, options) {
@@ -116,6 +119,8 @@ app.Model.periodEntry = Backbone.Model.extend({
 		days_entry_id:""
 		
 	},
+	
+	urlRoot:"/Manage/modules/department.php/period/entry",
 	
 	validate: function(attrs, options) {
 		//Now validating the subject_name..
