@@ -144,6 +144,14 @@
 	$result = mysqli_query($dbc,$query);
 	
 	//CREATE TABLE FOR FACULTY_LOG ENTRY..DEFAULT \'0\'
+	/*
+		'update'    : "For period entry update",
+		'create'    : "For username create or update",
+		"delete"    : "For delete",
+		"password"  : "Change of password." ,
+		"entry"     : "For period entry",
+		"subject"	: "For subject create or update"
+	*/
 	$query = "CREATE  TABLE faculty_log
 			 (
 			 	`id` INT AUTO_INCREMENT NOT NULL,

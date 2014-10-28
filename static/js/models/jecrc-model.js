@@ -48,7 +48,21 @@ app.Model.Subject = Backbone.Model.extend({
 	defaults:{
 		id:null,
 		subject:''
-	}
+	},
+	urlRoot: '/Manage/modules/department.php/subject',
+	
+	validate: function(attrs, options) {
+		//Now validating the subject_name..
+		var subject = attrs.subject;
+		var subject_pattern		    = /[^\d\s\w\.\-]/;
+		
+		if( subject_pattern.test( subject ) ){
+			//Error occured......
+			return "<strong>Error: </strong> Invalid characters inputted in subject. Only <strong >digits, alphabets, period(.) and spaces  </strong> are allowed for naming subject ";	
+		}
+		
+	}//End of validate function..
+	
 });
 
 

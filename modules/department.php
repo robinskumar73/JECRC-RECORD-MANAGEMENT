@@ -22,8 +22,11 @@
 	
 	//--------------------------------------------SUBJECT AREA---------------------------------------------------------------
 	//GET
-	$app->get('/subject/:key', 'getSubject');
+	$app->get('/subject', 'getSubject');
+	$app->get('/subject/:id', 'getSubjectById');
+	$app->put('/subject/:id', 'updateSubject');
 	$app->post('/subject', 'addSubject');
+	$app->delete('/subject/:id', 'deleteSubject');
 	
 	
 	//------------------------------------------PERIOD ENTRY AREA------------------------------------------------------------
@@ -139,8 +142,15 @@
 	}
 	
 	
-	function getSubject($key){
-		  $sql = "SELECT * FROM `subject` WHERE `subject` LIKE :key LIMIT 0, 30 ";
+	//----------------------------------------------------------SUBJECT ROUTES AREA----------------------------------------------
+	
+	function getSubject()
+	{
+				
+		 if( isset($_GET['key']) )
+		 {
+			$key =  $_GET['key'];
+			$sql = "SELECT * FROM `subject` WHERE `subject` LIKE :key LIMIT 0, 30 ";
 			$key = $key."%";
 			try {
 				$db = getConnection();
@@ -154,7 +164,128 @@
 				echo '{"error":{"text":'. $e->getMessage() .'}}';
 				header("Server Error");
 			}
+		 }
+		 else{
+			$sql = "SELECT * FROM `subject`  LIMIT 0, 30 ";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->execute();
+				$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+				$db = null;
+				echo json_encode($dept);
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header("Server Error");
+			} 
+		 }
 	}
+	
+	
+	
+	//Route /subject/:id
+	function getSubjectById($id){
+		$sql = "SELECT * FROM `subject` WHERE `id` = :id  LIMIT 0, 30 ";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("id", $id);
+				$stmt->execute();
+				$dept = $stmt->fetchObject();
+				$db = null;
+				echo json_encode($dept);
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header("Server Error");
+			} 
+	}//End of getting subject by id...
+	
+	
+	//Route for updating subject...
+	//'/subject/:id', 'updateSubject'
+	function updateSubject($id){
+		$request = \Slim\Slim::getInstance()->request();
+		$dept = json_decode($request->getBody());
+		$faculty_id = $request->headers->get('faculty_id');
+		if($faculty_id)
+		{
+			$sql = "UPDATE `subject` SET 
+					 subject = :subject
+					WHERE 
+					`id` = :id ";
+			
+			try 
+			{
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("id", $id);
+				$stmt->bindParam("subject", $dept->subject);
+				$stmt->execute();
+				$db = null;
+			} catch(PDOException $e) {
+				header ('Server Error');
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+
+
+			//Writing the log entry...
+			$message     = 'Subject Name changed from ' . getSubjectName($id). ' to ' . $dept->subject. '.';
+			//Now logging the entry for the faculty...
+			entry_faculty_log("subject", $faculty_id, $message, $dept->subject_name, $id );
+			
+			//sending the response..
+			echo json_encode($dept);
+			
+		}//IF STATEMENT ENDS...
+		else{
+			header ('Server Error');
+			echo '{"error":{"text":'. 'A header with Property Name \'faculty_id\' must be provided.' .'}}';
+		}
+	}
+	
+	
+	//subject/:id','deleteSubject'
+	function deleteSubject($id){
+		$request = \Slim\Slim::getInstance()->request();
+		$faculty_id = $request->headers->get('faculty_id');
+		if($faculty_id)
+		{
+			$subjectName = getSubjectName($id);
+			
+			$sql = "DELETE FROM `subject` WHERE  `id` = :id ";
+		
+			try 
+			{
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("id", $id);
+				$stmt->execute();
+				$db = null;
+			} catch(PDOException $e) {
+				header ('Server Error');
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+
+
+			//Writing the log entry...
+			$message     = 'Subject ' . $subjectName . ' deleted.' ;
+			//Now logging the entry for the faculty...
+			entry_faculty_log("delete", $faculty_id, $message, $subjectName, $id );
+			
+			
+		}//IF STATEMENT ENDS...
+		else{
+			header ('Server Error');
+			echo '{"error":{"text":'. 'A header with Property Name \'faculty_id\' must be provided.' .'}}';
+		}
+	}//End of deleteSubject function...
+	
+	//----------------------------------------------END OF SUBJECT ROUTES AREA--------------------------------------------
+	
+	
+	
+	
+	
 
 	//$app->get('/entry/:id','fetchPeriodEntry');
 	//Function for fetching the period by its id.
@@ -721,35 +852,46 @@
 	}//Function for getAllFacultyLogEntry ends here....
 
 
-	//'/entry/faculty/:id/daysEntry/:entryId','deleteEntry'
+	//OLD ROUTE		'/entry/faculty/:id/daysEntry/:entryId','deleteEntry'
+	//NEW ROUTE		'/period/entry/:id','deleteEntry'
 	//function for deleting the period entry...
-	function deleteEntry($id, $entryId)
+	function deleteEntry($id)
 	{
-		//Getting the current period info..
-		$period_info = getPeriodEntry($entryId);
-		//Now semester and department info..
-		$days_info   = get_days_entry($period_info->days_entry_id); 
-		
-	 	$sql = "DELETE FROM `period_entry` WHERE `id` = :id AND faculty_id = :faculty_id";
-		try {
-			$db = getConnection();
-			$stmt = $db->prepare($sql);
-			$stmt->bindParam("id", $entryId);
-			$stmt->bindParam("faculty_id", $id);
-			$stmt->execute();
-			$db = null;
-		} catch(PDOException $e) {
-			header ('Server Error');
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		$request = \Slim\Slim::getInstance()->request();
+		$faculty_id = $request->headers->get('faculty_id');
+		if($faculty_id)
+		{
+			//Getting the current period info..
+			$period_info = getPeriodEntry($id);
+			//Now semester and department info..
+			$days_info   = get_days_entry($period_info->days_entry_id); 
+			
+			$sql = "DELETE FROM `period_entry` WHERE `id` = :id AND faculty_id = :faculty_id";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("id", $id);
+				$stmt->bindParam("faculty_id", $faculty_id);
+				$stmt->execute();
+				$db = null;
+			} catch(PDOException $e) {
+				header ('Server Error');
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+			 
+			 $message     = 'Entry deleted for   ' . $days_info->semester_id . getDepartmentNameById($days_info->department_id) .'-'.$days_info->section_name.'.';
+			 $sub_info = getSubjectName($period_info->subject_id);
+			 
+			//Now logging the entry for the faculty...
+			entry_faculty_log("delete", $faculty_id, $message, $sub_info, 'NULL' );
 		}
-		 
-		 $message     = 'Entry deleted for   ' . $days_info->semester_id . getDepartmentNameById($days_info->department_id) .'-'.$days_info->section_name.'.';
-		 $sub_info = getSubjectName($period_info->subject_id);
-		 
-		//Now logging the entry for the faculty...
-		entry_faculty_log("delete", $id, $message, $sub_info, 'NULL' );
-		
+		else{
+			header ('Server Error');
+			echo '{"error":{"text":'. 'Property Name \'faculty_id\' must be provided with the Header. ' .'}}';
+		}
 	}//Function ends for delete entry..
+	
+	
 	
 	
 	//Function for updating Entry ...

@@ -112,20 +112,20 @@
 
 
 <script id="display-info" type="text/template">
-	<div id="dept-display-box" class="alert <%= typeInfo %> fade in" role="alert">
+	<div id="dept-display-box" class=" alert <%= typeInfo %> fade in" role="alert">
       		<button type="button" class="close" data-dismiss="alert">
 				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
 			</button>
-      		<%= message %>
+			<p class="alert-body">
+      			<%= message %>
+			</p>
     </div>
 </script>
 
 <script id="entry-log-alert-body" type="text/template">
-		<h4> <%- title %> </h4>
-		<p> <%= body %> </p>
+		<h4> Do you want to delete this entry. </h4>
 		<p>
-		  <button type="button" id="entry-action-btn" class="btn btn-danger"> <%- action %> </button>
-		  <button type="button" id="entry-close-btn" class="btn btn-default"> Cancel </button>
+		  <button type="button" id="entry-action-btn" class="btn btn-danger"> Delete </button>
 		</p>
 	</div><!--End of alert box-->
 	
@@ -139,11 +139,13 @@
 	<div class="modal-dialog">
 	  <div class="modal-content">
 		<div class="modal-header">
-		  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-		  <h4 class="modal-title" id="myModalLabel"><%= heading %></h4>
+		  	<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+		   	<h4 class="modal-title" id="myModalLabel">
+		  		 <!-- heading --->
+		   	</h4>
 		</div>
 		<div class="modal-body">
-		  <%= body %>
+		  <!--Modal body --->
 		</div>
 		<div class="modal-footer">
 		  <button id="alert_modal_close_btn" type="button" class="btn btn-default" data-dismiss="modal">Close</button>

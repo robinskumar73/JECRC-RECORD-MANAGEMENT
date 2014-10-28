@@ -814,18 +814,15 @@ app.Views.FacultyEntry = Backbone.View.extend({
 							 },
 					error: function () {
 						//update faculty log model with error type update..
-						//Now updating the faculty_log model...
-						//this.FacultyLogModel.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/daysEntry/" + this.FacultyLogModel.get("id");
-						//NOTE SENDING THE EXTRA PARAMS THROUGH HEADERS AND NOT WITH URL TO KEEP THE INTERFACE CLEAN...
 						//getting the date...
 						var d = new Date();
 						var time = d.getTime();
-						this.FacultyLogModel.save({
+						that.FacultyLogModel.save({
 							 last_update_type: 'error',
 							 last_updated_time: time },{
 							 headers:{
 								 //Sending the faculty headers with headers..
-							 	faculty_id:this.model.get('faculty_id'),
+							 	faculty_id:that.model.get('faculty_id'),
 							 },
 							 success:function(){console.log("Successfully updated period entry to server.");},
 							 error:function(){console.log("Error updating period entry to server.");}
@@ -840,14 +837,12 @@ app.Views.FacultyEntry = Backbone.View.extend({
 						//getting the date...
 						var d = new Date();
 						var time = d.getTime();
-						//Now updating the faculty_log model...
-						//this.FacultyLogModel.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/daysEntry/" + this.FacultyLogModel.get("id");
-						this.FacultyLogModel.save({
+						that.FacultyLogModel.save({
 							 last_update_type: 'update',
 							 last_updated_time: time,
 							 headers:{
 								 //Sending the faculty headers with headers..
-							 	faculty_id:this.model.get('faculty_id'),
+							 	faculty_id:that.model.get('faculty_id'),
 							 }, 
 						});
 						//Removing the view..
@@ -1081,6 +1076,9 @@ app.Views.Branch = Backbone.View.extend({
 
 });
 
+
+
+
 //--------------------------------------------VIEW FOR FACULTY ALERT MESSAGE BOX--------------------------------------
 //Takes 2 argument as option - 1) model:model_for_faculty_log_entry 2) delete:boolean if true then delete button was clicked..
 app.Views.logAlertBox = Backbone.View.extend({
@@ -1092,9 +1090,162 @@ app.Views.logAlertBox = Backbone.View.extend({
 			
 	},
 	
+	events:{
+		'click #entry-action-btn' 			: 'deleteItem',
+		'close.bs.alert #dept-display-box'	: 'destroy_view'
+	},
+	
+	
+	//Event when delete button is pressed and then confirmed to delete..
+	deleteItem: function(){
+		if( this.model.get('entry_type') === 'entry' || this.model.get('entry_type') === 'update')
+		{
+			var that = this;
+			//Fetch the period entry model...
+			var periodEntry = new app.Model.periodEntry({ "id": this.model.get('info_entry_id') });
+			//Now send delete request to the server the periodEntry Model
+			periodEntry.destroy({ 
+				headers:{
+					"faculty_id" : 	that.model.get('faculty_id')
+				},
+				success: function(){
+					console.log("Successfully deleted period entry from server!");
+					var message = "Successfully deleted period entry from server!";
+					//Updating the log.
+					//Undelecating the events..
+					that.displayMessage(message, that);
+					that.undelegateEvents();
+					//getting the date...
+					var d = new Date();
+					var time = d.getTime();
+					that.model.save({
+						 last_update_type: 'delete',
+						 last_updated_time: time,
+						 headers:{
+							 //Sending the faculty headers with headers..
+							faculty_id : that.model.get('faculty_id'),
+						 }, 
+					});
+					//Removing the view..
+					//that.destroy_view();
+					
+				},
+				error: function(){
+					console.log("Error deleting period entry from server!");
+					var message = "Error deleting period entry from server!";
+					//Updating the log.
+					//Undelecating the events..
+					that.displayMessage(message, that);
+					that.undelegateEvents();
+					//getting the date...
+					var d = new Date();
+					var time = d.getTime();
+					that.model.save({
+						 last_update_type: 'error',
+						 last_updated_time: time,
+						 headers:{
+							 //Sending the faculty headers with headers..
+							faculty_id : that.model.get('faculty_id'),
+						 }, 
+					});	
+				}
+			});//END OF periodEntry.destroy
+		}
+		else if(  this.model.get('entry_type') === "subject" ){
+			var that = this;
+			//Fetch the period entry model...
+			var subjectEntry = new app.Model.Subject({ "id": this.model.get('info_entry_id') });
+			//Now send delete request to the server the subjectEntry Model
+			//Now send delete request to the server the periodEntry Model
+			subjectEntry.destroy({ 
+				headers:{
+					"faculty_id" : 	that.model.get('faculty_id')
+				},
+				success: function(){
+					console.log("Successfully deleted subject entry from server!");
+					var message = "Successfully deleted subject entry from server!";
+					//Updating the log.
+					//Undelecating the events..
+					that.displayMessage(message, that);
+					that.undelegateEvents();
+					//getting the date...
+					var d = new Date();
+					var time = d.getTime();
+					that.model.save({
+						 last_update_type: 'delete',
+						 last_updated_time: time,
+						 headers:{
+							 //Sending the faculty headers with headers..
+							faculty_id : that.model.get('faculty_id'),
+						 }, 
+					});
+					//Removing the view..
+					//that.destroy_view();
+					
+				},
+				error: function(){
+					console.log("Error deleting subject entry from server!");
+					var message = "Error deleting subject entry from server!";
+					//Updating the log.
+					//Undelecating the events..
+					that.displayMessage(message, that);
+					that.undelegateEvents();
+					//getting the date...
+					var d = new Date();
+					var time = d.getTime();
+					that.model.save({
+						 last_update_type: 'error',
+						 last_updated_time: time,
+						 headers:{
+							 //Sending the faculty headers with headers..
+							faculty_id : that.model.get('faculty_id'),
+						 }, 
+					});	
+				}
+			});//END OF subjectEntry.destroy
+			
+		}
+		else{
+			/* do nothing*/
+		}
+	},//END OF deleteItem method
+	
+	//For displaying of message on delete...
+	displayMessage : function(message, context){
+		//Callback for success 
+		var alertBody = context.$el.find(".alert-body");
+		$(alertBody).empty();
+		$(alertBody).html(message);
+		//Now destroying this view after3 second..
+		setTimeout(function(){ context.destroy_view() }, 3000);
+	},
+	
 	
 	//Function for rendering the logAlertBox...
 	render:function(){
+		//app.Views.alertBod
+		if(this.delete)
+		{
+			//Delete button was clicked ...
+			//Get the alert box modal..
+			var deleteTemplateBox = _.template( $("#display-info").html() );
+			var deleteAlertBody	  = _.template( $("#entry-log-alert-body").html() );	
+			
+			deleteAlertBodyElement    = deleteAlertBody();
+			deleteTemplateBoxElement  = deleteTemplateBox({ "message" : deleteAlertBodyElement });
+			//Appending this to el element..
+			this.$el.append( deleteTemplateBoxElement );
+			
+		}
+		else{
+			//Edit button was clicked...
+			//Create an instance of alertBody view...
+			var alertBody = new app.Views.alertBody({ model: this.model });
+			//appending this alertBody Content to el element...
+			this.$el.append(alertBody.el);  
+		}
+		
+		return this;
 		
 	},
 	
@@ -1118,6 +1269,9 @@ app.Views.logAlertBox = Backbone.View.extend({
 app.Views.alertBody = Backbone.View.extend({
 	initialize : function(){
 		this.template =  _.template( $('#"alert-modal').html() );
+		//Append this template to el element...
+		this.$el.append( this.template() );
+		
 		//alert-modal
 		if( this.model.get('entry_type') === 'entry' || this.model.get('entry_type') === 'update' ){
 			if(this.model.get('last_update_type') !== 'delete')
@@ -1140,9 +1294,14 @@ app.Views.alertBody = Backbone.View.extend({
 		//Updating the subject name
 		else if( this.model.get('entry_type') === 'subject' && this.model.get('last_update_type') !== 'delete' ){
 			//Show the subject edit for update..
-			this.subjectModel 	=  new app.Model.Subject();				
-			//Now listen to this model on add...
-			this.listenTo(this.subjectModel, 'add', this.addSubjectEntryBody);
+			this.subjectModel 	=  new app.Model.Subject( { "id":this.model.get('info_entry_id'), "subject":this.model.get('sub_info')} );				
+			//Now show modal showing subject update...
+			this.showSubjectModal(this.subjectModel);
+		}
+		else{
+			/*Do nothing */
+			console.log("Wrong Entry type");
+			return false;
 		}
 		
 	},//End of initialize function ...
@@ -1151,9 +1310,40 @@ app.Views.alertBody = Backbone.View.extend({
 	events:{
 		//'click #alert_modal_close_btn' : 'closeModal',
 		'click #alert_modal_save_btn'  : 'saveModal',
-		'hide.bs.modal #myModal'	   : 'destroy_view'
+		'hide.bs.modal #myModal'	   : 'destroy_view',
+		//When modal is loaded...
+		'shown.bs.modal #myModal'	   : 'addAutoComplete'
+		
 	},
 	
+	showSubjectModal: function(subjectModel){
+		//Forming the model...
+		var heading = "Edit subject!";
+		//First showing an input box with..value as subject value..
+		var body    = '<input type="text" id="jecrc-subject-entry-update" class="form-control jecrc-dept-entry" placeholder="Subject Name">';
+		//this.subjectTemplateView = this.template({"heading":heading, "body":body});
+		//Adding the heading and body to the modal...
+		var headingElement  = this.$el.find('#myModalLabel');
+		var bodyElement		= this.$el.find('.modal-body');
+		//Appending data to this element respectively....
+		$(headingElement).append(heading);
+		$(bodyElement).append(body);		
+	},
+	
+	
+	
+	//Adding autocomplete option to the subject input form..
+	addAutoComplete: function(){
+		
+		//Finding the input element
+		var inputElement = this.$el.find("#jecrc-subject-entry-update");
+		var select = customSubjectSelectize( $( inputElement ) );
+		//Getting the selectize instance...
+		var control = select[0].selectize;
+		//Now adding data to the input element..
+		control.addOption( this.subjectModel.toJSON() );
+		control.addItem( this.subjectModel.get('subject') );
+	},
 	
 	
 	//Method for forming the entry body and appending to $el element on model change event...
@@ -1173,16 +1363,25 @@ app.Views.alertBody = Backbone.View.extend({
 		//Adding to the el
 		//Adding this  body to faculty
 		var heading =  "Edit your entry!";
-		var Modal = this.template({ "heading":heading, "body": this.facultyEntry.el  });
-		$(this.$el).append( Modal );
+		
+		var headingElement  = this.$el.find('#myModalLabel');
+		var bodyElement		= this.$el.find('.modal-body');
+		//Appending data to this element respectively....
+		$(headingElement).append( heading );
+		$(bodyElement).append( this.facultyEntry.el );		
+		
+		//var Modal = this.template({ "heading":heading, "body": this.facultyEntry.el  });
+		//$(this.$el).append( Modal );
 	},
+	
+	
 	
 	//Rendering the view...
 	render: function(){
-		
-		
 		return this;
 	},
+	
+	
 	
 	//event when modal is about to close...
 	removeView: function(){
@@ -1198,13 +1397,78 @@ app.Views.alertBody = Backbone.View.extend({
 	},
 	
 	
+	
+	
 	//Event when save entry button is pressed...
-	saveModal: function(){
-		console.log('Updating the entry data...');
-		this.facultyEntry.saveEntry();
+	saveModal: function(e){
+		
+		if( this.model.get('entry_type') === 'entry' || this.model.get('entry_type') === 'update' ){
+			console.info('Saving the updated the entry data...');
+			this.facultyEntry.saveEntry();
+		}
+		//IF MODEL VIEWING IS SUBJECT UPDATE...
+		if( this.model.get('entry_type') === 'subject'){
+			console.info('Saving the updated subject..');
+			//NOW FETCHING THE DATA...
+			//Find the element..
+			var inputElement = this.$el.find("#jecrc-subject-entry-update");
+			var subject		 = $(inputElement).val();
+			var that = this;
+			if( subject ){
+				this.subjectModel.save({ "subject": subject },
+					{
+						headers:{
+							"faculty_id" : that.model.get('faculty_id'),
+						},
+						success:function()
+						{
+							console.log("Successfully updated subject!");
+							//Undelecating the events..
+							that.undelegateEvents();
+							//getting the date...
+							var d = new Date();
+							var time = d.getTime();
+							that.model.save({
+								 last_update_type: 'error',
+								 last_updated_time: time,
+								 headers:{
+									 //Sending the faculty headers with headers..
+									faculty_id : that.model.get('faculty_id'),
+								 }, 
+							});
+							//Removing the view..
+							that.destroy_view();
+						},
+						error:function()
+						{
+							console.log("Error updating the subject to server!");
+							//Undelecating the events..
+							that.undelegateEvents();
+							//getting the date...
+							var d = new Date();
+							var time = d.getTime();
+							that.model.save({
+								 last_update_type: 'update',
+								 last_updated_time: time,
+								 headers:{
+									 //Sending the faculty headers with headers..
+									faculty_id : that.model.get('faculty_id'),
+								 }, 
+							});
+							//Removing the view..
+							that.destroy_view();
+						}
+					}
+				);	
+			}
+		}//End of if of subject...
+	
 		//Now hiding the modal..
 		$(this.$el.find('#myModal')).modal('hide');
 	},
+	
+	
+	
 	
 	getDepartmentName: function(PeriodModel){
 		//Now fetching the department name...
@@ -1285,7 +1549,9 @@ app.Views.faculty_entry = Backbone.View.extend({
 		this.detachIconsElement		= $(this.iconsElement).detach();
 		console.log("Editing the entry..");
 		//Now appending the data from the log-alert-action view..
-			
+		var alertBox = app.Views.logAlertBox({ "model" : this.model, delete:false });
+		//Now appending to el element..
+		this.$el.append( alertBox.render().el );
 	},
 	
 	deleteEntry: function(e){
@@ -1295,7 +1561,9 @@ app.Views.faculty_entry = Backbone.View.extend({
 		this.detachIconsElement		= $(this.iconsElement).detach();
 		console.log("deleting the entry..");
 		//Now appending the data from the log-alert-action view..	
-			
+		var alertBox = app.Views.logAlertBox({ "model" : this.model, delete:true });
+		//Now appending to el element..
+		this.$el.append( alertBox.render().el );
 	}
 	
 });

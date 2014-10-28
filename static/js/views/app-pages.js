@@ -53,7 +53,7 @@ customSubjectSelectize = function(elementObj){
 		load: function(query, callback) {
 			if (!query.length) return callback();
 			$.ajax({
-				url: 'http://localhost/Manage/modules/department.php/subject/'+query,
+				url: 'http://localhost/Manage/modules/department.php/subject?key='+query,
 				type: 'GET',
 				dataType: 'json',
 				error: function() {
