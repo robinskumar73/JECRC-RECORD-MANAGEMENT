@@ -231,8 +231,10 @@ var PeriodEntryRender = function(dept_name, semester_name, section_name, Periodc
 		var facultyEntry = new app.Views.FacultyEntry({
 			model		 : periodModel,				
 			collection   : Periodcollection,
-			update		 : false
+			
 		});
+		//Adding update param
+		facultyEntry.update = 0;
 		//Appending view to window..
 		$("#faculty-entry-record").html(facultyEntry.render().el);
 		

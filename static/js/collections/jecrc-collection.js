@@ -66,7 +66,8 @@ app.Collection.faculty_entry = Backbone.Collection.extend({
 	
 	//Sorting the collection in decreasing order of date..
 	comparator: function(Model) {
-		return Model.get("date");
+		console.log("Inside comparator!");
+		return [-Model.get("date"), -Model.get("time")];
 	},
 });
 

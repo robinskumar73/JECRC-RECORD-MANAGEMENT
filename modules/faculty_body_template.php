@@ -92,20 +92,13 @@
 		<% if(entry_type === 'update' || entry_type === 'entry' || entry_type === 'subject') { %>
 			<div id="log-icons-containers" style="margin-left:8px;">
 				<a id="log-entry-edit" style="display:inline-block" href="#">
-				  <p class="log-entry-icon glyphicon glyphicon-edit"></p>
+				  <p class="log-entry-icon glyphicon glyphicon-pencil"></p>
 				</a> 
 				<a id="log-entry-delete" style="display:inline-block" href="#">
 				  <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
 				</a> 
 			</div> 
-			<div class="alert alert-danger fade in" role="alert">
-			  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-			  <h4>Edit your entry.</h4>
-			  <p>
-				<button type="button" class="btn btn-danger">Update</button>
-				<button type="button" class="btn btn-default">Change</button>
-		      </p>
-    		</div> 
+			
 		<% } %>  
 	</blockquote> 					  
 </script>

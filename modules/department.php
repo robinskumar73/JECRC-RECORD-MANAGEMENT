@@ -831,7 +831,7 @@
 		{
 			$id = $_GET['faculty_id'];
 			//OFFSET 8
-			$sql = "SELECT * FROM `faculty_log` WHERE faculty_id = :faculty_id ORDER BY date DESC LIMIT :limit OFFSET :offset ;";
+			$sql = "SELECT * FROM `faculty_log` WHERE faculty_id = :faculty_id ORDER BY date DESC, time DESC  LIMIT :limit OFFSET :offset ;";
 			try 
 			{
 				$db = getConnection();
@@ -953,6 +953,7 @@
 	//NEW ROUTE faculty/activity/:entryId','updateLog'
 	function updateLog( $entryId )
 	{
+		echo "inside updateLog";
 		$request = \Slim\Slim::getInstance()->request();
 		$dept = json_decode($request->getBody());
 		$faculty_id = $request->headers->get('faculty_id');

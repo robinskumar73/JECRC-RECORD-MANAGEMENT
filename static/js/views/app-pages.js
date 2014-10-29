@@ -20,6 +20,21 @@ app.Global.entryLogCollection 		= new app.Collection.faculty_entry;
 //Now create a global variable accesing department list..
 app.Global = app.Global || {};
 
+
+//Extending the backbone view...
+Backbone.View.prototype.destroy_view = function()
+{ 
+	//COMPLETELY UNBIND THE VIEW
+	console.info("Destroying the view!  ");
+	this.undelegateEvents();
+	$(this.el).removeData().unbind(); 
+	//Remove view from DOM
+	this.remove();  
+	Backbone.View.prototype.remove.call(this);
+}
+
+
+
 app.Global.showLoadingBar = function(){
 	console.log("Showing the loading bar..");
 	$('#loading-bar').removeClass('hide');	

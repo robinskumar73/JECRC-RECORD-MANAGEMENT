@@ -618,7 +618,9 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	//el:$("#faculty-entry-record"),
 	
 	initialize: function(){
+		console.log("inside app.Views.FacultyEntry constructor");
 		$(this.el).empty();
+		app.period = this.model;
 		this["dept_name"]           =  this.model.get("department_name");
 		this["dept_id"]			    =  this.model.get("department_id");
 		this["semester_id"]         =  this.model.get("semester_id");
@@ -637,10 +639,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 			this.days_entry_id = "";	
 		}
 		
-		//Listening to faculty_log_model if it it is a update view....
-		//if( !this.update ){
-		//	this.listenTo(this.FacultyLogModel, 'change:last_updated_time', this.up);
-		//}
+		console.log("getting out app.Views.FacultyEntry constructor");
 
 	},
 	
@@ -662,6 +661,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	
 	
 	render:function(){
+		console.log("app.Views.FacultyEntry view rendering");
 		$(this.el).empty();
 		//Appending the form to the el element...
 		$(this.el).append(this.form);
@@ -669,6 +669,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		//Finding the element..
 		var subjectEntry = $(this.$el).find( "#jecrc-subject-entry" );
 		this.autoSelect = customSubjectSelectize( subjectEntry );
+		
 		return this;	
 	},
 	
@@ -698,6 +699,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	//Only used for updating the entry form...
 	//setting value if already present in the model...
 	setValue : function( ){
+		
 		//Hiding the save and cancel buttons...
 		var saveBtn    = this.$el.find("#faculty_save_button");
 		var cancelBtn  = this.$el.find("#faculty_reset_button");
@@ -705,32 +707,42 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		$(saveBtn).remove();
 		$(cancelBtn).remove();
 		
+		//Removing the boreders....
+		var containerElement = this.$el.find(".jecrc-stats");
+		$(containerElement).removeClass('jecrc-stats');
+		
 		if( this.model.get("subject_name") ){
-			//Adding the subject firsts..	
-			this.autoSelect.addOption({
+			//Adding the subject firsts..
+			
+			var control = this.autoSelect[0].selectize;	
+			control.addOption({
 				id:null,
 				subject:this.model.get("subject_name")
 			});
 			//adding to the input field...
-			this.autoSelect.addItem( this.model.get("subject_name") );
+			control.addItem( this.model.get("subject_name") );
 		}
 		
-		//Now addding the lab/class radio button....
-		if( this.model.get("lab") ){
+		
+		if( parseInt(this.model.get("lab")) === 1  ){
 			//Select the lab button...
 			var labLabelElement = this.$el.find("#lab-label");
 			$(labLabelElement).addClass('active');
 			var labElement = this.$el.find("#lab");
+			
 			$( labElement ).attr('checked', 'checked');
 			//Adding the batch field...
 			var batchElement = this.$el.find("#jecrc-batch-entry input");
-			$(batchElement).each(function(i, btn){
-   				if( $(btn).val() === this.model.get("batch") )
+			var batchContainer = this.$el.find("#jecrc-batch-entry");
+			$(batchContainer).removeClass('hide');
+			var that = this;
+			$(batchElement).each(function(j, btn){
+   				if( $(btn).val() === that.model.get("batch") )
 				{
 					//Add checked attr to this button...
 					$(btn).attr('checked', 'checked');
 					//Add active class to its parent properties...
-					$( btn.parent() ).addClass('active');
+					$( $(btn).parent() ).addClass('active');
 				}
 			})
 			
@@ -740,6 +752,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 			var classLabelElement = this.$el.find("#class-label");
 			$(classLabelElement).addClass('active');
 			var classElement = this.$el.find("#class");
+			$(classElement).click();
 			$( classElement ).attr('checked', 'checked');
 		}
 		
@@ -749,8 +762,8 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		if(period.length){
 			for(var i = 0; i<period.length; i++)
 			{
-			  $(periodElement).each(function(i, btn){
-				  if( $(btn).data('wat') === parseInt(period[i]) ){
+			  $(periodElement).each(function(j, btn){
+				  if( $(btn).data('wat') === parseInt( period[i]) ){
 					  $(btn).addClass('active');
 				  }	
 			  });//end of each loop..
@@ -761,13 +774,13 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		var strengthElement = this.$el.find("#jecrc-strength-entry");
 		$(strengthElement).val( this.model.get("strength") );
 		
-		
+		console.log("getting out of  setValue method of app.Views.FacultyEntry ");
 	},//End of save function...
 
 
 
 	saveEntry : function(){
-		
+		console.log("Inside save entry method!");
 		var EntryValue = this.getEntryValue();
 		if (EntryValue === null){
 			return null;	
@@ -775,7 +788,9 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		else{
 			//Updating the url value for post operation..
 			var that = this;
-			if(!this.update){
+			
+			if( parseInt(this.update) === 0  ){
+				console.log('Saving the entry!');
 				//Creating period entry model...
 				var PeriodModel = new app.Model.periodEntry;
 				//Adding an error validation event listener to it..
@@ -807,6 +822,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 				//Just update this model...
 				//this.model.url = "department.php/entry/faculty/" + this.model.get('faculty_id') + "/periodEntry/" + this.model.get('id') ;
 				/*NOTE INSTEAD OF PASSING EXTRA VALUE THROUGH URL WE ARE USING HEADER TO KEEP THE INTERFACE CLEAN*/
+				console.log("Updating the data.");
 				this.model.save(EntryValue,{
 					 headers:{
 								//Sending the faculty headers with headers..
@@ -1080,13 +1096,15 @@ app.Views.Branch = Backbone.View.extend({
 
 
 //--------------------------------------------VIEW FOR FACULTY ALERT MESSAGE BOX--------------------------------------
-//Takes 2 argument as option - 1) model:model_for_faculty_log_entry 2) delete:boolean if true then delete button was clicked..
+//Takes 2 argument as option - 1) model:model_for_faculty_log_entry 2) delete:0 or 1 if true then delete button was clicked..
 app.Views.logAlertBox = Backbone.View.extend({
 	initialize: function(){
+		console.log("I am inside alogAlertBox view!");
 		//Cache the template function for displaying the alert box..
 		this.template	= _.template( $('#display-info').html() );
 		//Listening to facultyLogModel for change...
 		this.listenTo(this.model, 'change:last_updated_time', this.destroy_view);
+		console.log("getting out alogAlertBox view!");
 			
 	},
 	
@@ -1224,7 +1242,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 	//Function for rendering the logAlertBox...
 	render:function(){
 		//app.Views.alertBod
-		if(this.delete)
+		if( parseInt(this.delete) === 1 )
 		{
 			//Delete button was clicked ...
 			//Get the alert box modal..
@@ -1268,7 +1286,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 //Takes one argument model of faculty log entry...
 app.Views.alertBody = Backbone.View.extend({
 	initialize : function(){
-		this.template =  _.template( $('#"alert-modal').html() );
+		this.template =  _.template( $('#alert-modal').html() );
 		//Append this template to el element...
 		this.$el.append( this.template() );
 		
@@ -1279,15 +1297,8 @@ app.Views.alertBody = Backbone.View.extend({
 				//Creating a model for fetching an period of given id;
 				this.periodModel 	=  new app.Model.periodEntry({ id: this.model.get('info_entry_id') });
 				
-				//Now listen to this model on add...
-				this.listenTo(this.periodModel, 'add', this.addPeriodEntryBody);
 				this.listenTo(this.model, 'change:last_updated_time', this.removeView);
 				
-				
-				//Adding the url for fetching the period_entry by id..
-				//OLD URL var url 	= "department.php/entry/"+ this.model.get('info_entry_id');
-				//fetching the period entry..
-				//this.fetchEntryModel(this.periodModel, url);
 				this.fetchEntryModel(this.periodModel);
 			}
 		}
@@ -1334,28 +1345,40 @@ app.Views.alertBody = Backbone.View.extend({
 	
 	//Adding autocomplete option to the subject input form..
 	addAutoComplete: function(){
-		
-		//Finding the input element
-		var inputElement = this.$el.find("#jecrc-subject-entry-update");
-		var select = customSubjectSelectize( $( inputElement ) );
-		//Getting the selectize instance...
-		var control = select[0].selectize;
-		//Now adding data to the input element..
-		control.addOption( this.subjectModel.toJSON() );
-		control.addItem( this.subjectModel.get('subject') );
+		if( this.model.get('entry_type') === 'subject' && this.model.get('last_update_type') !== 'delete' ){
+			console.log("Auto complete is loaded..");
+			//Finding the input element
+			var inputElement = this.$el.find("#jecrc-subject-entry-update");
+			var select_ = customSubjectSelectize( $( inputElement ) );
+			//Getting the selectize instance...
+			var control = select_[0].selectize;
+			//Now adding data to the input element..
+			control.addOption( this.subjectModel.toJSON() );
+			control.addItem( this.subjectModel.get('subject') );
+		}
 	},
 	
 	
 	//Method for forming the entry body and appending to $el element on model change event...
-	addPeriodEntryBody : function( PeriodModel ){
+	addPeriodEntryBody : function( periodModel ){
+		console.log("Inside addPeriodEntryBody");
 		//Forming template for entry form...
+		//adding the period Model
+		//Removing period of myModal
+		heading	= this.$el.find('.modal-footer');
+		$(heading).addClass('modal-form');
+		
+		var department_name = this.getDepartmentName(periodModel);
+		periodModel.set({"department_name" : department_name});
 		var Periodcollection = new app.Collection.periodEntry( periodModel );
 		this.facultyEntry = new app.Views.FacultyEntry({
 			model		    : periodModel,				
-			collection      : Periodcollection,
-			update		    : true,
-			FacultyLogModel : this.model
+			collection      : Periodcollection
 		});
+		//Addding the params...
+		this.facultyEntry.update 			= 1;
+		this.facultyEntry.FacultyLogModel   = this.model;
+		
 		//Rendering the faculty...
 		this.facultyEntry.render();
 		//Setting the initial values...
@@ -1369,7 +1392,7 @@ app.Views.alertBody = Backbone.View.extend({
 		//Appending data to this element respectively....
 		$(headingElement).append( heading );
 		$(bodyElement).append( this.facultyEntry.el );		
-		
+		console.log("getting out addPeriodEntryBody");
 		//var Modal = this.template({ "heading":heading, "body": this.facultyEntry.el  });
 		//$(this.$el).append( Modal );
 	},
@@ -1495,12 +1518,14 @@ app.Views.alertBody = Backbone.View.extend({
 			success: function( model, response, options ){
 				//Hiding the loading bar...
 				app.Global.hideLoadingBar();
-				console.log("Successfully fetched data of period_entry from server.");	
+				
+				console.log("Successfully fetched data of period_entry from server.");
+				that.addPeriodEntryBody(Periodmodel);	
 			}
 		 });
 	},
 	
-	//view destructor...
+	
 	//destroying the view..
 	destroy_view: function() {
 		//COMPLETELY UNBIND THE VIEW
@@ -1524,6 +1549,7 @@ app.Views.faculty_entry = Backbone.View.extend({
 	initialize:function(){
 		// Cache the template function for a single item.
     	this.template 				= _.template( $('#faculty_home_log').html() );
+		this.listenTo( this.model, 'change:last_updated_time', this.alertBoxClosed );
 		//For storing the detach icons element...	
 		this.detachIconsElement		= null;
 		
@@ -1542,6 +1568,20 @@ app.Views.faculty_entry = Backbone.View.extend({
       return this;
     },
 	
+	//Trigger when  model property  last_update_time is changed
+	alertBoxClosed : function(model, value, options){
+		//Now checking the model update type property...
+		if( ( model.get('last_update_type') === 'update' || model.get('last_update_type') === 'error')  && this.detachIconsElement !== null )
+		{
+			//update has been done on entry..
+			//show the icons...
+			var iconsContainer = this.$el.find("#log-icons-containers");
+			$(iconsContainer).append( this.detachIconsElement );
+		}
+		
+	},
+	
+	
 	editEntry: function(e){
 		e.preventDefault();
 		//detach the icons.. and store it safe first...
@@ -1549,9 +1589,13 @@ app.Views.faculty_entry = Backbone.View.extend({
 		this.detachIconsElement		= $(this.iconsElement).detach();
 		console.log("Editing the entry..");
 		//Now appending the data from the log-alert-action view..
-		var alertBox = app.Views.logAlertBox({ "model" : this.model, delete:false });
+		var alertBox = new app.Views.logAlertBox({ "model" : this.model });
+		alertBox.delete = 0;
 		//Now appending to el element..
 		this.$el.append( alertBox.render().el );
+		var modal = this.$el.find('#myModal');
+		console.log('showing the modal window..');
+		$(modal).modal('show');
 	},
 	
 	deleteEntry: function(e){
@@ -1561,7 +1605,8 @@ app.Views.faculty_entry = Backbone.View.extend({
 		this.detachIconsElement		= $(this.iconsElement).detach();
 		console.log("deleting the entry..");
 		//Now appending the data from the log-alert-action view..	
-		var alertBox = app.Views.logAlertBox({ "model" : this.model, delete:true });
+		var alertBox = new app.Views.logAlertBox({ "model" : this.model });
+		alertBox.delete = 1;
 		//Now appending to el element..
 		this.$el.append( alertBox.render().el );
 	}
