@@ -20,7 +20,7 @@
 						 
 					  </tr>
 					  <tr style="height:37px;">
-						  <td> <%= faculty %> </td>
+						  <td class="faculty_name_tuple" data-toggle="tooltip" data-placement="top" title="Loading.."> <%= faculty %> </td>
 						
 					  </tr>
 				  </tbody>

@@ -446,3 +446,12 @@ ul.log li {
 	margin:0px !important;	
 	border:none !important;
 }
+
+
+.faculty_name_tuple{
+	cursor:pointer;	
+}
+
+div#dept-display-box{
+	margin-bottom:40px !important;	
+}

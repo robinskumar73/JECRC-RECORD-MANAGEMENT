@@ -105,23 +105,23 @@
 
 
 <script id="display-info" type="text/template">
-	<div id="dept-display-box" class=" alert <%= typeInfo %> fade in" role="alert">
+	<div id="dept-display-box" style="margin-left:20px;" class=" alert <%= typeInfo %> fade in" role="alert">
       		<button type="button" class="close" data-dismiss="alert">
 				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
 			</button>
-			<p class="alert-body">
+			<div class="alert-body">
       			<%= message %>
-			</p>
+			</div>
     </div>
 </script>
 
 <script id="entry-log-alert-body" type="text/template">
-		<h4> Do you want to delete this entry. </h4>
-		<p>
-		  <button type="button" id="entry-action-btn" class="btn btn-danger"> Delete </button>
-		</p>
-	</div><!--End of alert box-->
-	
+	<div class="delete-info">
+  		<h4> Do you want to delete this entry. </h4>
+  		<p>
+			<button type="button" id="entry-action-btn" class="btn btn-danger"> Delete </button>
+  		</p>
+  	</div>
 </script>
 
 
