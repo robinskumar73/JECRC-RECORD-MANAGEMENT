@@ -75,7 +75,6 @@ customSubjectSelectize = function(elementObj){
 					callback();
 				},
 				success: function(res) {
-					console.log(res);
 					callback(res);
 				}
 			});

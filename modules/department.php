@@ -30,23 +30,6 @@
 	
 	
 	//------------------------------------------PERIOD ENTRY AREA------------------------------------------------------------
-	//OLD ROUTES-----
-	/*
-	//GET
-	$app->get('/entry/:id','fetchPeriodEntry');
-	$app->get('/entry/department/:dept_name/semester/:sem/section/:sec_name','getEntryBysection');
-	$app->get('/entry/department/:dept_name','getEntryBydept');
-	$app->get('/entry/department/:dept_name/year/:year','getEntryByYear');
-	$app->get('/faculty/department/:dept_name/semester/:semester_name/section/:section_name', 'getFacultyTodayEntry');
-	//POST
-	$app->post('/entry/department/daysEntry','addEntryBysection');
-	
-	//DELETE
-	$app->delete('/entry/faculty/:id/daysEntry/:entryId','deleteEntry');
-	//PUT
-	$app->put('/entry/faculty/:id/periodEntry/:entryId', 'updateEntry');
-	*/
-	
 	//NEW ROUTES
 	//GET
 	$app->get('/period/entry','getPeriodClassEntry');
@@ -60,17 +43,10 @@
 	
 	
 	//------------------------------------------FACULTY LOG  AREA------------------------------------------------------------
-	
-	/*//OLD ROUTES
-	//GET
-	$app->get('/entry/faculty/:id/daysEntry','getAllFacultyLogEntry');
-	//PUT
-	$app->put('/entry/faculty/:id/daysEntry/:entryId', 'updateLog');
-	*/
-	
+
 	//NEW ROUTES
 	//GET
-	$app->get('/faculty/activity','getAllFacultyLogEntry'); //faculty/activity?id=faculty_id&offset=0&limit=30
+	$app->get('/faculty/activity','getAllFacultyLogEntry'); //faculty/activity?faculty_id=3&offset=0&limit=30
 	//PUT
 	$app->put('/faculty/activity/:entryId','updateLog');
 
@@ -206,35 +182,76 @@
 	function updateSubject($id){
 		$request = \Slim\Slim::getInstance()->request();
 		$dept = json_decode($request->getBody());
-		$faculty_id = $request->headers->get('faculty_id');
+		$faculty_id     = $request->headers->get('faculty_id');
+		$oldSubjectName = $request->headers->get('Oldsubject');
+		$facultyLogId   = $request->headers->get('facultyLogId');
+		
+		$subjectId = checkSubjectExists( $dept->subject );
+		//Now checking ..if updated subject name already present..
 		if($faculty_id)
 		{
-			$sql = "UPDATE `subject` SET 
-					 subject = :subject
-					WHERE 
-					`id` = :id ";
-			
-			try 
+			if( $subjectId)
 			{
-				$db = getConnection();
-				$stmt = $db->prepare($sql);
-				$stmt->bindParam("id", $id);
-				$stmt->bindParam("subject", $dept->subject);
-				$stmt->execute();
-				$db = null;
-			} catch(PDOException $e) {
-				header ('Server Error');
-				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				if($subjectId == $dept->id)
+				{
+					//just send the respoonse....
+					//sending the response..
+					echo json_encode($dept);
+				}
+				else{
+				
+					//subject id already exists.... update the period entry the delete that subject id...the subject....
+					updatePeriodSubject($dept->id ,  $subjectId);
+					//Now delete that subject....
+					deleteSubjectById($dept->id);
+					
+					//Writing the log entry...
+					$message     = 'Subject name changed from \'' . $oldSubjectName. '\' to \'' . $dept->subject. '\'.';
+					//Now logging the entry for the faculty...
+					update_faculty_log( $facultyLogId ,"subject", $faculty_id, $message, $dept->subject, $subjectId  );
+					$log = getFacultyLogEntry( $facultyLogId, $faculty_id );
+					//update dept id
+					$dept->id  = $subjectId;
+					//Adding this faculty log to response...
+					$dept->log = $log; 
+					echo json_encode($dept);
+				}
+			}//End of if of subject check
+			else
+			{
+				$sql = "UPDATE `subject` SET 
+						 subject = :subject
+						WHERE 
+						`id` = :id ";
+				try 
+				{
+					$db = getConnection();
+					$stmt = $db->prepare($sql);
+					$stmt->bindParam("id", $id);
+					$stmt->bindParam("subject", $dept->subject);
+					$stmt->execute();
+					$db = null;
+				} catch(PDOException $e) {
+					header ('Server Error');
+					echo '{"error":{"text":'. $e->getMessage() .'}}';
+				}
+				
+				
+				//Writing the log entry...
+				$message     = 'Subject name changed from \'' . $oldSubjectName. '\' to \'' . $dept->subject. '\'.';
+				//Now logging the entry for the faculty...
+				update_faculty_log( $facultyLogId ,"subject", $faculty_id, $message, $dept->subject, $id  );
+				$log = getFacultyLogEntry( $facultyLogId, $faculty_id );
+				//update dept id
+				$dept->id  = $subjectId;
+				//Adding this faculty log to response...
+				$dept->log = $log; 
+				echo json_encode($dept);
 			}
-
-
-			//Writing the log entry...
-			$message     = 'Subject Name changed from ' . getSubjectName($id). ' to ' . $dept->subject. '.';
-			//Now logging the entry for the faculty...
-			entry_faculty_log("subject", $faculty_id, $message, $dept->subject_name, $id );
 			
-			//sending the response..
-			echo json_encode($dept);
+			
+			
+		
 			
 		}//IF STATEMENT ENDS...
 		else{
@@ -244,6 +261,26 @@
 	}
 	
 	
+	function deleteSubjectById($id){
+		$sql = "DELETE FROM `subject` WHERE  `id` = :id ";
+			try 
+			{
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("id", $id);
+				$stmt->execute();
+				
+				$db = null;
+			} catch(PDOException $e) {
+				header ('Server Error');
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+		
+		
+	}
+	
+	
+	
 	//subject/:id','deleteSubject'
 	function deleteSubject($id){
 		$request = \Slim\Slim::getInstance()->request();
@@ -251,28 +288,12 @@
 		if($faculty_id)
 		{
 			$subjectName = getSubjectName($id);
-			
-			$sql = "DELETE FROM `subject` WHERE  `id` = :id ";
-		
-			try 
-			{
-				$db = getConnection();
-				$stmt = $db->prepare($sql);
-				$stmt->bindParam("id", $id);
-				$stmt->execute();
-				$db = null;
-			} catch(PDOException $e) {
-				header ('Server Error');
-				echo '{"error":{"text":'. $e->getMessage() .'}}';
-			}
-
-
+			deleteSubjectById($id);
 			//Writing the log entry...
 			$message     = 'Subject ' . $subjectName . ' deleted.' ;
 			//Now logging the entry for the faculty...
 			entry_faculty_log("delete", $faculty_id, $message, $subjectName, $id );
-			
-			
+
 		}//IF STATEMENT ENDS...
 		else{
 			header ('Server Error');
@@ -280,13 +301,9 @@
 		}
 	}//End of deleteSubject function...
 	
+	
+	
 	//----------------------------------------------END OF SUBJECT ROUTES AREA--------------------------------------------
-	
-	
-	
-	
-	
-
 	//$app->get('/entry/:id','fetchPeriodEntry');
 	//Function for fetching the period by its id.
  	function fetchPeriodEntry($id)
@@ -700,13 +717,6 @@
 					echo '{"error":{"text":'. $e->getMessage() .'}}';
 					header ('Server Error');
 				}
-			/*}
-			else
-			{
-				echo '{"error":{"text":'. 'Invalid characters in period entry. Only digits allowed.' .'}}';
-				header ('Server Error');
-				return false;
-			}*/
 		}//End of foreach loop....
 		
 		//Now adding FACULTY ENTRY LOG---
@@ -953,7 +963,6 @@
 	//NEW ROUTE faculty/activity/:entryId','updateLog'
 	function updateLog( $entryId )
 	{
-		echo "inside updateLog";
 		$request = \Slim\Slim::getInstance()->request();
 		$dept = json_decode($request->getBody());
 		$faculty_id = $request->headers->get('faculty_id');

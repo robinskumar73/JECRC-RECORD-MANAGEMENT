@@ -321,7 +321,76 @@
 		
 			
 	}
-
+	
+	
+	//function for updating the subject_id
+	function updatePeriodSubject($old_subject_id, $new_subject_id){
+		
+		$request = \Slim\Slim::getInstance()->request();
+		$dept = json_decode($request->getBody());
+		$faculty_id = $request->headers->get('faculty_id');
+		
+		
+		if($faculty_id)
+		{
+			$sql = "UPDATE `period_entry` SET   `subject_id` = :new_subject_id WHERE subject_id = :old_subject_id "  ;
+			   
+			
+			try 
+			{
+				
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("new_subject_id", $new_subject_id);
+				$stmt->bindParam("old_subject_id", $old_subject_id);
+				$stmt->execute();
+				$db = null;
+				
+			} catch(PDOException $e) {
+				header ('Server Error');
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}
+		}
+		
+	}
+	
+	
+	//Function for checking if subject name exists...
+	function checkSubjectExists($subject_name){
+		
+		//Validation operations...
+		if(!$subject_name && !matchSubjectName($subject_name))
+		{	
+			header ('Server Error');
+			echo '{"error":{"text":'. 'Invalid characters in the subject field' .'}}';
+			return false;
+		}
+		else
+		{
+			$sql = "SELECT id FROM subject WHERE subject = :subject_name";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("subject_name", $subject_name);
+				$stmt->execute();
+				$dept = $stmt->fetchObject();
+				$db = null;
+				if($dept){
+					return $dept->id;
+				}
+				else{
+					return false;
+				}
+			}
+			catch(PDOException $e) 
+			{
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header('Server Error');
+			}	
+		}
+	
+	}//function for check subject_name ends..
+	
 	
 	
 	
@@ -462,6 +531,65 @@
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
 		}	
 	}//End of function of entry_faculty_log
+	
+	
+	
+	function update_faculty_log( $id ,$entry_type, $faculty_id, $message, $sub_info, $info_entry_id )
+	{
+		//Now adding FACULTY ENTRY LOG---
+		$sql = "UPDATE 
+				`attendance`.`faculty_log` 
+				 SET 				 				
+				 	`date`         = CURDATE(),
+				 	`time`         = CURTIME(),	
+				 	`entry_type`   = :entry_type,
+				 	`info_entry_id`= :info_entry_id,
+				 	`info`         = :message,
+				 	`sub_info`     = :sub_info
+				WHERE 
+					`id`		   = :id 
+				AND
+					`faculty_id`   = :faculty_id  
+				";
+		try 
+		{
+			$db   = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("id", $id);
+			$stmt->bindParam("faculty_id", $faculty_id);
+			$stmt->bindParam("message", $message);
+			$stmt->bindParam("sub_info", $sub_info);
+			$stmt->bindParam("info_entry_id", $info_entry_id);
+			$stmt->bindParam("entry_type", $entry_type);
+			$stmt->execute();
+			$db = null;
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}	
+	}//End of function of entry_faculty_log
+	
+	
+	
+	function getFacultyLogEntry( $id, $faculty_id ){	
+		
+		$sql = "SELECT * FROM `faculty_log` WHERE faculty_id = :faculty_id AND id = :id ;";
+		try 
+		{
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam(":id", $id);
+			$stmt->bindParam(":faculty_id", $faculty_id);
+			$stmt->execute();
+			$dept_ = $stmt->fetchObject();
+			$db = null;
+			return $dept_;
+		} catch(PDOException $e)
+		{
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header("Server Error");
+		}	
+	}
+	
 	
 	
 	/*-------------------------------------NOW APPLYING SOME VALIDATION FUNCTIONS------------------------------------*/
