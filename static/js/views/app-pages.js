@@ -24,14 +24,30 @@ app.Global = app.Global || {};
 //Extending the backbone view...
 Backbone.View.prototype.destroy_view = function()
 { 
-	//COMPLETELY UNBIND THE VIEW
-	console.info("Destroying the view!  ");
+	//for doing something before closing...useful for closing the child views...
+	if (this.beforeClose) {
+        this.beforeClose();
+    }
 	this.undelegateEvents();
 	$(this.el).removeData().unbind(); 
 	//Remove view from DOM
 	this.remove();  
 	Backbone.View.prototype.remove.call(this);
 }
+
+
+
+//Function for doing before closing the view...
+Backbone.View.prototype.beforeClose  = function(){
+	console.info("Closing the child views...");
+	if(this.childViews){
+	  var len = this.childViews.length;
+	  for(var i=0; i<len; i++){
+		  this.childViews[i].destroy_view();
+	  }
+	}//End of if statement
+} //End of beforeClose function
+
 
 
 

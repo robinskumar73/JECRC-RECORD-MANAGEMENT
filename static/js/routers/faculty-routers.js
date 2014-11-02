@@ -9,21 +9,47 @@ app.Routers =  app.Routers || {};
 //Defining routers here...
 app.Routers = Backbone.Router.extend({
 	routes:{
+		//"":	"ShowLogActivity",
 		"department/:name" : "showDepartment",
 		"department/:dept_name/semester/:semester_name/section/:section_name" : "FacultyEntry",
-		"*path":	"ShowLogActivity"
+		"*path":	"ShowLogActivity",
 	},
 	
 	
+	//Always call this function before calling a route call function...
+	closePreviousViews: function() {
+		console.log("Closing the pervious in memory views...");
+		if (this.currentView)
+			this.currentView.destroy_view();
+	},
 	
 	ShowLogActivity: function(){
+		this.closePreviousViews();
+		//If element doesnot exists...
+		if( !$("#jecrc-main-screen").length === 1 )
+		{
+			  var displayElement = $("<div id='faculty-display-screen'></div>");
+			  $("#jecrc-main-screen").prepend( displayElement );
+		}
 		console.log('loading the default route..');
 		//Loading the homepage view...
-		app.home = new app.Views.activity({collection : app.Global.entryLogCollection});
+		var logs = new app.Views.activity({collection : app.Global.entryLogCollection});
+		logs.render();
+		//Now loading the element...
+		$("#faculty-display-screen").html(logs.el);
 	},
+	
 	
 	
 	FacultyEntry : function(dept_name, semester_name, section_name ){
+		  this.closePreviousViews();
+		  //If element doesnot exists...
+		  if( $("#faculty-display-screen").length )
+		  {
+				var displayElement = $("<div id='faculty-display-screen'></div>");
+				$("#jecrc-main-screen").prepend( displayElement );
+		  }
+		   	
 		  if(app.Global.Department.length === 0)
 		  {
 			  app.Global.Department.fetch({
@@ -49,10 +75,16 @@ app.Routers = Backbone.Router.extend({
 	
 	//ROuter for displaying dapartment...
 	showDepartment: function(name){
+		this.closePreviousViews();
+		
+		
+		console.log("Showing the branches");
 		//fetching branch and storing it in collection...
 		fetchBranch(name);		
 	}
 });
+
+
 
 //Fetching branch...
 var fetchBranch = function(name){
@@ -97,16 +129,22 @@ var fetchBranch = function(name){
 
 
 
+
 app.Global.render_department =  function(name){
 		var dept_id = app.Global.Department.findWhere({"name": name}).get("id");
 		if(dept_id === undefined)
 			return null;
 			
 		var cs_department = app.Global.Branch.where({"department_id" : dept_id});
-		var cs_branch_collection = new app.Collection.Branch(cs_department); 
+		var cs_branch_collection = new app.Collection.Branch(cs_department);
+		
+		 
 		//Now rendering the batch view...
 		var cs_branch_view = new app.Views.Branch({"collection": cs_branch_collection});
 		cs_branch_view.render();
+		//Now loading the element...
+		$("#faculty-display-screen").html(cs_branch_view.el);
+		
 		console.log('loading bar is getting hide..');
 		app.Global.hideLoadingBar();	
 }
@@ -146,7 +184,6 @@ var periodDisplay = function( dept_name, semester_name, section_name, Periodcoll
 			  console.log('Successfully fetched faculty today entry data..');
 			  $("#faculty-display-screen").empty();
 			  var entry_arr  = $.unique(Periodcollection.pluck("days_entry_id"));
-			  console.log(entry_arr);
 			  if(entry_arr.length)
 			  {
 				  //Now processing each entry one by one..
@@ -174,7 +211,7 @@ var periodDisplay = function( dept_name, semester_name, section_name, Periodcoll
 			  
 			  
 			  //Calling period Entry function..
-			  PeriodEntryRender(dept_name, semester_name, section_name, Periodcollection);
+			  PeriodEntryRender(dept_name, semester_name, section_name, Periodcollection, periodView);
 		  
 		  }
 	});	
@@ -183,7 +220,7 @@ var periodDisplay = function( dept_name, semester_name, section_name, Periodcoll
 
 
 //Function for Entry Form 
-var PeriodEntryRender = function(dept_name, semester_name, section_name, Periodcollection){
+var PeriodEntryRender = function(dept_name, semester_name, section_name, Periodcollection, periodView){
 	
 	//Rendering faculty view..
 	var dept_model = app.Global.Department.findWhere({"name": dept_name});
@@ -213,7 +250,6 @@ var PeriodEntryRender = function(dept_name, semester_name, section_name, Periodc
 					collection   : Periodcollection
 					
 				});
-				
 				facultyEntry.render();
 			}
 		});
@@ -235,6 +271,11 @@ var PeriodEntryRender = function(dept_name, semester_name, section_name, Periodc
 		});
 		//Adding update param
 		facultyEntry.update = 0;
+		//Adding the child view...
+		if( periodView.childViews ){
+			console.info("Adding child views to period entry!");	
+			periodView.childViews.push(facultyEntry);
+		}
 		//Appending view to window..
 		$("#faculty-entry-record").html(facultyEntry.render().el);
 		

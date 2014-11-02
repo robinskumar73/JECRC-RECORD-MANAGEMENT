@@ -385,10 +385,11 @@ app.Views.periodEntry = Backbone.View.extend({
 	className: "col-md-12",
 	
 	
-	
-	
 	initialize:function(){
-		
+		//Adding the current view element...
+		app.Global.Router.currentView  = this;
+		//add the child views to this array...
+		this.childViews = [];
 		if (this.collection.length === 0){
 			var name      = faculty.first_name + " " + faculty.last_name; 
 			this.name     = getInitialFacultyName(name);
@@ -622,6 +623,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	
 	initialize: function(){
 		console.log("inside app.Views.FacultyEntry constructor");
+		
 		$(this.el).empty();
 		app.period = this.model;
 		this["dept_name"]           =  this.model.get("department_name");
@@ -641,10 +643,10 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		else{
 			this.days_entry_id = "";	
 		}
-		
 		console.log("getting out app.Views.FacultyEntry constructor");
-
 	},
+	
+	
 	
 	events:{
 		"click #lab-label"             : "displayBatch",
@@ -653,9 +655,13 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		"click #faculty_reset_button"  : "resetEntryValue"
 	},
 	
+	
+	
+	
 	displayBatch: function(){
 		$("#jecrc-batch-entry").removeClass("hide");
 	},
+	
 	
 	
 	handleClassButtonClick:function(){
@@ -672,7 +678,6 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		//Finding the element..
 		var subjectEntry = $(this.$el).find( "#jecrc-subject-entry" );
 		this.autoSelect = customSubjectSelectize( subjectEntry );
-		
 		return this;	
 	},
 	
@@ -716,7 +721,6 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		
 		if( this.model.get("subject_name") ){
 			//Adding the subject firsts..
-			
 			var control = this.autoSelect[0].selectize;	
 			control.addOption({
 				id:null,
@@ -759,6 +763,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 			$( classElement ).attr('checked', 'checked');
 		}
 		
+		
 		var period = this.model.get("period");
 		//Find the period element...
 		var periodElement = this.$el.find(".dept-check");
@@ -777,7 +782,6 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		var strengthElement = this.$el.find("#jecrc-strength-entry");
 		$(strengthElement).val( this.model.get("strength") );
 		
-		console.log("getting out of  setValue method of app.Views.FacultyEntry ");
 	},//End of save function...
 
 
@@ -906,10 +910,14 @@ app.Views.FacultyEntry = Backbone.View.extend({
 
     },
 	
+	
+	
 	//Method if model validation fails..
 	validationFailed: function(model){
 		this.displayMessage(model.validationError, app.Global.alertType[3]);
 	},
+	
+	
 	
 	
 	//destroying the view....
@@ -922,12 +930,14 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	},
 	
 	
+	
+	
 	//Function for getting the entry on clicking of save button...
 	getEntryValue:function(){
 		//get subject value..
 		var subject = $("#jecrc-subject-entry").val();
 		if(subject === ''){
-			this.displayMessage("<strong>Error:</strong> Subject cannot be empty.", app.Global.alertType[3]);
+			this.displayMessage("<strong>Error:</strong> Subject cannot be empty.",  app.Global.alertType[3]);
 			return null;	
 		}
 		
@@ -1009,6 +1019,9 @@ app.Views.Branch = Backbone.View.extend({
 	},
 	
 	initialize: function(){
+		//Setting the current view for deleting of the memory leaks...
+		app.Global.Router.currentView = this;
+		
 		//get the department name from model..
 		if (this.collection.length === 0){
 			console.log("returning from branch view initialize");
@@ -1021,7 +1034,6 @@ app.Views.Branch = Backbone.View.extend({
 		app.Global.dept = false;
 	},
 	
-	el: $("#faculty-display-screen"),
 	
 		
 	
@@ -1076,7 +1088,9 @@ app.Views.Branch = Backbone.View.extend({
 		
 		
 		//Inserting to el..
-		 $(this.el).html( this.branchTemplate( model_json ) );
+		console.log("Inserting to branch el html element..");
+		
+		$(this.$el).html( this.branchTemplate( model_json ) );
 		 
 		return this;	
 	},
@@ -1121,6 +1135,10 @@ app.Views.Branch = Backbone.View.extend({
 //Takes 2 argument as option - 1) model:model_for_faculty_log_entry 2) delete:0 or 1 if true then delete button was clicked..
 app.Views.logAlertBox = Backbone.View.extend({
 	initialize: function(){
+		
+		//add the child views to this array...
+		this.childViews = [];
+		
 		//Cache the template function for displaying the alert box..
 		this.template	= _.template( $('#display-info').html() );
 		//Listening to facultyLogModel for change...
@@ -1131,6 +1149,8 @@ app.Views.logAlertBox = Backbone.View.extend({
 		'click #entry-action-btn' 			: 'deleteItem',
 		'close.bs.alert #dept-display-box'	: 'removeView'
 	},
+	
+	
 	
 	
 	//Event when a view a removed...
@@ -1308,8 +1328,8 @@ app.Views.logAlertBox = Backbone.View.extend({
 		{
 			//Delete button was clicked ...
 			//Get the alert box modal..
-			var deleteTemplateBox = _.template( $("#display-info").html() );
-			var deleteAlertBody	  = _.template( $("#entry-log-alert-body").html() );	
+			var deleteTemplateBox     = _.template( $("#display-info").html() );
+			var deleteAlertBody	      = _.template( $("#entry-log-alert-body").html() );	
 			deleteAlertBodyElement    = deleteAlertBody();
 			deleteTemplateBoxElement  = deleteTemplateBox({ "message" : deleteAlertBodyElement, "typeInfo": app.Global.alertType[0] });
 			//Appending this to el element..
@@ -1320,6 +1340,10 @@ app.Views.logAlertBox = Backbone.View.extend({
 			//Edit button was clicked...
 			//Create an instance of alertBody view...
 			var alertBody = new app.Views.alertBody({ model: this.model });
+			
+			//adding the child view...
+			this.childViews.push(alertBody);
+			
 			//appending this alertBody Content to el element...
 			this.$el.append(alertBody.el);  
 		}
@@ -1347,6 +1371,10 @@ app.Views.logAlertBox = Backbone.View.extend({
 //Takes one argument model of faculty log entry...
 app.Views.alertBody = Backbone.View.extend({
 	initialize : function(){
+		
+		//add the child views to this array...
+		this.childViews = [];
+		
 		this.template =  _.template( $('#alert-modal').html() );
 		//Append this template to el element...
 		this.$el.append( this.template() );
@@ -1436,6 +1464,9 @@ app.Views.alertBody = Backbone.View.extend({
 		//Addding the params...
 		this.facultyEntry.update 			= 1;
 		this.facultyEntry.FacultyLogModel   = this.model;
+		
+		//add the child views to this array...
+		this.childViews.push( this.facultyEntry );
 		
 		//Rendering the faculty...
 		this.facultyEntry.render();
@@ -1599,7 +1630,7 @@ app.Views.alertBody = Backbone.View.extend({
 			error: function( model, response, options ){
 				//Hiding the loading bar....
 				app.Global.hideLoadingBar();
-				console.log("Error fetching collection from period_entry from server...");	
+				console.log("Error fetching  period_entry collection from server...");	
 			},
 			success: function( model, response, options ){
 				//Hiding the loading bar...
@@ -1637,6 +1668,8 @@ app.Views.alertBody = Backbone.View.extend({
 
 app.Views.faculty_entry = Backbone.View.extend({
 	initialize:function(){
+		//add the child views to this array...
+		this.childViews = [];
 		// Cache the template function for a single item.
     	this.template 				= _.template( $('#faculty_home_log').html() );
 		this.listenTo( this.model, 'change:last_updated_time', this.alertBoxClosed );
@@ -1645,6 +1678,20 @@ app.Views.faculty_entry = Backbone.View.extend({
 		this.detachIconsElement		= null;
 		
 	},
+	
+	
+	//For destroying the related child views...
+	beforeClose:function(){
+		if(this.childViews){
+		  var len = this.childViews.length;
+		  for(var i=0; i<len; i++){
+			  this.childViews[i].destroy_view();
+		  }
+		}//End of if statement
+	}, //End of beforeClose function
+
+	
+	
 	//... is a list tag.
     tagName:  "li",
 	// The DOM events specific to an item..
@@ -1682,6 +1729,11 @@ app.Views.faculty_entry = Backbone.View.extend({
 		//Now appending the data from the log-alert-action view..
 		var alertBox = new app.Views.logAlertBox({ "model" : this.model });
 		alertBox.delete = 0;
+		
+		//adding the child views...
+		this.childViews.push(alertBox);
+		
+			
 		//Now appending to el element..
 		this.$el.append( alertBox.render().el );
 		var modal = this.$el.find('#myModal');
@@ -1700,6 +1752,10 @@ app.Views.faculty_entry = Backbone.View.extend({
 		//Now appending the data from the log-alert-action view..	
 		var alertBox = new app.Views.logAlertBox({ "model" : this.model });
 		alertBox.delete = 1;
+		
+		//adding the child views...
+		this.childViews.push(alertBox);
+		
 		//Now appending to el element..
 		this.$el.append( alertBox.render().el );
 	}
@@ -1715,7 +1771,10 @@ app.Views.activity = Backbone.View.extend({
 	
 	//Initializing the view...
 	initialize: function(){
-		$(this.el).empty();
+		//Setting the current views....
+		app.Global.Router.currentView = this;
+		//add the child views to this array...
+		this.childViews = [];
 		this.listenTo(this.collection, 'add', this.addOne);
 		
 		this.listenTo(this.collection, 'reset', this.addAll);
@@ -1736,6 +1795,16 @@ app.Views.activity = Backbone.View.extend({
    		},300));
 		
 	},
+	
+	//Function for closing the child views for managing the memory leaks...
+	beforeClose:function(){
+		if(this.childViews){
+		  var len = this.childViews.length;
+		  for(var i=0; i<len; i++){
+			  this.childViews[i].destroy_view();
+		  }
+		}//End of if statement
+	}, //End of beforeClose function
 	
 	
 	//Adding an function for fetching value from the 
@@ -1766,11 +1835,10 @@ app.Views.activity = Backbone.View.extend({
 	},//End of fetch more function...
 	
 	//Adding the display element..
-	el: $("#faculty-display-screen"),
+	//el: $("#faculty-display-screen"),
 	
 	//Handling when a logModel is added to the collection...
 	addOne: function( logModel ){
-		console.log('Adding a log entry model to view..');
 		//getting a model date..
 		var date      = logModel.get('date');
 		var day       = getDay(date);
@@ -1787,7 +1855,7 @@ app.Views.activity = Backbone.View.extend({
 			parentElement.append(dayElement);
 			//Appending to parent
 			//Appending the parent element to the document element...
-			$(this.el).append(parentElement);
+			$(this.$el).append(parentElement);
 			dayElement.append(day);
 			parentElement.append(dateElement);
 			dateElement.append(absDate);
@@ -1798,9 +1866,14 @@ app.Views.activity = Backbone.View.extend({
 		}
 		//Now adding view to the entry...
 		var EntryView = new app.Views.faculty_entry({model: logModel});
+		//Now adding it to the childViews...
+		this.childViews.push(EntryView);
+		
 		//Now loading the view finally...
 		$(this.daysEntryRecord[date]).append( EntryView.render().el );
 	},
+	
+	
 	
 	//Adding all models to the collection...
 	addAll: function(){
@@ -1810,10 +1883,14 @@ app.Views.activity = Backbone.View.extend({
 		this.collection.each( this.addOne, this );
 	},
 	
+	
+	
 	render: function(){
 		//Clearing the main element...
-		$(this.el).empty();
-		console.log('rendering the log entry view...');
+		$(this.$el).empty();
+		if(this.collection.length){
+			this.addAll();
+		}
 		return this;
 	}
 	
