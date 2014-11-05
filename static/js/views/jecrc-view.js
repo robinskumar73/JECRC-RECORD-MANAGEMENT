@@ -386,40 +386,13 @@ app.Views.periodEntry = Backbone.View.extend({
 	
 	className: "col-md-12",
 	
+	
 	initialize:function(){
 		//Adding the current view element...
 		app.Global.Router.currentView  = this;
 		
-		if (this.collection.length === 0){
-			console.log("returning from period entry view initialize");
-			return null;
-		}
-		
-		
-		//For checking the lab table..
-		this.lab = {	
-			row0:null,
-			row1:null,
-			row2:null
-		};
-		
-		/*{period:[], lab:{}, id=[]  } */
-		//For storing lab period information..
-		this.LabPeriodAdd = [];
-		
-		this.periodList   = $("<tr/>");
-		this.subjectList  = $("<tr/>");
-		this.strengthList = $("<tr/>");
-		this.teacherList  = $("<tr/>");
-		
-		//Inserting date
-		this.date            =  this.collection[0].get("date");
-		
-		this.department_name =  app.Global.Department.findWhere({ "id":this.collection[0].get("department_id") }).get("name");
-		this.section_name    =  this.collection[0].get("section_name");
-		this.semester_id     =  this.collection[0].get("semester_id");
-		this.day             =  getDay(this.date);
-		this.parse_date	     =	convertDate(this.date);
+		//Now fetching of data..
+		this.fetchMore( this.collection );
 		
 		var that = this;
 		//Adding the scrolling options for fetchin more enteries..
@@ -428,55 +401,93 @@ app.Views.periodEntry = Backbone.View.extend({
    			if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
        			console.log("scroll position: near  bottom!");
 				//Now fetch more collection on pagination options..
-				that.fetchMore();
+				that.fetchMore( that.collection );
       		}
-   		},300));
-		
-		
+   		},300));	
 	},//End of initialize function..
 	
 	
-	//Adding a function for fetching more items...
-	fetchMore: function(){
 	
-	   var that = this;		
+	//Adding a function for fetching more items...
+	fetchMore: function( Periodcollection ){
+	   console.log("Inside fetch more function..");
+	   var that    = this;
+	   app.Global.showLoadingBar();
 	  //Now fetching url..
 	  Periodcollection.fetch({
-		  error: function () {
+		  
+		  error: function ( collection, response, options ) {
+			  
 			  app.Global.hideLoadingBar();
 			  console.log('Error fetching department wise entry from database..');
 		  },
-		  success: function(list_array){
-			  app.Global.hideLoadingBar();
-			  if(Periodcollection.length === 0){
-				  console.log("returning from department entry route as length is zero..");
-				  return null;
-			  }
+		  
+
+		  success: function(collection, response, options){
 			  //$("#jecrc-main-screen").html('');
 			  console.log('Successfully fetched department wise entries data..');
 			  //Getting the dates of entry in decreasing order..
-			  var entry_arr  = $.unique(Periodcollection.pluck("date"));
-			  x = entry_arr;
-			  $("#jecrc-main-screen").html('');
-			  //app.Global.arr = [];
-		  
+			  var entry_arr  = $.unique(Periodcollection.pluck("days_entry_id"));
+		  	 
 			  for(var i=0; i<entry_arr.length; i++)
 			  {
 					  //finding the entry model one by one....
-					  var entry_model_arr = Periodcollection.where({ "date":entry_arr[i] });
-					  //Now load this view..
-					  var periodView = new app.Views.periodEntry({collection:entry_model_arr});
-					  $("#jecrc-main-screen").append(periodView.render().el);
+					  that.entry_model_arr = Periodcollection.where({ "days_entry_id" : entry_arr[i] });
+					  //Processing the after fetch operations...
+			  		  that.afterFetch( that.entry_model_arr );
+					  //var periodView = new app.Views.periodEntry({collection:entry_model_arr});
+					  //Appending the period entry to el..
+					  $("#jecrc-main-screen").append( that.render().el );
 			  }
-			  //Periodcollection = null;
+			  
+			  //Now updating  the offset..
+			  var length = that.entry_model_arr.length;
+			  that.collection.data.offset = that.collection.data.offset + length;
+			  
+			  app.Global.hideLoadingBar();
 		  }, //End of success function....
-		  "data": data
+		  
+		  
+		  "data": that.collection.data
+		  
 		});//End of period collection fetch
-	},
+	},//End of fetchMore function...
+	
+	
+	
+	
+	//Function for performing the operations after fetching of respective period entry data..
+	afterFetch: function( collectionArray ){
+		if ( collectionArray.length === 0 ){
+				console.log("destroying the period entry view as zero data fetched from the server");
+				this.destroy_view();
+			}
+			//For checking the lab table..
+			this.lab = {	
+				row0:null,
+				row1:null,
+				row2:null
+			};
+			/*{period:[], lab:{}, id=[]  } */
+			//For storing lab period information..
+			this.LabPeriodAdd = [];
+			this.periodList   = $("<tr/>");
+			this.subjectList  = $("<tr/>");
+			this.strengthList = $("<tr/>");
+			this.teacherList  = $("<tr/>");
+			//Inserting date
+			this.date            =  collectionArray[0].get("date");
+			this.department_name =  app.Global.Department.findWhere({ "id":collectionArray[0].get("department_id") }).get("name");
+			this.section_name    =  collectionArray[0].get("section_name");
+			this.semester_id     =  collectionArray[0].get("semester_id");
+			this.day             =  getDay(this.date);
+			this.parse_date	     =	convertDate(this.date);	
+	},//End of afterFetch function...
+	
+	
 	
 	
 	render:function(){
-		
 		//Now adding date..
 		this.addBody(this.day, this.parse_date);
 		//Adding headers...
@@ -487,13 +498,12 @@ app.Views.periodEntry = Backbone.View.extend({
 		body_.append(this.subjectList);
 		body_.append(this.strengthList);
 		body_.append(this.teacherList);
-		
 		//inserting period data..
-		this.addToList(this.collection);
+		this.addToList(this.entry_model_arr);
 		this.table.append(body_);
-		
 		return this;	
 	},
+	
 	
 	addBody: function(day, date){
 	

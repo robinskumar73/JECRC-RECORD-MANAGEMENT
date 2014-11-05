@@ -50,7 +50,7 @@ app.Routers = Backbone.Router.extend({
 		data = {
 				
 						offset	   : 0,
-						limit	   :30, 
+						limit	   : 5, 
 						"dept_name": dept_name
 					
 				};
@@ -74,7 +74,7 @@ app.Routers = Backbone.Router.extend({
 			data = {
 				
 						offset	   : 0,
-						limit	   : 30, 
+						limit	   : 5, 
 						"dept_name": dept_name,
 						"sem"	   : semester_name,
 						"sec_name" : section_name
@@ -98,7 +98,7 @@ app.Routers = Backbone.Router.extend({
 		data = {
 					
 						offset	   : 0,
-						limit	   : 30, 
+						limit	   : 5, 
 						"dept_name": dept_name,
 						"year"     : year
 					
@@ -167,11 +167,16 @@ var PeriodEntryRender = function( data ){
 	app.Global.showLoadingBar();
 	if(app.Global.Department.length === 0){
 		app.Global.Department.fetch({
-			error  : function(){console.log("Error fetching the department..");},
+			error  : function()
+			{
+				console.log("Error fetching the department..");
+				app.Global.hideLoadingBar();
+			},
 			success: function()
 			{
+				app.Global.hideLoadingBar();
 				console.info("Successfully fetched  department data");
-				fetchPeriod();
+				fetchPeriod( data );
 				
 			},
 		});
@@ -188,8 +193,10 @@ var PeriodEntryRender = function( data ){
 var fetchPeriod = function( data ){
 	
 	//Now creating the collection......
-	var Periodcollection = new app.Collection.periodEntry;
-	
+	var PeriodCollection = new app.Collection.periodEntry;
+	PeriodCollection.data  = data;
+	//Now load this view..
+	var periodView = new app.Views.periodEntry({ collection:PeriodCollection });
 	
 }
 

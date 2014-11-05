@@ -385,6 +385,17 @@
 	//Changing the getEntryBysection($dept_name, $sem, $sec_name) to getPeriodClassEntry
 	function getPeriodClassEntry()
 	{
+		//Adding the offset and limit ..
+		if( isset($_GET['limit']) &&  isset($_GET['offset']) )
+		{
+			$limit  = $_GET['limit'];
+			$offset = $_GET['offset'];
+		}
+		else{
+			$limit  = 5;
+			$offset = 0;	
+		}
+		
 		if( isset($_GET['dept_name']) && isset($_GET['sem']) && isset($_GET['sec_name']) && isset($_GET['todayEntry']) ) {
 			//Fetch period entry for today's date only..	
 			//$dept_id = getDepartmentId($dept_name);
@@ -392,7 +403,7 @@
 			$semester_name	= $_GET['sem'];
 			$section_name   = $_GET['sec_name'];
 			
-			$dept = days_entry_by_section_and_date($semester_name, $section_name, $dept_name );
+			$dept = days_entry_by_section_and_date($semester_name, $section_name, $dept_name, $limit, $offset );
 			$dept_ = process_days_entry_obj($dept);
 			echo json_encode($dept_);		
 				
