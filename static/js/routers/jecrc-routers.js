@@ -41,7 +41,7 @@ app.Routers = Backbone.Router.extend({
 	//Showing report for department..
 	showDepartmentReport: function(dept_name){
 		this.closePreviousViews();
-		
+		$("#jecrc-main-screen").empty();
 		//Hiding the department...
 		$("#admin-department").addClass('hide');
 		app.Global.DepartmentElementObj = $("#admin-department").detach();
@@ -63,7 +63,9 @@ app.Routers = Backbone.Router.extend({
 	showBranchReport: function(dept_name, semester_name, section_name ){
 		//this.closePreviousViews();
 		//Hiding the department...
+		this.closePreviousViews();
 		$("#admin-department").addClass('hide');
+		$("#jecrc-main-screen").empty();
 		app.Global.DepartmentElementObj = $("#admin-department").detach();
 		
 		
@@ -90,7 +92,7 @@ app.Routers = Backbone.Router.extend({
 	
 	showYearReport: function(dept_name, year){
 		this.closePreviousViews();
-		
+		$("#jecrc-main-screen").empty();
 		//Hiding the department...
 		$("#admin-department").addClass('hide');
 		app.Global.DepartmentElementObj = $("#admin-department").detach();
@@ -115,7 +117,7 @@ app.Routers = Backbone.Router.extend({
 	
 	showDepartment: function(name){
 		this.closePreviousViews();
-		
+		$("#jecrc-main-screen").empty();
 		//Hiding the department...
 		$("#admin-department").addClass('hide');
 		app.Global.DepartmentElementObj = $("#admin-department").detach();
@@ -195,6 +197,7 @@ var fetchPeriod = function( data ){
 	//Now creating the collection......
 	var PeriodCollection = new app.Collection.periodEntry;
 	PeriodCollection.data  = data;
+	$("#jecrc-main-screen").html('');
 	//Now load this view..
 	var periodView = new app.Views.periodEntry({ collection:PeriodCollection });
 	

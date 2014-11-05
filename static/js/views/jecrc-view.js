@@ -415,20 +415,24 @@ app.Views.periodEntry = Backbone.View.extend({
 	   app.Global.showLoadingBar();
 	  //Now fetching url..
 	  Periodcollection.fetch({
-		  
-		  error: function ( collection, response, options ) {
-			  
+		  error: function ( collection, response, options ) { 
 			  app.Global.hideLoadingBar();
 			  console.log('Error fetching department wise entry from database..');
 		  },
-		  
-
 		  success: function(collection, response, options){
 			  //$("#jecrc-main-screen").html('');
 			  console.log('Successfully fetched department wise entries data..');
 			  //Getting the dates of entry in decreasing order..
-			  var entry_arr  = $.unique(Periodcollection.pluck("days_entry_id"));
-		  	 
+			  //var entry_arr  = $.unique(Periodcollection.pluck("days_entry_id"));
+			  var entry_arr  = _.uniq(Periodcollection.pluck("days_entry_id"), true)
+			  entry_arr = _.sortBy( entry_arr , function(num) {
+    		  		return num;
+			  }); 
+			  entry_arr = entry_arr.reverse(); 
+			  
+		  	  //Now updating  the offset..
+			  //var length = entry_arr.length;
+			  console.log(entry_arr);
 			  for(var i=0; i<entry_arr.length; i++)
 			  {
 					  //finding the entry model one by one....
@@ -440,10 +444,9 @@ app.Views.periodEntry = Backbone.View.extend({
 					  $("#jecrc-main-screen").append( that.render().el );
 			  }
 			  
-			  //Now updating  the offset..
-			  var length = that.entry_model_arr.length;
-			  that.collection.data.offset = that.collection.data.offset + length;
 			  
+			  //that.collection.data.offset = that.collection.data.offset + length;
+			  that.collection.data.offset = parseInt(that.collection.data.offset)+ parseInt(that.collection.data.limit) ;
 			  app.Global.hideLoadingBar();
 		  }, //End of success function....
 		  

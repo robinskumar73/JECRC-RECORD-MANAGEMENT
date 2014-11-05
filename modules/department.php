@@ -403,7 +403,7 @@
 			$semester_name	= $_GET['sem'];
 			$section_name   = $_GET['sec_name'];
 			
-			$dept = days_entry_by_section_and_date($semester_name, $section_name, $dept_name, $limit, $offset );
+			$dept = days_entry_by_section_and_date($semester_name, $section_name, $dept_name );
 			$dept_ = process_days_entry_obj($dept);
 			echo json_encode($dept_);		
 				
@@ -415,7 +415,7 @@
 			$sem	   = $_GET['sem'];
 			$sec_name  = $_GET['sec_name'];
 			
-			$dept = days_entry_by_section($sem, $sec_name, $dept_name );
+			$dept = days_entry_by_section($sem, $sec_name, $dept_name, $limit, $offset );
 			$dept = process_days_entry_obj($dept);
 			
 			echo json_encode($dept);
@@ -427,7 +427,7 @@
 			$dept_name = $_GET['dept_name'];
 			$year	   = $_GET['year'];
 			
-			$dept = days_entry_by_year($year, $dept_name);
+			$dept = days_entry_by_year($year, $dept_name, $limit, $offset);
 			$dept_ = process_days_entry_obj($dept);
 		
 			echo json_encode($dept_);
@@ -437,7 +437,7 @@
 			//FETCH PERIOD ENTRY BY DEPARTMENT WISE...
 			//$dept_id = getDepartmentId($dept_name);
 			$dept_name = $_GET['dept_name'];
-			$dept = days_entry_by_dept($dept_name);
+			$dept = days_entry_by_dept($dept_name, $limit, $offset);
 			$dept = process_days_entry_obj($dept);
 			echo json_encode($dept);
 		}

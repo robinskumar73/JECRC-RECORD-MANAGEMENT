@@ -61,26 +61,23 @@
 
 	
 	
-		
 
-	
-	
-	
 	//Getting days entry by section...
-	function days_entry_by_dept($dept_name )
+	function days_entry_by_dept($dept_name, $limit, $offset )
 	{
 		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id";
+		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id  ORDER BY date DESC  LIMIT $limit OFFSET $offset";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);
-			$stmt->bindParam("dept_id", $dept_id);
+			$stmt->bindParam("dept_id", $dept_id);			
+			//$stmt->bindParam("limit", $limit);
+			//$stmt->bindParam("offset", $offset);
 			$stmt->execute();
 			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
 			$db = null;
 			
 			return $dept;
-			
 		}
 		catch(PDOException $e) 
 		{
@@ -92,18 +89,21 @@
 	
 	
 	//Getting days entry by section...
-	function days_entry_by_year($year, $dept_name )
+	function days_entry_by_year($year, $dept_name, $limit, $offset )
 	{
 		$dept_id = getDepartmentId($dept_name);
 		$year_int = getYear($year);
 		$sem = $year_int*2;
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id IN ( :semester_id, :semester_id_) ";
+		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id IN ( :semester_id, :semester_id_)  ORDER BY date DESC  LIMIT $limit OFFSET $offset
+ ";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);
 			$stmt->bindParam("semester_id", $year_int);
 			$stmt->bindParam("semester_id_", $sem);
 			$stmt->bindParam("dept_id", $dept_id);
+			//$stmt->bindParam("limit", $limit);
+			//$stmt->bindParam("offset", $offset);
 			$stmt->execute();
 			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
 			$db = null;
@@ -125,16 +125,18 @@
 	
 	
 	//Getting days entry by section...
-	function days_entry_by_section($sem, $sec_name, $dept_name )
+	function days_entry_by_section($sem, $sec_name, $dept_name, $limit, $offset )
 	{
 		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name ORDER BY date DESC";
+		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name ORDER BY date DESC  LIMIT $limit OFFSET $offset";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);
 			$stmt->bindParam("semester_id", $sem);
 			$stmt->bindParam("section_name", $sec_name);
 			$stmt->bindParam("dept_id", $dept_id);
+			//$stmt->bindParam("limit", $limit);
+			//$stmt->bindParam("offset", $offset);
 			$stmt->execute();
 			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
 			$db = null;
@@ -151,18 +153,17 @@
 	
 	
 	//Getting days entry by date and section...
-	function days_entry_by_section_and_date($semester_name, $section_name, $dept_name, $limit, $offset )
+	function days_entry_by_section_and_date($semester_name, $section_name, $dept_name )
 	{
 		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name AND date=CURDATE() ORDER BY date DESC  LIMIT :limit OFFSET :offset ;";
+		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name AND date=CURDATE() ;";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);
 			$stmt->bindParam("semester_id", $semester_name);
 			$stmt->bindParam("section_name", $section_name);
 			$stmt->bindParam("dept_id", $dept_id);
-			$stmt->bindParam("limit", $limit);
-			$stmt->bindParam("offset", $offset);
+			
 			//$stmt->bindParam("today_date",  $today_date );
 			$stmt->execute();
 			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
