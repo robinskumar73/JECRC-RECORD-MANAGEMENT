@@ -49,7 +49,6 @@ app.Collection.periodEntry = Backbone.Collection.extend({
 	
 	//Sorting the collection in decreasing order of date..
 	comparator: function(Model) {
-		console.log("Inside comparator!");
 		return [-Model.get("date")];
 	},
 });

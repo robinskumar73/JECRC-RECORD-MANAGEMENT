@@ -393,6 +393,8 @@ app.Views.periodEntry = Backbone.View.extend({
 		
 		//Now fetching of data..
 		this.fetchMore( this.collection );
+		//for containing the element data with dept wise...
+		this.deptDataObj = {};
 		
 		var that = this;
 		//Adding the scrolling options for fetchin more enteries..
@@ -421,29 +423,68 @@ app.Views.periodEntry = Backbone.View.extend({
 		  },
 		  success: function(collection, response, options){
 			  //$("#jecrc-main-screen").html('');
-			  console.log('Successfully fetched department wise entries data..');
-			  //Getting the dates of entry in decreasing order..
-			  //var entry_arr  = $.unique(Periodcollection.pluck("days_entry_id"));
-			  var entry_arr  = _.uniq(Periodcollection.pluck("days_entry_id"), true)
-			  entry_arr = _.sortBy( entry_arr , function(num) {
-    		  		return num;
-			  }); 
-			  entry_arr = entry_arr.reverse(); 
+			  //First getting the entry department wise...
+			  var deptObjUniqueArray = that.branchUniqueObject( Periodcollection );
 			  
-		  	  //Now updating  the offset..
-			  //var length = entry_arr.length;
-			  console.log(entry_arr);
-			  for(var i=0; i<entry_arr.length; i++)
-			  {
-					  //finding the entry model one by one....
-					  that.entry_model_arr = Periodcollection.where({ "days_entry_id" : entry_arr[i] });
-					  //Processing the after fetch operations...
-			  		  that.afterFetch( that.entry_model_arr );
-					  //var periodView = new app.Views.periodEntry({collection:entry_model_arr});
-					  //Appending the period entry to el..
-					  $("#jecrc-main-screen").append( that.render().el );
+			  //For getting the dept wise entry...
+			  for(var key in deptObjUniqueArray)
+			  {   
+					var deptObj           = deptObjUniqueArray[key];
+					
+					
+					var department_id     = deptObj["department_id"];
+					var semester_id       = deptObj["semester_id"];
+					var section_name      = deptObj["section_name"];
+					var department_name   = app.Global.Department.findWhere({ "id":department_id }).get("name");
+					var entryArrDeptWise  =  Periodcollection.where( deptObj );
+					
+					
+					//Now checking if same department is present on document body already in this case just append...
+					if( that.deptDataObj[key] )
+					{
+						//Just collect a refrence of el element..
+						that.$el = 	that.deptDataObj[key];
+					}
+					else{
+						//Adding the department information ....
+						that.$el.append( "<h4 class='report-dept-info'>" + semester_id + " " + department_name  + "</h4>");
+						that.$el.append( "<span class='report-dept-info'>" + section_name + "</span><hr class='report-dept-info' style='margin-top:0px;margin-bottom:0px;'>");	
+					}
+					
+					//Now creating a temp. collection for getting collection by date..
+					var tempCollection    =  new app.Collection.periodEntry( entryArrDeptWise );
+					
+					//Now plucking days_entry_id from collection...
+					var dateArr            =  tempCollection.pluck("days_entry_id");
+					//Now getting the collection by date in decreasing order...
+					var entry_arr  = _.uniq( dateArr , true);			
+					   
+					//Now sorting the entry array records based on days entry id..
+					entry_arr = _.sortBy( entry_arr , function(num) {
+						return num;
+					}); 
+					entry_arr = entry_arr.reverse(); 
+					
+					console.info("Printing the department wise entry arr");
+					console.log(entry_arr);
+					
+					//Storing a refrence of the $el element...
+					that.deptDataObj[key] = that.$el;
+					
+					
+					for(var i=0; i<entry_arr.length; i++)
+					{
+						//finding the entry model one by one....
+						that.entry_model_arr = Periodcollection.where({ "days_entry_id" : entry_arr[i] });
+						//Processing the after fetch operations...
+						that.afterFetch( that.entry_model_arr );
+						//var periodView = new app.Views.periodEntry({collection:entry_model_arr});
+						//Appending the period entry to el..
+						$("#jecrc-main-screen").append( that.render().el );
+						
+					 }//End of For loop...
+					
 			  }
-			  
 			  
 			  //that.collection.data.offset = that.collection.data.offset + length;
 			  that.collection.data.offset = parseInt(that.collection.data.offset)+ parseInt(that.collection.data.limit) ;
@@ -490,6 +531,24 @@ app.Views.periodEntry = Backbone.View.extend({
 	
 	
 	
+	branchUniqueObject : function( periodCollection )
+	{
+		var arrObj = {};
+		periodCollection.each(function(model){
+			var branchName =  model.get( "semester_id") + " - " + model.get("department_id") + " - " +  model.get( "section_name"); 
+			//Forming the assosiative arrays...
+			arrObj[ branchName ] = {
+				semester_id   : model.get( "semester_id"),
+				department_id : model.get("department_id"),
+				section_name  : model.get( "section_name")
+			}
+		});
+		return arrObj;
+	},//end of arrayObject...
+	
+	
+	
+	
 	render:function(){
 		//Now adding date..
 		this.addBody(this.day, this.parse_date);
@@ -509,10 +568,11 @@ app.Views.periodEntry = Backbone.View.extend({
 	
 	
 	addBody: function(day, date){
-	
+		/*
 		//Adding department..
 		this.$el.append( "<h4 class='report-dept-info'>" + this.semester_id + " " + this.department_name  + "</h4>");
 		this.$el.append( "<span class='report-dept-info'>" + this.section_name + "</span><hr class='report-dept-info' style='margin-top:0px;margin-bottom:0px;'>");
+		*/
 		
 		//Adding day..
 		this.$el.append( "<h4 class='log_day'>" + day + "</h4>");
