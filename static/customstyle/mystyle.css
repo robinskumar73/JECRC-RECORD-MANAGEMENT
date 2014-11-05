@@ -25,6 +25,9 @@ body{
 	webkit-font-smoothing:antialiased;
 }
 
+
+
+
 /*Modifying scrollbar*/
 body::-webkit-scrollbar{
 	width:8px;
@@ -45,6 +48,11 @@ border:1px solid #333333;
 } 
 
 /*------------AREA END FOR MODIFYING SCROLLBARS-----*/
+
+ul{
+	list-style:none;	
+}
+
 
 .border{
 	border:1px solid;
@@ -314,6 +322,41 @@ border:1px solid #333333;
 		
 }
 
+
+/*Panel for faculty-list ul*/
+ul.faculty-list{
+	padding-left:15px;
+	
+}
+
+.faculty-list-icons{
+	margin-top:10px;
+	font-size:12px; 
+	padding-right:10px;
+	margin-left:8px;
+	display:inline-block;	
+	color:#777777;
+	cursor:pointer;
+	border-width:0px 1px 0px 0px;
+	border-style:solid;
+	border-color:#c0c0c0;
+}
+
+.faculty-list-icons:hover{
+	color:#111111;
+}
+
+li.faculty-list-items  span:last-of-type{
+	border:none;
+}
+
+
+li.faculty-list-items{
+	margin-bottom:20px;
+}
+
+
+
 /*----------------------PANEL STATISTICS AREA------------------------------*/
 .statistics h4.log_day, #faculty_attendance_heading4, .statistics h4.report-dept-info{
 	color:#49c131;
@@ -425,6 +468,7 @@ ul.log li {
 	margin-left:8px;
 	display:inline-block;	
 	color:#777777;
+	cursor:pointer
 }
 
 .log-entry-icon:hover{

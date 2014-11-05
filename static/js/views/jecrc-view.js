@@ -14,8 +14,6 @@ app.Global = app.Global || {};
 
 
 
-app.Global.DepartmentPresentAlready = false;
-
 //Now creating a views structure for VOTES FLAG 
 app.Views.Department = Backbone.View.extend({
 	
@@ -298,6 +296,7 @@ app.Views.Batch = Backbone.View.extend({
 	
 	
 	
+	
 	onClick: function(e){
     	setTimeout(this.count);
 	},
@@ -388,6 +387,9 @@ app.Views.periodEntry = Backbone.View.extend({
 	className: "col-md-12",
 	
 	initialize:function(){
+		//Adding the current view element...
+		app.Global.Router.currentView  = this;
+		
 		if (this.collection.length === 0){
 			console.log("returning from period entry view initialize");
 			return null;
@@ -395,7 +397,15 @@ app.Views.periodEntry = Backbone.View.extend({
 		
 		
 		//For checking the lab table..
-		this.lab = {row0:null,row1:null,row2:null};
+		this.lab = {	
+			row0:null,
+			row1:null,
+			row2:null
+		};
+		
+		/*{period:[], lab:{}, id=[]  } */
+		//For storing lab period information..
+		this.LabPeriodAdd = [];
 		
 		this.periodList   = $("<tr/>");
 		this.subjectList  = $("<tr/>");
@@ -403,20 +413,70 @@ app.Views.periodEntry = Backbone.View.extend({
 		this.teacherList  = $("<tr/>");
 		
 		//Inserting date
-		this.date           =  this.collection[0].get("date");
-		this.department_name  =  app.Global.Department.findWhere({ "id":this.collection[0].get("department_id") }).get("name");
-		this.section_name   =  this.collection[0].get("section_name");
-		this.semester_id    =  this.collection[0].get("semester_id");
-		this.day            =  getDay(this.date);
-		this.parse_date	    =	convertDate(this.date);
+		this.date            =  this.collection[0].get("date");
+		
+		this.department_name =  app.Global.Department.findWhere({ "id":this.collection[0].get("department_id") }).get("name");
+		this.section_name    =  this.collection[0].get("section_name");
+		this.semester_id     =  this.collection[0].get("semester_id");
+		this.day             =  getDay(this.date);
+		this.parse_date	     =	convertDate(this.date);
+		
+		var that = this;
+		//Adding the scrolling options for fetchin more enteries..
+		//Adding window scroll option for infinite scroll options...
+		$(window).scroll(_.debounce(function(){
+   			if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+       			console.log("scroll position: near  bottom!");
+				//Now fetch more collection on pagination options..
+				that.fetchMore();
+      		}
+   		},300));
 		
 		
 	},//End of initialize function..
 	
 	
+	//Adding a function for fetching more items...
+	fetchMore: function(){
+	
+	   var that = this;		
+	  //Now fetching url..
+	  Periodcollection.fetch({
+		  error: function () {
+			  app.Global.hideLoadingBar();
+			  console.log('Error fetching department wise entry from database..');
+		  },
+		  success: function(list_array){
+			  app.Global.hideLoadingBar();
+			  if(Periodcollection.length === 0){
+				  console.log("returning from department entry route as length is zero..");
+				  return null;
+			  }
+			  //$("#jecrc-main-screen").html('');
+			  console.log('Successfully fetched department wise entries data..');
+			  //Getting the dates of entry in decreasing order..
+			  var entry_arr  = $.unique(Periodcollection.pluck("date"));
+			  x = entry_arr;
+			  $("#jecrc-main-screen").html('');
+			  //app.Global.arr = [];
+		  
+			  for(var i=0; i<entry_arr.length; i++)
+			  {
+					  //finding the entry model one by one....
+					  var entry_model_arr = Periodcollection.where({ "date":entry_arr[i] });
+					  //Now load this view..
+					  var periodView = new app.Views.periodEntry({collection:entry_model_arr});
+					  $("#jecrc-main-screen").append(periodView.render().el);
+			  }
+			  //Periodcollection = null;
+		  }, //End of success function....
+		  "data": data
+		});//End of period collection fetch
+	},
+	
+	
 	render:function(){
-		//inserting period data..
-		this.addToList(this.collection);
+		
 		//Now adding date..
 		this.addBody(this.day, this.parse_date);
 		//Adding headers...
@@ -427,26 +487,30 @@ app.Views.periodEntry = Backbone.View.extend({
 		body_.append(this.subjectList);
 		body_.append(this.strengthList);
 		body_.append(this.teacherList);
+		
+		//inserting period data..
+		this.addToList(this.collection);
 		this.table.append(body_);
+		
 		return this;	
 	},
 	
 	addBody: function(day, date){
-		
+	
 		//Adding department..
 		this.$el.append( "<h4 class='report-dept-info'>" + this.semester_id + " " + this.department_name  + "</h4>");
 		this.$el.append( "<span class='report-dept-info'>" + this.section_name + "</span><hr class='report-dept-info' style='margin-top:0px;margin-bottom:0px;'>");
 		
 		//Adding day..
-		this.$el.append( "<h4>" + day + "</h4>");
-		this.$el.append( "<span>" + date + "</span>");	
+		this.$el.append( "<h4 class='log_day'>" + day + "</h4>");
+		this.$el.append( "<span class='log_date'>" + date + "</span>");	
 		var div1   = $("<div class='col-md-12 jecrc-stats' />");
 		var div2   = $("<div class='table-responsive'/>");	
 		this.table = $("<table class='table table-striped'/>");
 		div1.append(div2);
 		div2.append(this.table);		
 		this.$el.append( div1 );
-		this.$el.append( "<br />" )
+		this.$el.append( "<br />" );
 		
 	},
 	
@@ -454,22 +518,77 @@ app.Views.periodEntry = Backbone.View.extend({
 	addToList: function(modelArray){
 		for(var i=0; i<modelArray.length; i++){
 			var periodModel = modelArray[i];
-			//console.log("I am checking for lab..");
+			
+			
 			if(periodModel.get("lab") === "0")
 			{
 				   //console.log("I am inside if lab= false..");				
 				  //Adding period
-				  this.periodList.append("<th>" + periodModel.get("period")[0] + "</th>");
+				  //Insert lab period..
+				  for(var j = 0; j<periodModel.get("period").length; j++)
+				  {
+					  //Adding period...
+					  this.periodList.append("<th>" + periodModel.get("period")[j] + "</th>");
+				  }//End of for loop of entering period..
+				  
+				  var periodLen   = periodModel.get("period").length;
+				  
+				  //this.periodList.append("<th>" + periodModel.get("period")[0] + "</th>");
+				  
 				  //Adding subject..
-				  this.subjectList.append("<td>" + periodModel.get("subject_name") + "</td>");
+				  this.subjectList.append("<td colspan='" +periodLen + "' >" + periodModel.get("subject_name") + "</td>");
 				  //Adding subject list..
-				  this.strengthList.append("<td>" + periodModel.get("strength") + "</td>");
+				  this.strengthList.append("<td  colspan='" +periodLen + "' >" + periodModel.get("strength") + "</td>");
 				  //adding teacher list..
-				  this.teacherList.append( "<td>" + getInitialFacultyName( periodModel.get("faculty_name") ) + "</td>" );
+				  this.teacherList.append( "<td class='faculty_name_tuple' data-toggle='tooltip' data-placement='top' title='Faculty :  " +  periodModel.get("faculty_name").toUpperCase() + "' colspan='" +periodLen + "' >" + getInitialFacultyName( periodModel.get("faculty_name") ) + "</td>" );
 			}
 			else
 			{
-				  if(this.lab["row0"] === null)
+				
+				  var currentLab = null;
+				  var currentId  = [];
+				  //First check for lab period..
+			      /*{period:[], lab:{}, id=[]  } */
+			      for(var x = 0; x < this.LabPeriodAdd.length; x++ )
+			      {
+						var lab_        = this.LabPeriodAdd[x].lab;
+						var period_     = this.LabPeriodAdd[x].period;
+						//Now matching period with current given period in the model..
+						var givenPeriod = periodModel.get("period");
+						//Now matching both period..
+						if ($(period_).not(givenPeriod).length == 0 && $(givenPeriod).not(period_).length == 0 )
+						{
+							//current lab value 
+							currentLab = lab_;
+							currentId  = this.LabPeriodAdd[x].id;
+							break;	
+						}
+				
+				   }
+				   
+				   //Now inserting values of current lab value is null...
+				   if (currentLab === null){
+						//Insert value to initialize this current period..
+						var lab_        = {	row0:null, row1:null, row2:null };
+						var period_     = periodModel.get("period");
+						//Adding to LabPeriodAdd object
+						//Now updating the currentLab value..
+						currentLab = lab_;
+						//Now setting an random ids to lab elements for fetching..
+						var id0 = app.Global.randomNumber(999,999999);
+						var id1 = app.Global.randomNumber(999,999999);
+						var id2 = app.Global.randomNumber(999,999999);
+						
+						currentId = [id0, id1, id2];
+						
+						this.LabPeriodAdd.push({ "period":period_, "lab": lab_, "id": currentId });
+					   
+				   }
+				   
+				  
+				  
+				
+				  if(currentLab["row0"] === null)
 				  {
 					  //Insert lab period..
 					  for(var j = 0; j<periodModel.get("period").length; j++)
@@ -486,25 +605,46 @@ app.Views.periodEntry = Backbone.View.extend({
 				  var periodLen   = periodModel.get("period").length;
 				  
 				  //Now checking for row-to-fill data...
-				  if(this.lab["row0"] === null)
+				  if(currentLab["row0"] === null)
 				  {	
+		
 					  row="0";
-					  this.lab["row0"] = true;
+					   //Adding lab entry..
+				  	  this.subjectList.append("<td id='"+ currentId[0] +"'  colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
+					 
+					  //Appending dummy list
+					   this.strengthList.append("<td id='"+ currentId[1] +"'  colspan='" +periodLen + "'  rowspan='" + "1" + "'  >" + " -------  " + "</td>" );
+					   this.teacherList.append("<td  id='"+ currentId[2] +"'  colspan='" +periodLen + "'  rowspan='" + "2" + "'  >" + " ------- " + "</td>" );
+					   
+					  //Setting up flags..
+					  currentLab["row0"] = true;
 					  
 				  }
-				  else if (this.lab["row1"] === null)
+				  else if (currentLab["row1"] === null  )
 				  {
+					  
+					  var element = this.strengthList.find("td#" + currentId[1]);
+					  $(element).html(subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName);
 					  row="1";
-					  this.lab["row1"] = true;
+					 
+					  currentLab["row1"] = true;
 				  }
 				  else
 				  {
+					 
 					  row="2";
-					  this.lab["row2"] = true;
+					  //Finding element..
+					  var element = this.teacherList.find("td#" + currentId[2]);
+					  $(element).html(subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName);
+					  
+					  currentLab["row2"] = true;
+					  //reset stats..
+					  currentLab["row0"] = null;
+					  currentLab["row1"] = null;
+					  currentLab["row2"] = null;
 				  }
 				  
-				  //Adding lab entry..
-				  this.subjectList.append("<td style='text-align: center;' colspan='" +periodLen + "'  rowspan='" + row + "'  >" + subject + " -  "+section + batch + " Batch  -" + strength + " - " + facultyName + "</td>" );
+				 
 					  
 			}//End of if-else..
 		}//End of for loop..
@@ -541,6 +681,7 @@ app.Views.FacultyEntry = Backbone.View.extend({
 app.Views.Branch = Backbone.View.extend({
 	
 	initialize: function(){
+		app.Global.Router.currentView  = this;
 		//get the department name from model..
 		if (this.collection.length === 0){
 			console.log("returning from branch view initialize");
@@ -553,7 +694,6 @@ app.Views.Branch = Backbone.View.extend({
 		app.Global.dept = false;
 	},
 	
-	el: $("#jecrc-main-screen"),
 	
 		
 	
@@ -608,7 +748,7 @@ app.Views.Branch = Backbone.View.extend({
 		
 		
 		//Inserting to el..
-		 $(this.el).html( this.branchTemplate( model_json ) );
+		 $(this.$el).html( this.branchTemplate( model_json ) );
 		 
 		return this;	
 	},
@@ -645,109 +785,6 @@ app.Views.Branch = Backbone.View.extend({
 	
 
 });
-
-
-
-app.Global.alertType = ["alert-danger", "alert-success", "alert-info", "alert-warning"];
-
-//function for getting random numbers...
-app.Global.randomNumber = function(min, max) {
-  	return parseInt(Math.random() * (max - min) + min);
-}
-
-var getYear = function(id){
-	var x = {
-		1:"I YEAR",
-		2:"I YEAR",
-		3:"II YEAR",
-		4:"II YEAR",
-		5:"III YEAR",
-		6:"III YEAR",
-		7:"IV YEAR",
-		8:"IV YEAR"	
-	}
-	return x.id;
-}
-
-
-var parseBranch = function(branchName){
-	var patt = /([0-9])\s*\-\s*([a-zA-Z]+)\s*\-\s*([a-zA-Z])/
-	var value = patt.exec(	branchName );
-	value = value.splice(1);
-	return value;
-}
-
-var parseDate = function(date){
-	var patt = /([0-9]+)\s*\-\s*([0-9]+)\s*\-\s*([0-9]+)/
-	var value = patt.exec(	date );
-	value = value.splice(1);
-	return value;
-}
-
-var getMonth = function(month){
-	var x = {
-		1:"January",
-		2:"Fabuary",
-		3:"March",
-		4:"April",
-		5:"May",
-		6:"June",
-		7:"July",
-		8:"August",
-		9:"September",
-		10:"October",
-		11:"November",
-		12:"December"	
-	}
-	return x[month];
-}
-
-var convertDate = function(date){
-	var par_date = parseDate(date);
-	return getMonth(par_date[1]) + " " + par_date[2]; 	
-}
-
-var getInitialFacultyName = function(name){
-	var patt = /([a-zA-Z])[a-zA-Z]*\s*([a-zA-Z])[a-zA-Z]*\s*/
-	var value = patt.exec(	name );
-	value = value.splice(1);
-	return value[0].toUpperCase() + "." + value[1].toUpperCase();
-	
-}
-
-var getDay = function(sqlDateString){
-	var d = new Date(sqlDateString);
-	var day = d.getDay();
-	var days = {
-		1:"Monday",
-		2:"Tuesday",
-		3:"Wednesday",
-		4:"Thursday",
-		5:"Friday",
-		6:"Saturday",
-		7:"Sunday",	
-	}
-	return days[day];	
-}//End of getday function..
-
-
-//Get sql format of date ..
-var getSqlDate = function(year, month, day){
-		return year + "-" + month +"-"+ day;
-}
-
-var getTodayDate = function(){
-	var d = new Date();
-	var date  = d.getDate();
-	//JAvascript month 0-11
-	var month = d.getMonth();
-	//converting to sql format month 1-12
-	month=month+1;
-	var year  = d.getFullYear();
-	return getSqlDate(year, month, date);	
-}
-
-
 
 
 

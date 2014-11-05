@@ -128,7 +128,7 @@
 	function days_entry_by_section($sem, $sec_name, $dept_name )
 	{
 		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name";
+		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name ORDER BY date DESC";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);

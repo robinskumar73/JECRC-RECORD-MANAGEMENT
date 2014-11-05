@@ -13,5 +13,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 </head>
+<style>
+#jecrc-main-screen span.log_date::before, #jecrc-main-screen span.report-dept-info::before{
+	content:"-";
+	font-size:20px;
+	font-weight:100;
+}
+</style>
+
 
 <body>

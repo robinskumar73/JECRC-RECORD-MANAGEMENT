@@ -54,7 +54,7 @@
 	
 	
 	
-	//-------------------------------------------BRANCH ENTRY AREA-----------------------------------------------------------------
+	//-----------------------------------------BRANCH ENTRY  AREA----------------------------------------------------------
 	//GET
 	$app->get('/branch/', 'getBranch');
 	$app->post('/branch/', 'addBranch');
@@ -428,7 +428,6 @@
 			$dept_name = $_GET['dept_name'];
 			$dept = days_entry_by_dept($dept_name);
 			$dept = process_days_entry_obj($dept);
-			
 			echo json_encode($dept);
 		}
 		else{

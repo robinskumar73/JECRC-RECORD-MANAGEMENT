@@ -7,53 +7,119 @@ app.Routers =  app.Routers || {};
 //Defining routers here...
 app.Routers = Backbone.Router.extend({
 	routes:{
-		"department/:name" : "showDepartment",
-		"report/department/:dept_name" : "showDepartmentReport"	,
-		"report/department/:dept_name/:year" : "showYearReport",
+		""																			 : "showHomePage",			
+		"department/:name" 															 : "showDepartment",
+		"report/department/:dept_name" 												 : "showDepartmentReport"	,
+		"report/department/:dept_name/:year" 										 : "showYearReport",
 		"report/department/:dept_name/semester/:semester_name/section/:section_name" : "showBranchReport"
+	},
+	
+	
+	//Area for displaying basic home page...
+	showHomePage: function()
+	{
+		this.closePreviousViews();
+		if(app.Global.DepartmentElementObj){
+			$("#jecrc-right-hook").prepend( app.Global.DepartmentElementObj );
+		}
+		//Now showing the department...
+		$("#admin-department").removeClass('hide');
+		//Showing the loading bar..
+		app.Global.showLoadingBar();
+		
+	},
+	
+	
+	//Always call this function before calling a route call function...
+	closePreviousViews: function() {
+		console.log("Closing the pervious in memory views...");
+		if (this.currentView)
+			this.currentView.destroy_view();
 	},
 	
 	
 	//Showing report for department..
 	showDepartmentReport: function(dept_name){
-		app.Global.showLoadingBar();
-		//Now fecthing report collection based on department..
-		var periodEntryCollection = new app.Collection.periodEntry;
-		periodEntryCollection.url = "modules/department.php/entry/department/" + dept_name; 
+		this.closePreviousViews();
 		
+		//Hiding the department...
+		$("#admin-department").addClass('hide');
+		app.Global.DepartmentElementObj = $("#admin-department").detach();
+		
+		
+		data = {
+				
+						offset	   : 0,
+						limit	   :30, 
+						"dept_name": dept_name
+					
+				};
 		//Now fecthing and rendering periodentryCollection..
-		PeriodEntryRender(periodEntryCollection);
+		PeriodEntryRender( data );
 		
 	},
 	
 	
 	showBranchReport: function(dept_name, semester_name, section_name ){
-		app.Global.showLoadingBar();
+		//this.closePreviousViews();
+		//Hiding the department...
+		$("#admin-department").addClass('hide');
+		app.Global.DepartmentElementObj = $("#admin-department").detach();
+		
+		
 		//Now fecthing report collection based on department..
 			var periodEntryCollection = new app.Collection.periodEntry;
-			periodEntryCollection.url = "modules/department.php/entry/department/" + dept_name +"/semester/" + semester_name + "/section/" + section_name;
+			
+			//$_GET['dept_name']) && isset($_GET['sem']) && isset($_GET['sec_name']
+			data = {
+				
+						offset	   : 0,
+						limit	   : 30, 
+						"dept_name": dept_name,
+						"sem"	   : semester_name,
+						"sec_name" : section_name
+				
+				};
 			
 		//Now fecthing and rendering periodentryCollection..
-		PeriodEntryRender(periodEntryCollection);
+		PeriodEntryRender( data );
 		
 		
 	},
 	
 	
 	showYearReport: function(dept_name, year){
-		app.Global.showLoadingBar();
-		//Now fecthing report collection based on department..
-		var periodEntryCollection = new app.Collection.periodEntry;
-		periodEntryCollection.url = "modules/department.php/entry/department/" + dept_name +"/year/"+year;
+		this.closePreviousViews();
+		
+		//Hiding the department...
+		$("#admin-department").addClass('hide');
+		app.Global.DepartmentElementObj = $("#admin-department").detach();
+		
+		data = {
+					
+						offset	   : 0,
+						limit	   : 30, 
+						"dept_name": dept_name,
+						"year"     : year
+					
+				};
+		
+		
 		
 		//Now fecthing and rendering periodentryCollection..
-		PeriodEntryRender(periodEntryCollection);
+		PeriodEntryRender( data );
 		 
 	},
 	
 	
 	
 	showDepartment: function(name){
+		this.closePreviousViews();
+		
+		//Hiding the department...
+		$("#admin-department").addClass('hide');
+		app.Global.DepartmentElementObj = $("#admin-department").detach();
+		
 		//Showing loading bar..
 		app.Global.showLoadingBar();
 		//fetching branch and storing it in collection...
@@ -92,42 +158,40 @@ app.Routers = Backbone.Router.extend({
 	}	
 });
 
+
+
+//collection.fetch({data: {offset: 30, limit:30, faculty_id:id_of_faculty}, add: true})
 //Route function for rendering period entry data...
-var PeriodEntryRender = function(Periodcollection){
-	
-	//Now fetching url..
-	Periodcollection.fetch({
-		error: function () {
-			app.Global.hideLoadingBar();
-			console.log('Error fetching department wise entry from database..');
-		},
-		success: function(list_array){
-			app.Global.hideLoadingBar();
-			if(Periodcollection.length === 0){
-				console.log("returning from department entry route as length is zero..");
-				return null;
-			}
-			//$("#jecrc-main-screen").html('');
-			console.log('Successfully fetched department wise entries data..');
-			//Getting the dates of entry in decreasing order..
-			var entry_arr  = $.unique(Periodcollection.pluck("days_entry_id"));
-			
-			$("#jecrc-main-screen").html('');
-			app.Global.arr = [];
-		
-			for(var i=0; i<entry_arr.length; i++)
+//Here data is for adding the page rendering info like department name, year name etc and also for offset and limit info 
+var PeriodEntryRender = function( data ){
+	app.Global.showLoadingBar();
+	if(app.Global.Department.length === 0){
+		app.Global.Department.fetch({
+			error  : function(){console.log("Error fetching the department..");},
+			success: function()
 			{
-					//finding the entry model one by one....
-					var entry_model_arr = Periodcollection.where({ "days_entry_id":entry_arr[i] });
-					//Now load this view..
-					var periodView = new app.Views.periodEntry({collection:entry_model_arr});
-					$("#jecrc-main-screen").append(periodView.render().el);
-			}
-			Periodcollection = null;
-		}
-	});
+				console.info("Successfully fetched  department data");
+				fetchPeriod();
+				
+			},
+		});
+	}
+	else{
+		fetchPeriod( data );	
+	}
+	
 				
 }//Function end for periodEntryRender..
+
+
+
+var fetchPeriod = function( data ){
+	
+	//Now creating the collection......
+	var Periodcollection = new app.Collection.periodEntry;
+	
+	
+}
 
 
 
@@ -141,11 +205,13 @@ app.Global.render_department =  function(name){
 		//Now rendering the batch view...
 		var cs_branch_view = new app.Views.Branch({"collection": cs_branch_collection});
 		cs_branch_view.render();
+		//Adding the element to the page...
+		$("#jecrc-main-screen").html(cs_branch_view.el);
 		console.log('loading bar is getting hide..');
 		app.Global.hideLoadingBar();	
 }
 
 $(document).ready(function(e) {
-   app.Global.Router = new app.Routers();
-   Backbone.history.start(); 
+    app.Global.Router = new app.Routers();
+	Backbone.history.start({root: "/Manage/"}); 
 });

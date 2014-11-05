@@ -48,9 +48,10 @@ app.Collection.periodEntry = Backbone.Collection.extend({
 	url:"/Manage/modules/department.php/period/entry",
 	
 	//Sorting the collection in decreasing order of date..
-	comparator: function(periodEntryModel) {
-		return -periodEntryModel.get("date");
-	}
+	comparator: function(Model) {
+		console.log("Inside comparator!");
+		return [-Model.get("date")];
+	},
 });
 
 
@@ -66,7 +67,6 @@ app.Collection.faculty_entry = Backbone.Collection.extend({
 	
 	//Sorting the collection in decreasing order of date..
 	comparator: function(Model) {
-		console.log("Inside comparator!");
 		return [-Model.get("date"), -Model.get("time")];
 	},
 });
