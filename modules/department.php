@@ -29,6 +29,19 @@
 	$app->delete('/subject/:id', 'deleteSubject');
 	
 	
+	
+	//------------------------------------------FACULTY AREA---------------------------------------------------------------
+	//GET
+	$app->get('/members',"getAllFaculty");
+	$app->get('/members/:id',"getFacultyById");
+	//POST
+	$app->post('/members',"addFaculty");
+	//PUT
+	$app->put('members/:id','updateFaculty');
+	//DELETE
+	$app->delete('/members/:id','deleteFaculty');
+	
+
 	//------------------------------------------PERIOD ENTRY AREA------------------------------------------------------------
 	//NEW ROUTES
 	//GET
@@ -87,16 +100,37 @@
 	
 	//function to get all department start here
 	function getAllDepartment() {
-		$sql = "SELECT * FROM department";
-		try {
-			$db = getConnection();
-			$stmt = $db->query($sql);
-			$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
-			$db = null;
-			echo json_encode($dept);
-		} catch(PDOException $e) {
-			echo '{"error":{"text":'. $e->getMessage() .'}}';
-			header("Server Error");
+		
+		if( isset($_GET['key']) )
+		{
+			$key =  $_GET['key'];
+			$sql = "SELECT * FROM `department` WHERE `name` LIKE :key LIMIT 0, 30 ";
+			$key = $key."%";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("key", $key);
+				$stmt->execute();
+				$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+				$db = null;
+				echo json_encode($dept);
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header("Server Error");
+			}
+		}
+		else{
+			$sql = "SELECT * FROM department";
+			try {
+				$db = getConnection();
+				$stmt = $db->query($sql);
+				$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+				$db = null;
+				echo json_encode($dept);
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header("Server Error");
+			}
 		}
 	}//function to get all department ends here
 	
@@ -119,7 +153,7 @@
 	}
 	
 	
-	//----------------------------------------------------------SUBJECT ROUTES AREA----------------------------------------------
+	//------------------------------------------------SUBJECT ROUTES AREA----------------------------------------------
 	
 	function getSubject()
 	{
@@ -472,7 +506,7 @@
 	
 	
 	//function to get department by id start here
-  function getDepartmentById($deptId) {
+  function getDepartmentById($deptId) {	  
 		$sql = "SELECT name FROM department WHERE id=:deptId";
 		try {
 			$db = getConnection();
@@ -1048,10 +1082,316 @@
 			return false;
 		}	
 	}//Function ends for updateLog...
-  
+
+
+
+
+
+
+//-----------------------------------FACULTY ROUTE AREA--------------------------------------------------------
+	//$app->get('/members',"getAllFaculty");
+	//collection.fetch({data: {offset: 30, limit:30, dept_id:154}, add: true})
+	function getAllFaculty(){
+		
+		//Setting the max limit faculty log fetch..
+		try 
+		{
+			$limit  = $_GET['limit'];
+			$offset = $_GET['offset'];
+			
+		}catch(ErrorException $e) 
+		{
+			$limit  = 10;
+			$offset = 0;
+		}
+		$limit = (int)(trim($limit));
+		$offset = (int)(trim($offset));
+		//proceed only if user is admin...
+		if( $_SESSION['admin'] )
+		{
+			if( isset($_GET['dept_id']) )
+			{
+				//set department id..
+				$department_id = $_GET['dept_id'];
+				
+				$sql = "SELECT * FROM `faculty` WHERE department_id = :department_id LIMIT :limit OFFSET :offset ;";
+				try 
+				{
+					$db = getConnection();
+					$stmt = $db->prepare($sql);
+					$stmt->bindParam(":department_id", $department_id);
+					$stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
+					$stmt->bindParam(":offset", $offset,  PDO::PARAM_INT);
+					$stmt->execute();
+					$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+					$db = null;
+					echo json_encode($dept);
+				} catch(PDOException $e)
+				{
+					echo '{"error":{"text":'. $e->getMessage() .'}}';
+					header("Server Error");
+				}
+			}//End of if clause DEPARTMENT ID CHECKING..
+			else{
+				$sql = "SELECT * FROM `faculty` LIMIT :limit OFFSET :offset ;";
+				try 
+				{
+					$db = getConnection();
+					$stmt = $db->prepare($sql);
+					$stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
+					$stmt->bindParam(":offset", $offset,  PDO::PARAM_INT);
+					$stmt->execute();
+					$dept = $stmt->fetchAll(PDO::FETCH_OBJ);
+					$db = null;
+					echo json_encode($dept);
+				} catch(PDOException $e)
+				{
+					echo '{"error":{"text":'. $e->getMessage() .'}}';
+					header("Server Error");
+				}
+			}//End of else statemenet..
+		}//IF stat ends for checkin of admin...
+	}//Function ends for getAll Faculty
 	
 	
 	
+	//$app->get('/members/:id',"getFacultyById");
+	//collection.fetch({data: {offset: 30, limit:30}})
+	function getFacultyById( $id ){
+		
+		//proceed only if user is admin...
+		if( $_SESSION['admin'] )
+		{
+			$dept = getMemberById( $id );
+			echo json_encode($dept);
+		}//IF stat ends for checkin of admin...
+	}//getFacultyById function ends here....
+	
+	
+	//$app->post('/memebers',"addFaculty");
+	function addFaculty(){
+		$request          = \Slim\Slim::getInstance()->request();
+    	$dept             = json_decode($request->getBody());
+		//$department_id    = $request->headers->get('faculty_id');
+		//proceed only if user is admin...
+		if( $_SESSION['admin'] )
+		{	
+		  $sql = "INSERT INTO  `faculty` 
+		        (
+				  first_name,
+				  last_name,
+				  email_address, 
+				  username, 
+				  password, 
+				  department_id, 
+				  status
+				)VALUES (
+				  :first_name,
+				  :last_name, 
+				  :email_address, 
+				  :username,
+				  :password,
+				  :department_id, 
+				  :status
+				)";
+		   try 
+		   {
+			  //Checking for validity
+			  if( 
+			      numberMatch( $dept->department_id ) && 
+			      matchEmail( $dept->email_address )  && 
+				  matchName( $dept->first_name )      &&
+				  matchName( $dept->last_name )       &&
+				  matchUserName( $dept->username ) 
+				)
+			  {
+				   //Getting the random password...
+				  $pass                     = randomPassword();
+				  $password_md5             = md5( $pass ); 
+				  $dept->first_name         = htmlspecialchars(trim($dept->first_name));
+				  $dept->last_name          = htmlspecialchars(trim($dept->last_name));
+				  $dept->username           = htmlspecialchars(trim($dept->username));
+				  $dept->department_id      = htmlspecialchars(trim($dept->department_id));
+				  $status					= 'live';	
+				  
+				  
+				  //First check for possible update....
+				  $whereString = " email_address = '$dept->email_address' ";
+				  $rows = countReturnedRows( $whereString );
+				  
+				  if($rows > 0)
+				  {
+						header ('Server Error');
+						echo "<strong>Email address is not availaible</strong>.Please choose another";
+						return true;
+				  }
+				  
+				  $whereString = " username =  '$dept->username' ";
+				  $rows = countReturnedRows( $whereString );
+				  if($rows > 0)
+				  {
+						header ('Server Error');
+						echo  "<strong>Username is not availaible</strong>.Please choose another" ;
+						return true;
+				  }
+			  				
+				  
+				  //Getting the connection...
+				  $db = getConnection();
+				  $stmt = $db->prepare($sql);
+				  $stmt->bindParam("first_name",     $dept->first_name);
+				  $stmt->bindParam("last_name",      $dept->last_name);
+				  $stmt->bindParam("email_address",  $dept->email_address);
+				  $stmt->bindParam("username",       $dept->username);
+				  $stmt->bindParam("password",       $password_md5);
+				  $stmt->bindParam("department_id",  $department_id);
+				  $stmt->bindParam("status",         $status);
+				  $stmt->execute();
+				  $faculty_id = $db->lastInsertId();
+				  //Now fetch feculty data...
+				  $dept = getMemberById( $faculty_id );
+				  //Add string  pass to dept..
+				  $dept->pass_string =  $pass;
+				  echo json_encode($dept);
+				  
+				  $db = null;
+			  }//End of if
+			  else{
+				  echo  "Invalid characters" ;
+				  header("Server Error"); 	  
+			  }
+			  	
+			} catch(PDOException $e) {
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+				header ('Server Error');
+			}
+		}//End of if for checking of admin
+		else{
+			echo "Only Admin can have permission to add faculty members" ;
+			header("Server Error");
+		}
+	}//Function ends for addFaculty....
+	
+	
+	
+	
+	//$app->put('members/:id','updateFaculty');
+	function updateFaculty( $id ){
+		$request       = \Slim\Slim::getInstance()->request();
+		$dept          = json_decode($request->getBody());
+		//$faculty_id    = $request->headers->get('faculty_id');
+		if( $_SESSION['admin'] )
+		{
+		   if( 
+				numberMatch( $dept->department_id ) && 
+				matchEmail( $dept->email_address )  && 
+				matchName( $dept->first_name )      &&
+				matchName( $dept->last_name )       &&
+				matchUserName( $dept->username )    
+			  )
+			{
+				
+			  //Perform update operation...
+			  $sql = " UPDATE `faculty` 
+			           SET 
+						   `first_name`     =  :first_name,
+						   `last_name`      =  :last_name,
+						   `username`       =  :username,
+						   `password`       =  :password,
+						   `department_id`  =  :department_id,
+						   `email_address`  =  :email_address
+				      WHERE 
+					  	   `id`               =  :id ";
+			  
+			  $password_md5             =  md5($dept->password ); 
+			  $dept->first_name         =  htmlspecialchars(trim($dept->first_name));
+			  $dept->last_name          =  htmlspecialchars(trim($dept->last_name));
+			  $dept->username           =  htmlspecialchars(trim($dept->username));
+			  $dept->department_id      =  htmlspecialchars(trim($dept->department_id));
+			 
+			 
+			  //First check for possible update....
+			  $whereString = "email_address = " . $dept->email_address;
+			  $rows = countReturnedRows( $whereString );
+			  if($rows > 1)
+			  {
+					header ('Server Error');
+					echo '{"error":{"text":'. '<strong>Email address is not availaible</strong>.Please choose another' .'}}';
+					return true;
+			  }
+			  
+			  $whereString = "username = " . $dept->username;
+			  $rows = countReturnedRows( $whereString );
+			  if($rows > 1)
+			  {
+					header ('Server Error');
+					echo '{"error":{"text":'. '<strong>Username is not availaible</strong>.Please choose another' .'}}';
+					return true;
+			  }
+			  				 
+			 
+			  try 
+			  {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("id",            $id);
+				$stmt->bindParam("first_name",    $dept->first_name );
+				$stmt->bindParam("last_name",     $dept->last_name);
+				$stmt->bindParam("username",      $dept->username);
+				$stmt->bindParam("password",      $password_md5);
+				$stmt->bindParam("department_id", $dept->department_id);
+				$stmt->bindParam("email_address", $dept->email_address);
+				$stmt->execute();
+				$db = null;
+				$dept->password = $password_md5;
+				echo json_encode($dept);
+				
+			  } catch(PDOException $e) {
+				  header ('Server Error');
+				  echo '{"error":{"text":'. $e->getMessage() .'}}';
+			  }	
+			  
+			}//End of if validation..
+		}//end of if admin...
+		else{
+			header ('Server Error');
+			echo '{"error":{"text":'. 'Only Admin can have permission to add faculty members' .'}}';
+		}	
+	}//End of function of updateFaculty
+	
+	
+	
+	//$app->delete('/members/:id','deleteFaculty');
+	function deleteFaculty( $id ){
+	  if( $_SESSION['admin'] )
+	  {
+		//Performing the delete operations...
+		$sql = "DELETE FROM `faculty` WHERE id=:id";
+		
+		 try 
+		  {
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("id",  $id);
+			$stmt->execute();
+			$db = null;
+			echo '{}';
+			
+		  } catch(PDOException $e) {
+			  header ('Server Error');
+			  echo '{"error":{"text":'. $e->getMessage() .'}}';
+		  }	
+	  }
+	}//End of function of deleteFaculty...
+
+
+//-----------------------------------AREA ENDS FOR FACULTY AREA-------------------------------------------------
+
+
+	
+	
+
+//-----------------------------------CONNECTION AREA------------------------------------------------------------	
 	
 	function getConnection() {
 		$dbhost= HOST;

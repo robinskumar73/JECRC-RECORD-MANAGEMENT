@@ -755,6 +755,8 @@ app.Views.Branch = Backbone.View.extend({
 	
 	initialize: function(){
 		app.Global.Router.currentView  = this;
+		//Adding right side hook elements related to branch...
+		this.childViews                = [];
 		//get the department name from model..
 		if (this.collection.length === 0){
 			console.log("returning from branch view initialize");
@@ -768,8 +770,7 @@ app.Views.Branch = Backbone.View.extend({
 	},
 	
 	
-		
-	
+
 	render: function(){
 		
 		//Cleaning el
@@ -823,6 +824,16 @@ app.Views.Branch = Backbone.View.extend({
 		//Inserting to el..
 		 $(this.$el).html( this.branchTemplate( model_json ) );
 		 
+		 //Adding the add faculty template....
+		 var facultyModel = new app.Model.Faculty;
+		 facultyModel.set( "department_id", this.collection.at(0).get("department_id") );
+		 var facultyView = new app.Views.CreateFaculty({ model:facultyModel });
+		 facultyView["department_id"] = this.collection.at(0).get("department_id");
+		 //add this view to the child views...
+		 this.childViews.push( facultyView );
+		 //Now rendering the create faculty template....
+		 $("#right-side-hook").append( facultyView.render().el );
+		 
 		return this;	
 	},
 
@@ -861,8 +872,127 @@ app.Views.Branch = Backbone.View.extend({
 
 
 
+//-----------------------------------------------VIEWS FOR CREATING FACULTY---------------------------------------------------
+
+//Accept a argument model of faculty...
+//View for Creating Activity.....
+//Provide department_id value rendering this..
+//Child Views...
+app.Views.CreateFaculty = Backbone.View.extend({
+	
+	initialize: function(){
+		//initializing template for create faculty...
+		this.template = _.template( $("#Create-Faculty-Template").html() );
+		//For listening to validation error..
+		this.listenTo(  this.model , 'invalid', this.validationFailed );
+	},
+	
+	
+	
+	//For getting the value of faculty info 
+	getValue: function(){
+		var firstName     = $("#faculty-first-name").val();
+		var lastName      = $("#faculty-last-name").val();
+		var userName      = $("#faculty-user-name").val();
+		var emailAddress  = $("#faculty-email-address").val();
+		//check if values are empty...
+		if( !firstName.length && !lastName.length && !userName.length && !emailAddress.length )
+		{
+			message = "All <strong>values</strong> must be entered.";
+			//Display message showing all values not entered...
+			this.displayMessage( message, app.Global.alertType[3] );
+			return false;	
+		}
+		
+		var Obj = {
+			first_name   : firstName,	
+			last_name    : lastName,
+			username     : userName,
+			email_address : emailAddress
+		}
+		//Return the object..
+		return Obj;
+	},
+	
+	
+	
+	//Event management...
+	events:{
+		"click  #faculty-create-btn"  : "saveEntry",
+		"click  #faculty-reset-btn"   : "resetEntry"
+	},
+	
+	
+	
+	render: function(){
+		this.$el.append( this.template() );
+		return this;
+	},
+	
+	
+	saveEntry: function(e){
+		var obj = this.getValue();
+		if(!obj)
+		{
+			//All values must be entered..
+			return false;	
+		}
+		//Adding the department..
+		obj[department_id] = this.department_id;
+		var that = this;
+		this.model.save(obj,{
+			success: function( model, response ){
+				console.log("Succesfully created faculty!");
+				var message = "<strong>Faculty</strong> created.\
+								<p> Faculty Name: " + obj.first_name + " " + obj.last_name  + "</p>  \
+								<p> Faculty Pass: " + response.pass_string + " </p> \
+								<p><strong>Note</strong>:Change this password as soon as you login.</p>";
+				that.displayMessage(message, app.Global.alertType[1] );
+				//Adding the faculty model to global collection...
+				app.Global.facultyList.add(that.model);
+			},
+			error: function( model, response ){
+				console.log("Error created faculty!");
+				//var message = "<strong>Error</strong> creating faculty.";
+				
+				var message = response.responseText;
+				that.displayMessage(message, app.Global.alertType[3] );
+			}
+		});
+		this.resetEntry();
+		
+	},
+	
+	
+	resetEntry: function(){
+		var firstName     = $("#faculty-first-name").val('');
+		var lastName      = $("#faculty-last-name").val('');
+		var userName      = $("#faculty-user-name").val('');
+		var emailAddress  = $("#faculty-email-address").val('');
+	},
+	
+	//Method if model validation fails..
+	validationFailed: function(model){
+		this.displayMessage(model.validationError, app.Global.alertType[3]);
+	},
+	
+	
+	//Function for diplaying result and console screen...
+	displayMessage : function(message, type){
+		var Template = _.template( $("#display-info").html() );
+		this.display =  Template( {"message": message, "typeInfo": type } );
+		//Callback for success 
+		//Now adding this info to form display ..
+		var displayElement = this.$el.find("#admin-faculty-info-box");
+		$(displayElement).html(this.display);
+	}
+	
+	
+});
 
 
 
+
+//------------------------------------------------------VIEWS FOR UPDATING THE FACULTY-------------------------------------
 
 

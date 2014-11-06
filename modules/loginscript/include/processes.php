@@ -168,7 +168,7 @@ class Login_Process {
 		$first_name		= $post['first_name'];
 		$last_name		= $post['last_name'];
 		$email_address	= $post['email_address'];
-		$department_id			= $post['department_id'];
+		$department_id	= $post['department_id'];
 		$username		= $post['username'];
 		$password		= $_SESSION['password'];
 		

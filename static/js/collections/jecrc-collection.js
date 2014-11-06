@@ -36,7 +36,8 @@ app.Collection.Subject = Backbone.Collection.extend({
 
 
 app.Collection.Faculty = Backbone.Collection.extend({
-	model:app.Model.Faculty
+	model:app.Model.Faculty,
+	url:"/Manage/modules/department.php/members"
 });
 
 

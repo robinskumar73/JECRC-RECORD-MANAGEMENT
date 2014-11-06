@@ -35,13 +35,19 @@ app.Model.Branch = Backbone.Model.extend({
 
 app.Model.Faculty = Backbone.Model.extend({
 	defaults:{
-		id:null,
-		first_name:'',
-		last_name:'',
-		username:'',
-		department_id:null	
-	}
+		id            :null,
+		first_name    :'',
+		last_name     :'',
+		username      :'',
+		department_id :null,
+		password	  :'',
+		email_address :''
+	},
+	
+	urlRoot:"/Manage/modules/department.php/members"
+	
 });
+
 
 
 app.Model.Subject = Backbone.Model.extend({

@@ -14,6 +14,7 @@ app.Global.Department     			= new app.Collection.Department;
 app.Global.Branch         			= new app.Collection.Branch;
 app.Global.Subjects       			= new app.Collection.Subject;
 app.Global.entryLogCollection 		= new app.Collection.faculty_entry;
+app.Global.facultyList              = new app.Collection.Faculty;
 
 
 //Other global values related to admin page..
@@ -133,6 +134,56 @@ customSubjectSelectize = function(elementObj){
 	//Now returning the object...
 	return subjectSelect;
 	
+}
+
+
+
+//Function for custom selecting autocomplete ...
+customDepartmentSelectize = function(elementObj){
+	
+	//Initializing the selectize function...
+	deptSelect = $(elementObj).selectize({
+		
+		//Now instantiating values for selectize..
+		theme:false  ,
+		maxItems: 1,
+		valueField:  'id',
+		searchField: 'name',
+		labelField: 'name',
+	
+		options: [],
+
+	
+		load: function(query, callback) {
+			if (!query.length) return callback();
+			$.ajax({
+				url: 'http://localhost/Manage/modules/department.php/department?key='+query,
+				type: 'GET',
+				dataType: 'json',
+				error: function() {
+					callback();
+				},
+				success: function(res) {
+					callback(res);
+				}
+			});
+		},
+
+			
+		render: {
+			option: function(item, escape) {
+	
+			  return '<div>' +
+				  '<span class="auto-title">' +
+				  '<span class="auto-name">' + escape(item.subject) + '</span>' +
+				  '</span>' +
+			  '</div>';
+			}
+	    },
+		
+	});//End of selectize function..
+	//Now returning the object...
+	return deptSelect;
 }
 
 

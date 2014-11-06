@@ -66,7 +66,7 @@
 	function days_entry_by_dept($dept_name, $limit, $offset )
 	{
 		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id  ORDER BY date DESC  LIMIT $limit OFFSET $offset";
+		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id  ORDER BY semester_id, section_name, date DESC  LIMIT $limit OFFSET $offset";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);
@@ -128,7 +128,7 @@
 	function days_entry_by_section($sem, $sec_name, $dept_name, $limit, $offset )
 	{
 		$dept_id = getDepartmentId($dept_name);
-		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name ORDER BY date DESC  LIMIT $limit OFFSET $offset";
+		$sql = "SELECT * FROM days_entry WHERE department_id=:dept_id AND semester_id = :semester_id AND section_name = :section_name ORDER BY  date DESC  LIMIT $limit OFFSET $offset";
 		try {
 			$db = getConnection();
 			$stmt = $db->prepare($sql);
@@ -594,6 +594,44 @@
 	}
 	
 	
+	function countReturnedRows($whereString){
+		
+		$sql = "SELECT count(*) FROM `faculty` WHERE $whereString " ; 
+		try 
+		{
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->execute(); 
+			$number_of_rows = $stmt->fetchColumn();
+			return $number_of_rows; 
+		} catch(PDOException $e)
+		{
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header("Server Error");
+		}	
+		
+	}
+	
+	
+	
+	function getMemberById( $id )
+	{
+		$sql = "SELECT * FROM `faculty` WHERE id=:id  ;";
+		try 
+		{
+			$db = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam(":id", $id);
+			$stmt->execute();
+			$dept = $stmt->fetchObject();
+			$db = null;
+			return $dept;
+		} catch(PDOException $e)
+		{
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+			header("Server Error");
+		}
+	}
 	
 	/*-------------------------------------NOW APPLYING SOME VALIDATION FUNCTIONS------------------------------------*/
 	/*
@@ -606,6 +644,48 @@
 	function matchSubjectName($subject)
 	{
 		$pattern = '/[^\d\s\w\.\-]/';
+		$success = preg_match($pattern, $subject);
+		if($success)	
+		{
+			//retun validation fails..
+			return false;	
+		}
+		else
+			return true;
+	}
+	
+	
+	function matchUserName($subject)
+	{
+		$pattern = '/[^\d\w\.\-\_]/';
+		$success = preg_match($pattern, $subject);
+		if($success)	
+		{
+			//retun validation fails..
+			return false;	
+		}
+		else
+			return true;
+	}
+	
+	
+	function matchName($subject)
+	{
+		$pattern = '/[^\w]/';
+		$success = preg_match($pattern, $subject);
+		if($success)	
+		{
+			//retun validation fails..
+			return false;	
+		}
+		else
+			return true;
+	}
+	
+	
+	function matchEmail($subject)
+	{
+		$pattern = '/[^\d\w\.\-\@\_]/';
 		$success = preg_match($pattern, $subject);
 		if($success)	
 		{
@@ -633,5 +713,17 @@
 		}
 	}
 	
+	//For getting the random digit password...
+	function randomPassword() {
+	  $alphabet = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
+	  $pass = array(); //remember to declare $pass as an array
+	  $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+	  for ($i = 0; $i < 8; $i++) {
+		  $n = rand(0, $alphaLength);
+		  $pass[] = $alphabet[$n];
+	  }
+    return implode($pass); //turn the array into a string
+	}
+
 
 ?>

@@ -126,16 +126,7 @@
         </div><!--DIV ENDS FOR INFO SCREEN-->
     </div> <!--DIV ENDS FOR DISPLAYING THE SELECTED SEMESTERS-->
     
-    <!--DIV FOR ADDING FACULTY-->
-    <div class="col-sm-12"><!--INFO for adding faculty-->
-        <div id="AddFaculty" class="col-sm-12 AddFaculty" >
-            <h4 class="blue-text semAddHeading" style="margin-bottom:18px;" > + Add Faculty</h4>
-            <input type="text" class="form-control faculty-dept-entry "  placeholder="First Name">
-            <input type="text" class="form-control faculty-dept-entry" placeholder="Last Name">
-            <input type="text" class="form-control faculty-dept-entry" placeholder="User Name">
-            <button type="button" class="btn btn-primary jecrc-create-btn">Next</button>
-        </div><!--DIV ENDS FOR ADDING FACULTY-->
-    </div>
+    
     
      <!--DIV FOR ADDING FACULTY-->
     <div class="col-sm-12"><!--INFO for adding faculty-->

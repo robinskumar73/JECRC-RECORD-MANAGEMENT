@@ -115,6 +115,8 @@
     </div>
 </script>
 
+
+
 <script id="entry-log-alert-body" type="text/template">
 	<div class="delete-info">
   		<h4> Do you want to delete this entry. </h4>
