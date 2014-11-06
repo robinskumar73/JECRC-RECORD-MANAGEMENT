@@ -128,32 +128,5 @@
     
     
     
-     <!--DIV FOR ADDING FACULTY-->
-    <div class="col-sm-12"><!--INFO for adding faculty-->
-        <div id="FacultyList" class="col-sm-12 AddFaculty" >
-            <h4 class="blue-text semAddHeading" style="margin-bottom:18px;" > Faculty List </h4>
-            <ul class="faculty-list">
-                <li class="faculty-list-items" >
-                     <h4 style="margin-bottom:0px;">Ravi Gupta</h4>
-                     <span class="faculty-list-icons glyphicon glyphicon-pencil"></span>
-                     <span class="faculty-list-icons glyphicon glyphicon-trash"></span>
-                     <span  class="faculty-list-icons  glyphicon glyphicon-cog"></span>
-                </li>
-               <li class="faculty-list-items" >
-                     <h4 style="margin-bottom:0px;">Robins Gupta</h4>
-                     <input type="text" id="Department" value="Robins Gupta" class="form-control typeahead jecrc-dept-entry" placeholder="Edit faculty name">
-                     <span class="faculty-list-icons glyphicon glyphicon-pencil"></span>
-                     <span class="faculty-list-icons glyphicon glyphicon-trash"></span>
-                     <span class="faculty-list-icons glyphicon glyphicon-cog"></span>
-                </li>
-               <li class="faculty-list-items" >
-                     <h4  style="margin-bottom:0px;" >Suresh Gupta</h4>
-                     <span class="faculty-list-icons glyphicon glyphicon-pencil"></span>
-                     <span class="faculty-list-icons glyphicon glyphicon-trash"></span>
-                     <span class="faculty-list-icons glyphicon glyphicon-cog"></span>
-                </li>
-             
-            </ul>
-        </div><!--DIV ENDS FOR ADDING FACULTY-->
-    </div>
+
 </div><!--DIV ENDS FOR ADMIN-DEPARTMENT-->

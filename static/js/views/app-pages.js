@@ -138,6 +138,7 @@ customSubjectSelectize = function(elementObj){
 
 
 
+
 //Function for custom selecting autocomplete ...
 customDepartmentSelectize = function(elementObj){
 	
@@ -150,6 +151,7 @@ customDepartmentSelectize = function(elementObj){
 		valueField:  'id',
 		searchField: 'name',
 		labelField: 'name',
+		create:false,
 	
 		options: [],
 
@@ -170,7 +172,7 @@ customDepartmentSelectize = function(elementObj){
 		},
 
 			
-		render: {
+		/*render: {
 			option: function(item, escape) {
 	
 			  return '<div>' +
@@ -179,7 +181,7 @@ customDepartmentSelectize = function(elementObj){
 				  '</span>' +
 			  '</div>';
 			}
-	    },
+	    },*/
 		
 	});//End of selectize function..
 	//Now returning the object...

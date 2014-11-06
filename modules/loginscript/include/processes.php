@@ -61,9 +61,22 @@ class Login_Process {
 		ini_set("session.gc_maxlifetime", Session_Lifetime); 
 		session_start();
 
-		if(!isset($_SESSION['username'])){
+		if(!isset($_SESSION['username'])  ){
 			//echo "http://".$_SERVER['HTTP_HOST'].$page;
 			header("Location: http://".$_SERVER['HTTP_HOST']."/Manage/modules/login.php?page=".$page); 
+		}
+		else 
+			return true;
+	}
+	
+	
+	function check_register() {
+
+		ini_set("session.gc_maxlifetime", Session_Lifetime); 
+		session_start();
+
+		if(!isset($_SESSION['register']) ){
+			return false;
 		}
 		else 
 			return true;

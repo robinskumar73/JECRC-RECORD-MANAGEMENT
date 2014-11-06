@@ -4,6 +4,9 @@ include 'include/constants.php';
 include_once 'include/processes.php';
 $Login_Process = new Login_Process;
 $New = $Login_Process->Register($_POST, $_POST['process']);
+ini_set("session.gc_maxlifetime", 0); 
+session_start();
+$_SESSION['register'] = "test";
 ?>
 
 
@@ -14,6 +17,13 @@ $New = $Login_Process->Register($_POST, $_POST['process']);
 	<title>Password Reset</title>
 	<link href="../../static/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
 	<link href="../../static/customstyle/mystyle.css" type="text/css" rel="stylesheet">
+    <link href="../../static/selectize.js-master/dist/css/selectize.bootstrap3.css" type="text/css" rel="stylesheet">
+    <!--script area-->
+	<script src="../../static/jquery/jquery-1.7.2.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script type="text/javascript" src="../../static/bootstrap/js/bootstrap.js"></script>
+
+	<script type="text/javascript" src="../../static/selectize.js-master/dist/js/standalone/selectize.min.js"></script>
 </head>
 
 <body>
@@ -49,7 +59,7 @@ $New = $Login_Process->Register($_POST, $_POST['process']);
 <input placeholder="Email Address" name="email_address" type="text" class="field form-control" value="<? echo $_POST['email_address']; ?>" />
 <br />
 
-<input placeholder="Department Id" name="department_id" type="text" class="field form-control" value="<? echo $_POST['department_id']; ?>" />
+<input id="department_id" placeholder="Department Id" name="department_id" type="text" class="field form-control" value="<? echo $_POST['department_id']; ?>" />
 
 <br /><br />
 
@@ -66,3 +76,69 @@ $New = $Login_Process->Register($_POST, $_POST['process']);
 </div>
 
 </form>
+
+<script>
+$(document).ready(function(e) {
+    //adding the selectize on department..
+	customDepartmentSelectize($("#department_id"));
+});
+
+
+//Function for custom selecting autocomplete ...
+customDepartmentSelectize = function(elementObj){
+	
+	//Initializing the selectize function...
+	deptSelect = $(elementObj).selectize({
+		
+		//Now instantiating values for selectize..
+		theme:false  ,
+		maxItems: 1,
+		valueField:  'id',
+		searchField: 'name',
+		labelField: 'name',
+		create:false,
+	
+		options: [],
+
+	
+		load: function(query, callback) {
+			if (!query.length) return callback();
+			$.ajax({
+				url: 'http://localhost/Manage/modules/department.php/department?key='+query,
+				type: 'GET',
+				dataType: 'json',
+				error: function() {
+					callback();
+				},
+				success: function(res) {
+					callback(res);
+				}
+			});
+		},
+
+			
+		/*render: {
+			option: function(item, escape) {
+	
+			  return '<div>' +
+				  '<span class="auto-title">' +
+				  '<span class="auto-name">' + escape(item.subject) + '</span>' +
+				  '</span>' +
+			  '</div>';
+			}
+	    },*/
+		
+	});//End of selectize function..
+	//Now returning the object...
+	return deptSelect;
+}
+
+
+</script>
+
+
+
+
+
+</body>
+</html>

@@ -37,7 +37,7 @@
 	//POST
 	$app->post('/members',"addFaculty");
 	//PUT
-	$app->put('members/:id','updateFaculty');
+	$app->put('/members/:id','updateFaculty');
 	//DELETE
 	$app->delete('/members/:id','deleteFaculty');
 	
@@ -88,7 +88,8 @@
 
 	include_once 'loginscript/include/processes.php';
 	$Login_Process = new Login_Process;
-	$Login_Process->check_status($_SERVER['SCRIPT_NAME']);
+	if( !$Login_Process->check_register() )
+		$Login_Process->check_status($_SERVER['SCRIPT_NAME']);
 
 ?>
 
@@ -1114,7 +1115,19 @@
 				//set department id..
 				$department_id = $_GET['dept_id'];
 				
-				$sql = "SELECT * FROM `faculty` WHERE department_id = :department_id LIMIT :limit OFFSET :offset ;";
+				$sql = "SELECT `id`,
+				  			   `first_name`,
+							   `last_name`,
+							   `username`,
+							   `department_id`,
+							   `email_address`,
+							   `last_loggedin` 
+						FROM
+						  `faculty` 
+						WHERE 
+								department_id = :department_id 
+						ORDER BY `first_name` DESC, `last_name` DESC 
+						 LIMIT :limit OFFSET :offset;";
 				try 
 				{
 					$db = getConnection();
@@ -1133,7 +1146,17 @@
 				}
 			}//End of if clause DEPARTMENT ID CHECKING..
 			else{
-				$sql = "SELECT * FROM `faculty` LIMIT :limit OFFSET :offset ;";
+				$sql = "SELECT `id`,
+				  			   `first_name`,
+							   `last_name`,
+							   `username`,
+							   `department_id`,
+							   `email_address`,
+							   `last_loggedin` 
+						FROM 
+						  `faculty` 
+						 ORDER BY `first_name` DESC, `last_name` DESC
+						  LIMIT :limit OFFSET :offset ;";
 				try 
 				{
 					$db = getConnection();
@@ -1172,7 +1195,7 @@
 	function addFaculty(){
 		$request          = \Slim\Slim::getInstance()->request();
     	$dept             = json_decode($request->getBody());
-		//$department_id    = $request->headers->get('faculty_id');
+
 		//proceed only if user is admin...
 		if( $_SESSION['admin'] )
 		{	
@@ -1244,7 +1267,7 @@
 				  $stmt->bindParam("email_address",  $dept->email_address);
 				  $stmt->bindParam("username",       $dept->username);
 				  $stmt->bindParam("password",       $password_md5);
-				  $stmt->bindParam("department_id",  $department_id);
+				  $stmt->bindParam("department_id",  $dept->department_id);
 				  $stmt->bindParam("status",         $status);
 				  $stmt->execute();
 				  $faculty_id = $db->lastInsertId();
@@ -1282,14 +1305,8 @@
 		//$faculty_id    = $request->headers->get('faculty_id');
 		if( $_SESSION['admin'] )
 		{
-		   if( 
-				numberMatch( $dept->department_id ) && 
-				matchEmail( $dept->email_address )  && 
-				matchName( $dept->first_name )      &&
-				matchName( $dept->last_name )       &&
-				matchUserName( $dept->username )    
-			  )
-			{
+		   if( numberMatch( $dept->department_id ) && matchEmail( $dept->email_address )  && matchName( $dept->first_name )      &&  matchName( $dept->last_name )       &&   matchUserName( $dept->username )    )
+		   {
 				
 			  //Perform update operation...
 			  $sql = " UPDATE `faculty` 
@@ -1311,7 +1328,7 @@
 			 
 			 
 			  //First check for possible update....
-			  $whereString = "email_address = " . $dept->email_address;
+			  $whereString = " email_address  =  '$dept->email_address' ";
 			  $rows = countReturnedRows( $whereString );
 			  if($rows > 1)
 			  {
@@ -1320,7 +1337,7 @@
 					return true;
 			  }
 			  
-			  $whereString = "username = " . $dept->username;
+			  $whereString = " username =  '$dept->username' ";
 			  $rows = countReturnedRows( $whereString );
 			  if($rows > 1)
 			  {

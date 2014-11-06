@@ -37,7 +37,11 @@ app.Collection.Subject = Backbone.Collection.extend({
 
 app.Collection.Faculty = Backbone.Collection.extend({
 	model:app.Model.Faculty,
-	url:"/Manage/modules/department.php/members"
+	url:"/Manage/modules/department.php/members",
+	//Sorting the collection in decreasing order of date..
+	comparator: function(Model) {
+		return [-Model.get("first_name"), -Model.get("last_name")];
+	},
 });
 
 

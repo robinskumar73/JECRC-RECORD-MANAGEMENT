@@ -210,6 +210,7 @@ ul{
 .jecrc-create-btn{
 	border-radius:2px;
 	background-color:#378ae2;
+	margin-top:10px;
 }
 @media (min-width: 768px) {
 .jecrc-create-btn{
@@ -334,7 +335,6 @@ ul.faculty-list{
 	font-size:12px; 
 	padding-right:10px;
 	margin-left:8px;
-	display:inline-block;	
 	color:#777777;
 	cursor:pointer;
 	border-width:0px 1px 0px 0px;

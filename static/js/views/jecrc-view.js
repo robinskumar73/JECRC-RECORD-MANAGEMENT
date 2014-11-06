@@ -834,6 +834,15 @@ app.Views.Branch = Backbone.View.extend({
 		 //Now rendering the create faculty template....
 		 $("#right-side-hook").append( facultyView.render().el );
 		 
+		 
+		 //Now adding the faculty list model ..
+		 var facultyList_ = new app.Views.ShowFaculty;
+		 facultyList_.department_id = this.collection.at(0).get("department_id");
+		 facultyList_.fetchMore();
+		 $("#right-side-hook").append( facultyList_.el );
+		  //add this view to the child views...
+		 this.childViews.push( facultyList_ );
+		 
 		return this;	
 	},
 
@@ -932,6 +941,7 @@ app.Views.CreateFaculty = Backbone.View.extend({
 	
 	saveEntry: function(e){
 		var obj = this.getValue();
+		this.resetEntry();
 		if(!obj)
 		{
 			//All values must be entered..
@@ -943,13 +953,13 @@ app.Views.CreateFaculty = Backbone.View.extend({
 		this.model.save(obj,{
 			success: function( model, response ){
 				console.log("Succesfully created faculty!");
-				var message = "<strong>Faculty</strong> created.\
-								<p> Faculty Name: " + obj.first_name + " " + obj.last_name  + "</p>  \
-								<p> Faculty Pass: " + response.pass_string + " </p> \
+				var message = "<strong>Faculty created</strong>.\
+								<p> Faculty Name: <strong>" + obj.first_name + " " + obj.last_name  + "</strong></p>  \
+								<p> Faculty Pass: <strong>" + response.pass_string + "</strong> </p> \
 								<p><strong>Note</strong>:Change this password as soon as you login.</p>";
 				that.displayMessage(message, app.Global.alertType[1] );
-				//Adding the faculty model to global collection...
-				app.Global.facultyList.add(that.model);
+				//Now add this mode to the list...
+				//app.Global.facultyList.add(that.model);
 			},
 			error: function( model, response ){
 				console.log("Error created faculty!");
@@ -959,7 +969,7 @@ app.Views.CreateFaculty = Backbone.View.extend({
 				that.displayMessage(message, app.Global.alertType[3] );
 			}
 		});
-		this.resetEntry();
+		
 		
 	},
 	
@@ -993,6 +1003,273 @@ app.Views.CreateFaculty = Backbone.View.extend({
 
 
 
-//------------------------------------------------------VIEWS FOR UPDATING THE FACULTY-------------------------------------
+
+//------------------------------------------------------VIEWS FOR SHOWING LIST OF FACULTY-------------------------------------
+//Accept a argument model of faculty...
+//View for Creating Activity.....
+//Provide department_id value rendering this..
+//Child Views...
+
+app.Views.ShowFaculty = Backbone.View.extend({
+	
+	initialize: function(){
+		this.childViews  =  [];
+		this.offset = 0;
+		this.limit  = 10;
+		
+		this.facultyList = new app.Collection.Faculty;
+		//initializing template for create faculty...
+		this.template = _.template( $("#faculty-list-collection").html() );
+		
+		this.$el.append( this.template() );
+		//For listening to validation error..
+		this.listenTo(  this.facultyList , 'add',    this.addFacultyList );
+		this.listenTo(  this.facultyList , 'reset',  this.resetFaculty );
+		
+		var that = this;
+		//Adding the scrolling options for fetchin more enteries..
+		//Adding window scroll option for infinite scroll options...
+		$(window).scroll(_.debounce(function(){
+   			if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+       			console.log("scroll position: near  bottom!");
+				//Now fetch more collection on pagination options..
+				that.fetchMore( );
+      		}
+   		},300));
+		//this.fetchMore();
+	},
+	
+	//For adding the faculty to the list..
+	//also add childViews to clear memory..
+	addFacultyList : function( model){
+		console.log("Adding models;");
+		var view  = new app.Views.FacultyItem( {"model": model} );
+		view.listCollection = this.facultyList;
+		this.childViews.push( view );
+		$("ul.faculty-list").append( view.render().el );
+	},
+	
+	//For resetting the faculty collection and adding new set of collection...
+	resetFaculty : function( ){
+		
+		app.Global.facultyList.each(this.addFacultyList, this);
+	},
+	
+	//Adding an function for fetching value from the 
+	fetchMore:function(){
+		var that = this;
+		var add  = parseInt(this.offset) ? false : true;
+		
+		//showing the loading bar....
+		app.Global.showLoadingBar();
+		this.facultyList.fetch({
+			add:true,
+			data: {offset: that.offset, limit:that.limit, dept_id: that.department_id },
+			//Adding an error callback...
+			error: function(collection, response, options){
+				app.Global.hideLoadingBar();
+				console.log("Error fetching faculty list collection from server.");	
+			},
+			success: function(collection, response, options){
+				app.Global.hideLoadingBar();
+				if(response.length === 0 && add )
+				{
+					that.destroy_view();	
+					return false;
+				}
+				
+				//Creating a global refrence of the collection...
+				app.Global.facultyList = that.facultyList;
+				console.log("Successfully fetched faculty list from server.");
+				//Now updating  the offset..
+				var length = response.length;
+				that.offset = that.offset + length;	
+			}
+	 	});
+	}
+	
+	
+	
+});
 
 
+app.Views.FacultyItem  =  Backbone.View.extend({
+
+	initialize: function(){
+		//Resetting  a collection... 
+		app.Global.facultyList.reset();
+		//initializing template for create faculty...
+		this.template = _.template( $("#faculty-list-item").html() );
+		
+		//For listening to validation error..
+		//this.listenTo(  this.model , 'change',  this.render );
+		this.listenTo(  this.model , 'destroy', this.deleteFaculty );
+		this.detachElement = null;
+	},
+	
+	
+	tagName: "li",	
+	
+	className: "faculty-list-items",
+	
+	
+	events:{
+		"dblclick #faculty-list-item-full-name"  : "edit",
+		"click #faculty-item-edit"               : "edit",
+		"click #faculty-create-btn"				 : "updateModel",
+		//Now handle delete..
+		"click #faculty-item-delete"	         : "deleteModel",
+		"click #faculty-reset-btn"               : "cancelUpdate" 
+	},
+	
+	
+	//Activates the edit option for faculty name...
+	edit: function(e){
+		e.preventDefault();
+		var element = this.$el.find("#faculty-list-item-full-name");
+		$(element).addClass('hide');
+		this.detachElement = this.$el.find("p");
+		this.detachElement = $(this.detachElement).detach();
+		var inputElement = this.$el.find("#faculty-edit-list");
+		$(inputElement).removeClass('hide');
+		$(this.$el).css("margin-bottom","80px");
+		$(this.$el).css("margin-top","50px");
+	},
+	
+	cancelUpdate:function(){
+		console.log("Updating the models...");
+		var element = this.$el.find("#faculty-list-item-full-name");
+		$(element).removeClass('hide');
+		if(this.detachElement){
+			this.$el.append( this.detachElement );	
+			this.detachElement = null;
+		}
+		var inputElement = this.$el.find("#faculty-edit-list");
+		$(inputElement).addClass('hide');
+		$(this.$el).css("margin-bottom","0px");
+		$(this.$el).css("margin-top","0px");
+	},
+	
+	//Triggers on pressing the delete button...
+	deleteModel: function(){
+	   this.model.destroy( {
+		  success: function(){
+			  console.log("successfully delete faculty from server..");	
+		  },
+		  error: function(){
+			  console.log("Error deleting faculty from server..");
+		  }
+		});
+	},
+	
+	
+	
+	updateModel:function(e){
+		console.log("Updating the models...");
+		var element = this.$el.find("#faculty-list-item-full-name");
+		$(element).removeClass('hide');
+		if(this.detachElement){
+			this.$el.append( this.detachElement );	
+			this.detachElement = null;
+		}
+		var inputElement = this.$el.find("#faculty-edit-list");
+		$(inputElement).addClass('hide');
+		$(this.$el).css("margin-bottom","0px");
+		$(this.$el).css("margin-top","0px");
+		var obj = this.getValue();
+		//Now checking the values...
+		if(!obj)
+		{
+			var message = "Fields cannot be left <strong>blank</strong>"
+			this.displayMessage( message, app.Global.alertType[3] );
+			return false;
+		}
+		
+		//Updating the model..
+		this.model.set(obj);
+		var that = this;
+		//Now save this model to the server..
+		this.model.save(null, {
+			success: function(){
+				console.log("successfully updated faculty info to the server..");
+				var model = that.listCollection.get(that.model.get("id"));
+				//Now change that view...
+				that.render();
+			},
+			error: function(){
+				console.log("Error updating faculty info to the server.");
+				var message = "<strong>Errror</strong> updating faculty information to the server.<strong>Please try again sometime later</strong>";
+				this.displayMessage( message, app.Global.alertType[3] );
+			}
+		});
+		
+	},
+	
+	
+	
+	getValue: function(){
+		var firstNameElement    = this.$el.find("#faculty-edit-first-name");
+		var first_name          = $(firstNameElement).val();
+		
+		var lastNameElement     = this.$el.find("#faculty-edit-last-name");
+		var last_name           = $(lastNameElement).val();
+		
+		var usernameElement     = this.$el.find("#faculty-edit-username");
+		var username            = $(usernameElement).val();
+		
+		var emailAddressElement = this.$el.find("#faculty-edit-email-address"); 
+		var email_address	    = $(emailAddressElement).val();
+		
+		if(!first_name.length && !last_name.length && !username.length  && !email_address.length  ){
+			return false;
+		}
+		
+		var obj = {
+			"first_name"    : first_name,
+			"last_name"     : last_name,
+			"username"	    : username,
+			"email_address" : email_address
+		}
+		
+		return obj;
+		
+	},
+	
+	
+	render: function(){
+		console.info("Rendering the faculty item model");
+		this.$el.empty();
+		var name = this.model.get("first_name") + " " + this.model.get("last_name");
+		//adding this to the model...
+		this.model.set("name", name);
+		var itemElement =  this.template( this.model.toJSON() );
+		this.$el.append(itemElement);
+		return this;
+	},
+	
+
+	
+	
+	//On removing a faculty model from collection...
+	//Always use collection.remove method...
+	deleteFaculty : function( model ){
+		//First remove this model from collection and then destroy this view...
+		app.Global.facultyList.remove(model);
+		//Now destroy this view...
+		this.destroy_view();
+	},
+	
+	
+	
+	//Function for diplaying result and console screen...
+	displayMessage : function(message, type){
+		var Template = _.template( $("#display-info").html() );
+		this.display =  Template( {"message": message, "typeInfo": type } );
+		//Callback for success 
+		//Now adding this info to form display ..
+		var displayElement = this.$el.find("#faculty-list-item-display-info");
+		$(displayElement).html(this.display);
+	}
+
+
+});

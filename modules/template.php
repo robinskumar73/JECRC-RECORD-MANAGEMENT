@@ -21,6 +21,7 @@
 </script>
 
 
+
 <script type="text/template" id="Create-Faculty-Template">
 	<!--DIV FOR ADDING FACULTY-->
     <div class="col-sm-12"><!--INFO for adding faculty-->
@@ -40,6 +41,41 @@
 </script>
 
 
+<!--TEMPLATE FOR FACULTY LIST-->
+<script id="faculty-list-item" type="text/template">
+	 <div id="faculty-list-item-display-info" style="margin-bottom:3px;"> </div>
+	 <h4 id="faculty-list-item-full-name" style="margin-bottom:0px;"><%= name %></h4>
+	 <div id="faculty-edit-list" style="display:block;" class="hide">
+	 	 <h4  style="margin-bottom:0px;">Edit faculty</h4>	
+		 <input type="text" id="faculty-edit-first-name" value="<%= first_name %>" class="form-control  jecrc-dept-entry" placeholder="First Name">
+		 <input type="text" id="faculty-edit-last-name" value="<%= last_name %>" class="form-control jecrc-dept-entry" placeholder="Last Name">
+		 <input type="text" id="faculty-edit-username" value="<%= username %>" class="form-control jecrc-dept-entry" placeholder="Username">
+		 <input type="text" id="faculty-edit-email-address" value="<%= email_address %>" class="form-control  jecrc-dept-entry" placeholder="Email Address">
+		 <button type="button" id="faculty-create-btn"  class="btn btn-primary jecrc-create-btn">Update</button>
+		 <button type="button" id="faculty-reset-btn" style="margin-right:15px;" class="btn btn-primary jecrc-create-btn">Cancel</button>
+	 </div>
+	 <p>
+		 <span  id="faculty-item-delete" class="faculty-list-icons glyphicon glyphicon-trash"></span>
+		 <span  id="faculty-item-edit" class="faculty-list-icons glyphicon glyphicon-pencil"></span>
+	 <p>	
+</script>
+
+
+
+
+<script id="faculty-list-collection" type="text/template">
+	<!--DIV FOR ADDING FACULTY-->
+    <div class="col-sm-12"><!--INFO for adding faculty-->
+        <div id="FacultyList" class="col-sm-12 AddFaculty" >
+            <h4 class="blue-text semAddHeading" style="margin-bottom:18px;" > Faculty List </h4>
+            <ul class="faculty-list">
+              <!--Add the list items to create list of faculty-->
+            </ul>
+        </div><!--DIV ENDS FOR ADDING FACULTY-->
+   </div>
+</script>
+
+
 <!--For displaying of alert messages--->
 <script id="display-info" type="text/template">
 	<div id="dept-display-box" style="margin-left:20px;" class=" alert <%= typeInfo %> fade in" role="alert">
@@ -51,5 +87,8 @@
 			</div>
     </div>
 </script>
+
+
+
 
 

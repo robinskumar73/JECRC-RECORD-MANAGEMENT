@@ -7,6 +7,6 @@
     <!--<li><a href="">CS</a></li>-->
     
 </ul>
-<ul class="nav nav-sidebar">
+<!--<ul class="nav nav-sidebar">
     <li><a href="">Settings</a></li>
-</ul>
+</ul>-->
