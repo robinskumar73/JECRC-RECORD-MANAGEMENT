@@ -19,9 +19,10 @@ include_once 'loadingbar.php';
           	<ul class="nav nav-sidebar">
             	<!--Area for sidebar info-->
           	</ul>
+            <!--
           	<ul class="nav nav-sidebar">
             	<li><a href="">Settings</a></li>
-          	</ul>
+          	</ul>-->
         </div>
         <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 ">
         	<!--Adding the navigation-->
@@ -56,31 +57,7 @@ include_once 'loadingbar.php';
       <div id="jecrc-main-screen"  class="col-md-8 statistics  col-xs-12 ">
      
            <div id="faculty-display-screen">
-           		<!--Faculty display screen to be pasted here-->
-                <!--
-                <div class="col-md-12 col-xs-12 ">
-                  <h4>Wednesday</h4>
-                  <span >August 20</span>
-                     <ul class="jecrc-stats log">
-                        <li>
-                          	  <div class="log-entry-circle"></div>
-                              <blockquote  class="log-entry">
-                                <p>Lab entry for 3CS1 has been created.</p>
-                                 <footer>Subject <cite title="Source Title">Compiler Lab</cite></footer>
-                                  <div style="margin-left:8px;">
-                                        <a style="display:inline-block" href="#">
-                                            <p class="log-entry-icon glyphicon glyphicon-edit"></p>
-                                        </a> 
-                                        <a style="display:inline-block" href="#">
-                                            <p  class="log-entry-icon glyphicon glyphicon-trash"></p>
-                                        </a> 
-                                  </div>    
-                              </blockquote>                               
-                        </li>
-                    </ul>
-                </div>-->
-          
-                <!---->
+           		
            </div>
            
            <div id="faculty-entry-record">

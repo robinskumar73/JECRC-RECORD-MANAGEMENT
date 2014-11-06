@@ -19,13 +19,20 @@ app.Routers = Backbone.Router.extend({
 	showHomePage: function()
 	{
 		this.closePreviousViews();
-		if(app.Global.DepartmentElementObj){
-			$("#jecrc-right-hook").prepend( app.Global.DepartmentElementObj );
+		
+		if(this.DepartmentElementObj && this.DepartmentElementObj.length ){
+			$("#right-side-hook").html( this.DepartmentElementObj );
+			//this.DepartmentElementObj = null;
 		}
 		//Now showing the department...
 		$("#admin-department").removeClass('hide');
-		//Showing the loading bar..
-		app.Global.showLoadingBar();
+		
+		console.log("Loading the activity logs");
+		//Loading the activity view...
+		var logs = new app.Views.activity({collection : app.Global.entryLogCollection});
+		logs.render();
+		//Now loading the element...
+		$("#jecrc-main-screen").html(logs.el);
 		
 	},
 	
@@ -44,7 +51,15 @@ app.Routers = Backbone.Router.extend({
 		$("#jecrc-main-screen").empty();
 		//Hiding the department...
 		$("#admin-department").addClass('hide');
-		app.Global.DepartmentElementObj = $("#admin-department").detach();
+		if(!this.DepartmentElementObj ){
+			this.DepartmentElementObj = $("#admin-department").detach();
+		}
+		else{
+			if(!this.DepartmentElementObj.length){
+				this.DepartmentElementObj = $("#admin-department").detach();
+			}
+		}
+		
 		
 		
 		data = {
@@ -66,7 +81,15 @@ app.Routers = Backbone.Router.extend({
 		this.closePreviousViews();
 		$("#admin-department").addClass('hide');
 		$("#jecrc-main-screen").empty();
-		app.Global.DepartmentElementObj = $("#admin-department").detach();
+		
+		if(!this.DepartmentElementObj ){
+			this.DepartmentElementObj = $("#admin-department").detach();
+		}
+		else{
+			if(!this.DepartmentElementObj.length){
+				this.DepartmentElementObj = $("#admin-department").detach();
+			}
+		}
 		
 		
 		//Now fecthing report collection based on department..
@@ -95,7 +118,14 @@ app.Routers = Backbone.Router.extend({
 		$("#jecrc-main-screen").empty();
 		//Hiding the department...
 		$("#admin-department").addClass('hide');
-		app.Global.DepartmentElementObj = $("#admin-department").detach();
+		if(!this.DepartmentElementObj ){
+			this.DepartmentElementObj = $("#admin-department").detach();
+		}
+		else{
+			if(!this.DepartmentElementObj.length){
+				this.DepartmentElementObj = $("#admin-department").detach();
+			}
+		}
 		
 		data = {
 					
@@ -120,7 +150,14 @@ app.Routers = Backbone.Router.extend({
 		$("#jecrc-main-screen").empty();
 		//Hiding the department...
 		$("#admin-department").addClass('hide');
-		app.Global.DepartmentElementObj = $("#admin-department").detach();
+		if(!this.DepartmentElementObj ){
+			this.DepartmentElementObj = $("#admin-department").detach();
+		}
+		else{
+			if(!this.DepartmentElementObj.length){
+				this.DepartmentElementObj = $("#admin-department").detach();
+			}
+		}
 		
 		//Showing loading bar..
 		app.Global.showLoadingBar();

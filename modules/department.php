@@ -655,8 +655,9 @@
 
 	//function to add department start here
 	function addDepartment() {
-		$request = \Slim\Slim::getInstance()->request();
-		$dept = json_decode($request->getBody());
+		$request       = \Slim\Slim::getInstance()->request();
+		$faculty_id    = $request->headers->get('faculty_id');
+		$dept          = json_decode($request->getBody());
 		$sql = "INSERT INTO department (id,name) VALUES (:id, :name)";
 		try {
 			$db = getConnection();
@@ -666,6 +667,11 @@
 			$stmt->execute();
 			$dept->id = $db->lastInsertId();
 			$db = null;
+			
+			$message="Department " . $dept->name . " created";
+			//Add log report...
+			entry_admin_log( 'create' , $faculty_id, $message, $dept->name, "NULL" );
+			
 			echo json_encode($dept);
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
@@ -856,6 +862,11 @@
 	}//function to update department end here
 
 	function deleteDepartment($deptId){
+		$request       = \Slim\Slim::getInstance()->request();
+		$faculty_id    = $request->headers->get('faculty_id');
+		$dept_name     = getDepartmentNameById($deptId); 
+		
+		
 		$sql = "DELETE FROM department WHERE id=:id";
 		$sql_1 = "DELETE FROM branch WHERE department_id=:id";
 		try {
@@ -864,6 +875,12 @@
 			$stmt->bindParam("id", $deptId);
 			$stmt->execute();
 			$db = null;
+			echo '{}';
+			//Writing the logs....			 
+			$message=" Department " . $dept_name   . " deleted.";
+			//Add log report...
+			entry_admin_log( 'delete' , $faculty_id, $message, $dept_name, "NULL" );
+			
 		} catch(PDOException $e) {
 			echo '{"error":{"text":'. $e->getMessage() .'}}';
 		}
@@ -1194,8 +1211,9 @@
 	//$app->post('/memebers',"addFaculty");
 	function addFaculty(){
 		$request          = \Slim\Slim::getInstance()->request();
+		$admin_id       = $request->headers->get('faculty_id');
     	$dept             = json_decode($request->getBody());
-
+		
 		//proceed only if user is admin...
 		if( $_SESSION['admin'] )
 		{	
@@ -1276,13 +1294,20 @@
 				  //Add string  pass to dept..
 				  $dept->pass_string =  $pass;
 				  echo json_encode($dept);
+				  //writing logs..			  
+			  	  $message=" Faculty " .$dept->first_name . ' ' . $dept->last_name . " created";
+			      //Add log report...
+			      entry_admin_log( 'create' , $admin_id, $message, $dept->username, "NULL" );
 				  
 				  $db = null;
 			  }//End of if
 			  else{
 				  echo  "Invalid characters" ;
-				  header("Server Error"); 	  
+				  header("Server Error");
+				  return false; 	  
 			  }
+			  
+			
 			  	
 			} catch(PDOException $e) {
 				echo '{"error":{"text":'. $e->getMessage() .'}}';
@@ -1300,9 +1325,11 @@
 	
 	//$app->put('members/:id','updateFaculty');
 	function updateFaculty( $id ){
-		$request       = \Slim\Slim::getInstance()->request();
-		$dept          = json_decode($request->getBody());
-		//$faculty_id    = $request->headers->get('faculty_id');
+		$request          = \Slim\Slim::getInstance()->request();
+		$dept             = json_decode($request->getBody());
+		$faculty_id       = $request->headers->get('faculty_id');
+		$facultyOldName   = getFacultyName($id);
+		
 		if( $_SESSION['admin'] )
 		{
 		   if( numberMatch( $dept->department_id ) && matchEmail( $dept->email_address )  && matchName( $dept->first_name )      &&  matchName( $dept->last_name )       &&   matchUserName( $dept->username )    )
@@ -1369,6 +1396,13 @@
 			  }	
 			  
 			}//End of if validation..
+			
+			//Writing the logs...
+			$message        = "Faculty " . $facultyOldName . " got updated.";
+			$facultyNewName = $dept->first_name .' '. $dept->last_name;
+			//Add log report...
+			entry_admin_log( 'update' , $faculty_id, $message, $facultyNewName, "NULL" );
+			
 		}//end of if admin...
 		else{
 			header ('Server Error');
@@ -1380,6 +1414,10 @@
 	
 	//$app->delete('/members/:id','deleteFaculty');
 	function deleteFaculty( $id ){
+	  $request       = \Slim\Slim::getInstance()->request();
+	  $faculty_id    = $request->headers->get('faculty_id');
+	  $facultyName   = getFacultyName($id);
+	  
 	  if( $_SESSION['admin'] )
 	  {
 		//Performing the delete operations...
@@ -1393,6 +1431,11 @@
 			$stmt->execute();
 			$db = null;
 			echo '{}';
+			
+			//Writing logs....
+			$message="Faculty '" . $facultyName . "' deleted";
+			//Add log report...
+			entry_admin_log( 'delete' , $faculty_id, $message, $facultyName, "NULL" );
 			
 		  } catch(PDOException $e) {
 			  header ('Server Error');

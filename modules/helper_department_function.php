@@ -510,6 +510,33 @@
 		}
 	}
 	
+	
+	function entry_admin_log($entry_type, $faculty_id, $message, $sub_info, $info_entry_id )
+	{
+		$log_type = "admin";
+		//Now adding FACULTY ENTRY LOG---
+		$sql = "INSERT INTO `attendance`.`faculty_log` 
+					(`id`, `date`, `time`, `entry_type`, `info_entry_id`, `faculty_id`, `info`, `sub_info`, `log_type`)VALUES 
+					(NULL, CURDATE(), CURTIME(), :entry_type , :info_entry_id, :faculty_id, :message, :sub_info, :log_type);";
+		try 
+		{
+			$db   = getConnection();
+			$stmt = $db->prepare($sql);
+			$stmt->bindParam("faculty_id",    $faculty_id);
+			$stmt->bindParam("message",       $message);
+			$stmt->bindParam("sub_info",      $sub_info);
+			$stmt->bindParam("info_entry_id", $info_entry_id);
+			$stmt->bindParam("entry_type",    $entry_type);
+			$stmt->bindParam("log_type",      $log_type);
+			$stmt->execute();
+			$db = null;
+		} catch(PDOException $e) {
+			echo '{"error":{"text":'. $e->getMessage() .'}}';
+		}	
+	}//End of function of entry_admin_log
+	
+	
+	
 	function entry_faculty_log($entry_type, $faculty_id, $message, $sub_info, $info_entry_id )
 	{
 		//Now adding FACULTY ENTRY LOG---

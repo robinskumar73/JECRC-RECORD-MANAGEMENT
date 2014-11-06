@@ -90,5 +90,15 @@
 
 
 
+<!--Template for creating faculty entry log -->
+<script id="faculty_home_log" type="text/template">
+	<div class="log-entry-circle"></div>
+	<blockquote  class="log-entry">
+		<p> <%- info %> </p>
+		<footer> <%- entry_type %>  <cite title="Source Title"> <%- sub_info %> </cite></footer>
+	</blockquote> 					  
+</script>
+
+
 
 

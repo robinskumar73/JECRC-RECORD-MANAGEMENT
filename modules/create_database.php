@@ -161,6 +161,7 @@
 				`info_entry_id`  INT,
 				`faculty_id`  INT NOT NULL,
 				`info` VARCHAR(200),
+				`log_type` CHAR(10),
 				`sub_info` VARCHAR(100),
 				`last_update_type` enum ('update', 'delete','error') ,
 				

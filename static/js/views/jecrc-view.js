@@ -69,6 +69,10 @@ app.Views.Department = Backbone.View.extend({
 		
 		//Now add this department to department collection..
 		app.Global.Department.create({name:value}, {
+		 headers:{
+			//Sending the faculty headers with headers..
+			faculty_id  : faculty.id,
+		},	
     	error: function (model, response) {
 			displayMessage('Error saving department..');
 			revertDeptToInitial();
@@ -151,6 +155,10 @@ app.Views.Department = Backbone.View.extend({
 				success:function(model,response){
 					console.log('Successfully deleted department..');
 					displayMessage('Successfully deleted department..');
+				},
+				 headers:{
+					//Sending the faculty headers with headers..
+					faculty_id  : faculty.id,
 				}
 			});
 			/*
@@ -967,7 +975,12 @@ app.Views.CreateFaculty = Backbone.View.extend({
 				
 				var message = response.responseText;
 				that.displayMessage(message, app.Global.alertType[3] );
-			}
+			},
+			
+ 			headers:{
+				//Sending the faculty headers with headers..
+				faculty_id     : faculty.id,
+ 			},
 		});
 		
 		
@@ -1158,7 +1171,11 @@ app.Views.FacultyItem  =  Backbone.View.extend({
 		  },
 		  error: function(){
 			  console.log("Error deleting faculty from server..");
-		  }
+		  },
+		  headers:{
+			//Sending the faculty headers with headers..
+			faculty_id     : faculty.id,
+ 		  }
 		});
 	},
 	
@@ -1200,7 +1217,11 @@ app.Views.FacultyItem  =  Backbone.View.extend({
 				console.log("Error updating faculty info to the server.");
 				var message = "<strong>Errror</strong> updating faculty information to the server.<strong>Please try again sometime later</strong>";
 				this.displayMessage( message, app.Global.alertType[3] );
-			}
+			},
+			headers:{
+			//Sending the faculty headers with headers..
+			faculty_id     : faculty.id,
+ 		  }
 		});
 		
 	},
@@ -1273,3 +1294,148 @@ app.Views.FacultyItem  =  Backbone.View.extend({
 
 
 });
+
+
+
+//----------------------------------------------VIEW FOR LOADING ACTIVITY-----------------------------
+//Main app entry for the faculty page..
+app.Views.activity = Backbone.View.extend({
+	
+	//Initializing the view...
+	initialize: function(){
+		//Setting the current views....
+		app.Global.Router.currentView = this;
+		//add the child views to this array...
+		this.childViews = [];
+		this.listenTo(this.collection, 'add', this.addOne);
+		
+		this.listenTo(this.collection, 'reset', this.addAll);
+		this.offset = 0;
+		this.limit  = 10;
+		//{date:unorderedListelement}
+		this.daysEntryRecord = {};
+		//Now fetching from this collection and reset the collection after fecthing.....
+		this.fetchMore();
+		var that = this;
+		//Adding window scroll option for infinite scroll options...
+		$(window).scroll(_.debounce(function(){
+   			if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+       			console.log("scroll position: near  bottom!");
+				//Now fetch more collection on pagination options..
+				that.fetchMore();
+      		}
+   		},300));
+		
+	},
+	
+	
+	
+	
+	//Adding an function for fetching value from the 
+	fetchMore:function(){
+		var that = this;
+		var add  = parseInt(that.offset) ? true : false;
+		//var add = true;
+		console.log("fetching more log data..." + add);
+		//showing the loading bar....
+		app.Global.showLoadingBar();
+		var facultyId =  faculty.id;
+		this.collection.fetch({
+			data: {offset: that.offset, limit:that.limit, faculty_id: facultyId},
+			add:true,
+			//Adding an error callback...
+			error: function(collection, response, options){
+				app.Global.hideLoadingBar();
+				console.log("Error fetching collection from admin_log collection.");	
+			},
+			success: function(collection, response, options){
+				app.Global.hideLoadingBar();
+				console.log("Successfully fetched data of admin_log from server.");
+				//Now updating  the offset..
+				var length = response.length;
+				that.offset = that.offset + length;	
+			}
+		 });
+	},//End of fetch more function...
+	
+	
+	//Handling when a logModel is added to the collection...
+	addOne: function( logModel ){
+		//getting a model date..
+		var date      = logModel.get('date');
+		var day       = getDay(date);
+		var absDate   = convertDate(date);
+		
+		//Now checking if same date entry is present already.....
+		if( this.daysEntryRecord[date] === undefined )
+		{
+			var parentElement 			= $('<div class="col-md-12 col-xs-12 "></div>');
+			var dayElement	  			= $('<h4 class="log_day"></h4>');
+			var dateElement   			= $('<span class="log_date"></span>');
+			var UnorderedlistElement	= $('<ul class="jecrc-stats log"></ul>')
+			//Append
+			parentElement.append(dayElement);
+			//Appending to parent
+			//Appending the parent element to the document element...
+			$(this.$el).append(parentElement);
+			dayElement.append(day);
+			parentElement.append(dateElement);
+			dateElement.append(absDate);
+			parentElement.append(UnorderedlistElement);
+			//Adding entry..
+			this.daysEntryRecord[date] = UnorderedlistElement;
+				
+		}
+		//Now adding view to the entry...
+		var EntryView = new app.Views.activityModel({model: logModel});
+		//Now adding it to the childViews...
+		this.childViews.push(EntryView);
+		
+		//Now loading the view finally...
+		$(this.daysEntryRecord[date]).append( EntryView.render().el );
+	},
+	
+	
+	
+	//Adding all models to the collection...
+	addAll: function(){
+		//Clearing the main element...
+		//$(this.el).empty();
+		console.log('resetting  the log entry view...');
+		this.collection.each( this.addOne, this );
+	},
+	
+	
+	
+	render: function(){
+		//Clearing the main element...
+		$(this.$el).empty();
+		if(this.collection.length){
+			this.addAll();
+		}
+		return this;
+	}
+	
+	
+});
+
+//------------------------------------------------------VIEW FOR LOADING A MODEL------------------------------------------
+
+
+app.Views.activityModel = Backbone.View.extend({
+	initialize:function(){
+		// Cache the template function for a single item.
+    	this.template 				= _.template( $('#faculty_home_log').html() );
+	},
+	
+	//... is a list tag.
+    tagName:  "li",
+
+	// Re-render the titles of the todo item.
+    render: function() {
+      this.$el.html(this.template(this.model.toJSON()));
+      return this;
+    }
+});
+
+

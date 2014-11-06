@@ -70,9 +70,9 @@ app.Collection.faculty_entry = Backbone.Collection.extend({
 	url:"/Manage/modules/department.php/faculty/activity",
 	
 	//Sorting the collection in decreasing order of date..
-	comparator: function(Model) {
+	/*comparator: function(Model) {
 		return [-Model.get("date"), -Model.get("time")];
-	},
+	},*/
 });
 
 
