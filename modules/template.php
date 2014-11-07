@@ -43,7 +43,7 @@
 
 <!--TEMPLATE FOR FACULTY LIST-->
 <script id="faculty-list-item" type="text/template">
-	 <div id="faculty-list-item-display-info" style="margin-bottom:3px;"> </div>
+	
 	 <h4 id="faculty-list-item-full-name" style="margin-bottom:0px;"><%= name %></h4>
 	 <div id="faculty-edit-list" style="display:block;" class="hide">
 	 	 <h4  style="margin-bottom:0px;">Edit faculty</h4>	
@@ -57,7 +57,8 @@
 	 <p>
 		 <span  id="faculty-item-delete" class="faculty-list-icons glyphicon glyphicon-trash"></span>
 		 <span  id="faculty-item-edit" class="faculty-list-icons glyphicon glyphicon-pencil"></span>
-	 <p>	
+	 <p>
+	  <div id="faculty-list-item-display-info" style="margin-left:0px;margin-bottom:10px; margin-top:10px"> </div>	
 </script>
 
 
@@ -78,7 +79,7 @@
 
 <!--For displaying of alert messages--->
 <script id="display-info" type="text/template">
-	<div id="dept-display-box" style="margin-left:20px;" class=" alert <%= typeInfo %> fade in" role="alert">
+	<div id="dept-display-box" class=" alert <%= typeInfo %> fade in" role="alert">
       		<button type="button" class="close" data-dismiss="alert">
 				<span aria-hidden="true">×</span><span class="sr-only">Close</span>
 			</button>
@@ -100,5 +101,14 @@
 </script>
 
 
+
+<script id="entry-log-alert-body" type="text/template">
+	<div class="delete-info">
+  		<h4> Do you want to delete this entry. </h4>
+  		<p>
+			<button type="button" id="entry-action-btn" class="btn btn-danger"> Delete </button>
+  		</p>
+  	</div>
+</script>
 
 

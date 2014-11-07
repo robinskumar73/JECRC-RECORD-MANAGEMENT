@@ -233,15 +233,13 @@
 	
 	
 	//Getting period..
-	function updatePeriod($period_array, $period_entry_id){
-		foreach( $period_array as $period )
-		{
-			$sql = "UPDATE `period_join` SET `period`= :period WHERE period_entry_id = :period_entry_id";
+	function deletePeriod($period_entry_id){
+		
+			$sql = "DELETE FROM `period_join`  WHERE period_entry_id = :period_entry_id";
 				try {
 					$db = getConnection();
 					$stmt = $db->prepare($sql);
 					$stmt->bindParam("period_entry_id", $period_entry_id);
-					$stmt->bindParam("period", $period);
 					$stmt->execute();
 					$db = null;
 				}
@@ -249,7 +247,6 @@
 				{
 					echo '{"error":{"text":'. $e->getMessage() .'}}';
 				}	
-		}
 		
 	}
 	

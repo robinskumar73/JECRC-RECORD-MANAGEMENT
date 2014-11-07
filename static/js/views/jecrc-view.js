@@ -948,8 +948,8 @@ app.Views.CreateFaculty = Backbone.View.extend({
 	
 	
 	saveEntry: function(e){
-		var obj = this.getValue();
-		this.resetEntry();
+		obj = this.getValue();
+		
 		if(!obj)
 		{
 			//All values must be entered..
@@ -960,6 +960,7 @@ app.Views.CreateFaculty = Backbone.View.extend({
 		var that = this;
 		this.model.save(obj,{
 			success: function( model, response ){
+				that.resetEntry();
 				console.log("Succesfully created faculty!");
 				var message = "<strong>Faculty created</strong>.\
 								<p> Faculty Name: <strong>" + obj.first_name + " " + obj.last_name  + "</strong></p>  \
@@ -973,6 +974,7 @@ app.Views.CreateFaculty = Backbone.View.extend({
 				
 			},
 			error: function( model, response ){
+				that.resetEntry();
 				console.log("Error created faculty!");
 				//var message = "<strong>Error</strong> creating faculty.";
 				if( response.responseText.length< 30 )
@@ -980,7 +982,7 @@ app.Views.CreateFaculty = Backbone.View.extend({
 					var message = response.responseText;
 				}
 				else{
-					var message = "Error created faculty!";
+					var message = "Error creating faculty!";
 				}
 				
 				that.displayMessage(message, app.Global.alertType[3] );
@@ -1151,7 +1153,9 @@ app.Views.FacultyItem  =  Backbone.View.extend({
 		"click #faculty-create-btn"				 : "updateModel",
 		//Now handle delete..
 		"click #faculty-item-delete"	         : "deleteModel",
-		"click #faculty-reset-btn"               : "cancelUpdate" 
+		"click #faculty-reset-btn"               : "cancelUpdate" ,
+		"click #entry-action-btn"                : "confirmDelete",
+		"close.bs.alert #dept-display-box"       : "cancelDelete"
 	},
 	
 	
@@ -1184,7 +1188,49 @@ app.Views.FacultyItem  =  Backbone.View.extend({
 	
 	//Triggers on pressing the delete button...
 	deleteModel: function(){
-	   this.model.destroy( {
+		this.detachElement = this.$el.find("p");
+		this.detachElement = $(this.detachElement).detach();
+		var element = this.$el.find("#faculty-list-item-full-name");
+		$(element).addClass('h3');
+	
+		
+		
+		var deleteMessage = _.template($("#entry-log-alert-body").html());		
+		this.displayMessage(deleteMessage(), app.Global.alertType[0] );
+	},
+	
+	
+	cancelDelete: function(){
+		var element = this.$el.find("#faculty-list-item-full-name");
+		$(element).removeClass('hide');
+		$(element).removeClass('h4');
+		if(this.detachElement){
+			this.$el.append( this.detachElement );	
+			this.detachElement = null;
+		}
+		var inputElement = this.$el.find("#faculty-edit-list");
+		$(inputElement).addClass('hide');
+		//$(this.$el).css("margin-bottom","0px");
+		//$(this.$el).css("margin-top","0px");
+		
+	},
+	
+		
+	confirmDelete: function(){
+		
+		var element = this.$el.find("#faculty-list-item-full-name");
+		$(element).removeClass('hide');
+		$(element).removeClass('h4');
+		if(this.detachElement){
+			this.$el.append( this.detachElement );	
+			this.detachElement = null;
+		}
+		var inputElement = this.$el.find("#faculty-edit-list");
+		$(inputElement).addClass('hide');
+		$(this.$el).css("margin-bottom","0px");
+		$(this.$el).css("margin-top","0px");
+		
+	    this.model.destroy( {
 		  success: function(){
 			  console.log("successfully delete faculty from server..");	
 		  },

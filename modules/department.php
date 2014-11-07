@@ -1048,7 +1048,35 @@
 				echo '{"error":{"text":'. $e->getMessage() .'}}';
 			}
 			//Updating periods...
-			updatePeriod($dept->period, $id);
+			//First delete pervious..
+			deletePeriod($id);
+			
+			
+			//Now adding period...
+			foreach($dept->period as $period)
+			{
+				//validating the period..
+				/*if( numberMatch(trim($period)) )
+				{*/
+					//Now inserting data to periodEntry
+					$sql = "INSERT INTO `attendance`.`period_join` (`period_entry_id`, `period`) VALUES (:period_entry_id, :period)";
+					try 
+					{
+						$db = getConnection();
+						$stmt = $db->prepare($sql);
+						$stmt->bindParam("period_entry_id", $id);
+						$stmt->bindParam("period", $period);
+						$stmt->execute();
+						$db = null;
+					} 
+					catch(PDOException $e)
+					{
+						echo '{"error":{"text":'. $e->getMessage() .'}}';
+						header ('Server Error');
+					}
+			}//End of foreach loop....
+			
+			
 			
 			//Now semester and department info..
 			$days_info   = get_days_entry($dept->days_entry_id); 

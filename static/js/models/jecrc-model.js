@@ -44,6 +44,30 @@ app.Model.Faculty = Backbone.Model.extend({
 		email_address :''
 	},
 	
+	validate: function(attrs, options) {
+		//Now validating the subject_name..
+		var username                 = attrs.username;
+		var username_pattern		 = /[^\d\w\.\-\_]/;
+		var email_pattern            = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+		var email                    = attrs.email_address;
+		var name_pattern             = /[^a-zA-Z]/;
+		
+		if( username_pattern.test( username ) ){
+			//Error occured......
+			return "<strong>Error: </strong> Invalid characters inputted in username. Only <strong >digits, alphabets, period(.) and spaces  </strong> are allowed for naming subject ";	
+		}
+		if( !email_pattern.test( email ) ){
+			//Error occured......
+			return "<strong>Error: </strong> Invalid characters inputted in email.";	
+		}
+		if( name_pattern.test( attrs.first_name ) || name_pattern.test( attrs.last_name ) ){
+			//Error occured......
+			return "<strong>Error: </strong> Invalid characters inputted in name.";	
+		}
+		
+		
+	},//End of validate function..
+	
 	urlRoot:"/Manage/modules/department.php/members"
 	
 });
