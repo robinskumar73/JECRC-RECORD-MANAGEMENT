@@ -18,6 +18,9 @@ app.Routers = Backbone.Router.extend({
 	//Area for displaying basic home page...
 	showHomePage: function()
 	{
+		//Unbinding any previous selected scroll events...
+		$(window).unbind('scroll');
+		
 		this.closePreviousViews();
 		
 		if(this.DepartmentElementObj && this.DepartmentElementObj.length ){
@@ -47,6 +50,8 @@ app.Routers = Backbone.Router.extend({
 	
 	//Showing report for department..
 	showDepartmentReport: function(dept_name){
+		//Unbinding any previous selected scroll events...
+		$(window).unbind('scroll');
 		this.closePreviousViews();
 		$("#jecrc-main-screen").empty();
 		//Hiding the department...
@@ -76,6 +81,8 @@ app.Routers = Backbone.Router.extend({
 	
 	
 	showBranchReport: function(dept_name, semester_name, section_name ){
+		//Unbinding any previous selected scroll events...
+		$(window).unbind('scroll');
 		//this.closePreviousViews();
 		//Hiding the department...
 		this.closePreviousViews();
@@ -114,6 +121,8 @@ app.Routers = Backbone.Router.extend({
 	
 	
 	showYearReport: function(dept_name, year){
+		//Unbinding any previous selected scroll events...
+		$(window).unbind('scroll');
 		this.closePreviousViews();
 		$("#jecrc-main-screen").empty();
 		//Hiding the department...
@@ -146,6 +155,8 @@ app.Routers = Backbone.Router.extend({
 	
 	
 	showDepartment: function(name){
+		//Unbinding any previous selected scroll events...
+		$(window).unbind('scroll');
 		this.closePreviousViews();
 		$("#jecrc-main-screen").empty();
 		//Hiding the department...

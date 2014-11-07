@@ -25,6 +25,8 @@ app.Routers = Backbone.Router.extend({
 	
 	ShowLogActivity: function(){
 		this.closePreviousViews();
+		//Unbinding any previous selected scroll events...
+		$(window).unbind('scroll');
 		//If element doesnot exists...
 		if( !$("#jecrc-main-screen").length === 1 )
 		{
@@ -43,6 +45,8 @@ app.Routers = Backbone.Router.extend({
 	
 	FacultyEntry : function(dept_name, semester_name, section_name ){
 		  this.closePreviousViews();
+		  //Unbinding any previous selected scroll events...
+		  $(window).unbind('scroll');
 		  //If element doesnot exists...
 		  if( $("#faculty-display-screen").length )
 		  {
@@ -76,7 +80,7 @@ app.Routers = Backbone.Router.extend({
 	//ROuter for displaying dapartment...
 	showDepartment: function(name){
 		this.closePreviousViews();
-		
+		$(window).unbind('scroll');
 		
 		console.log("Showing the branches");
 		//fetching branch and storing it in collection...
