@@ -956,7 +956,7 @@ app.Views.CreateFaculty = Backbone.View.extend({
 			return false;	
 		}
 		//Adding the department..
-		obj[department_id] = this.department_id;
+		obj["department_id"] = this.department_id;
 		var that = this;
 		this.model.save(obj,{
 			success: function( model, response ){
@@ -968,13 +968,24 @@ app.Views.CreateFaculty = Backbone.View.extend({
 				that.displayMessage(message, app.Global.alertType[1] );
 				//Now add this mode to the list...
 				//app.Global.facultyList.add(that.model);
+				//Now clearing the model id and everything....
+				that.model.clear({silent:true});
+				
 			},
 			error: function( model, response ){
 				console.log("Error created faculty!");
 				//var message = "<strong>Error</strong> creating faculty.";
+				if( response.responseText.length< 30 )
+				{
+					var message = response.responseText;
+				}
+				else{
+					var message = "Error created faculty!";
+				}
 				
-				var message = response.responseText;
 				that.displayMessage(message, app.Global.alertType[3] );
+				//Now clearing the model id and everything....
+				that.model.clear({silent:true});
 			},
 			
  			headers:{
@@ -1038,6 +1049,7 @@ app.Views.ShowFaculty = Backbone.View.extend({
 		//For listening to validation error..
 		this.listenTo(  this.facultyList , 'add',    this.addFacultyList );
 		this.listenTo(  this.facultyList , 'reset',  this.resetFaculty );
+		this.listenTo(  this.facultyList , 'remove', this.deleteFaculty );
 		
 		var that = this;
 		//Adding the scrolling options for fetchin more enteries..
@@ -1071,12 +1083,15 @@ app.Views.ShowFaculty = Backbone.View.extend({
 	//Adding an function for fetching value from the 
 	fetchMore:function(){
 		var that = this;
-		var add  = parseInt(this.offset) ? false : true;
-		
+		var add = false;
+		if(parseInt(this.offset))
+		{
+			add = true;
+		}
 		//showing the loading bar....
 		app.Global.showLoadingBar();
 		this.facultyList.fetch({
-			add:true,
+			remove:false,
 			data: {offset: that.offset, limit:that.limit, dept_id: that.department_id },
 			//Adding an error callback...
 			error: function(collection, response, options){
@@ -1085,20 +1100,24 @@ app.Views.ShowFaculty = Backbone.View.extend({
 			},
 			success: function(collection, response, options){
 				app.Global.hideLoadingBar();
-				if(response.length === 0 && add )
+				if(response.length === 0 && !add )
 				{
 					that.destroy_view();	
 					return false;
 				}
 				
 				//Creating a global refrence of the collection...
-				app.Global.facultyList = that.facultyList;
-				console.log("Successfully fetched faculty list from server.");
+				//app.Global.facultyList = that.facultyList;
 				//Now updating  the offset..
 				var length = response.length;
 				that.offset = that.offset + length;	
 			}
 	 	});
+	},
+	
+	
+	deleteFaculty: function(){
+		this.offset  = parseInt(this.offset) - 1;
 	}
 	
 	
@@ -1334,15 +1353,13 @@ app.Views.activity = Backbone.View.extend({
 	//Adding an function for fetching value from the 
 	fetchMore:function(){
 		var that = this;
-		var add  = parseInt(that.offset) ? true : false;
-		//var add = true;
-		console.log("fetching more log data..." + add);
+		
 		//showing the loading bar....
 		app.Global.showLoadingBar();
 		var facultyId =  faculty.id;
 		this.collection.fetch({
 			data: {offset: that.offset, limit:that.limit, faculty_id: facultyId},
-			add:true,
+			remove:false,
 			//Adding an error callback...
 			error: function(collection, response, options){
 				app.Global.hideLoadingBar();

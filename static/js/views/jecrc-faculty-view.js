@@ -1811,15 +1811,12 @@ app.Views.activity = Backbone.View.extend({
 	//Adding an function for fetching value from the 
 	fetchMore:function(){
 		var that = this;
-		//var add  = that.offset? true : false;
-		var add = true;
-		console.log("fetching more log data..." + add);
 		//showing the loading bar....
 		app.Global.showLoadingBar();
 		 
 		this.collection.fetch({
 			data: {offset: that.offset, limit:that.limit, faculty_id: faculty.id },
-			add:add,
+			remove:false,
 			//Adding an error callback...
 			error: function(collection, response, options){
 				app.Global.hideLoadingBar();

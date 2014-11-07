@@ -1131,7 +1131,7 @@
 			{
 				//set department id..
 				$department_id = $_GET['dept_id'];
-				
+				//ORDER BY `first_name` DESC, `last_name` DESC 
 				$sql = "SELECT `id`,
 				  			   `first_name`,
 							   `last_name`,
@@ -1143,7 +1143,7 @@
 						  `faculty` 
 						WHERE 
 								department_id = :department_id 
-						ORDER BY `first_name` DESC, `last_name` DESC 
+						
 						 LIMIT :limit OFFSET :offset;";
 				try 
 				{
