@@ -1,9 +1,5 @@
 /*CSS-3 script  by Robins Gupta*/
 
-@font-face{
-	font-family:Lato;
-	src:url(../bootstrap/fonts/Lato/Lato-Regular.ttf);
-}
 
 /*Setting up print page*/
 @media print

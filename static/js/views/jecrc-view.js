@@ -1191,7 +1191,7 @@ app.Views.FacultyItem  =  Backbone.View.extend({
 		this.detachElement = this.$el.find("p");
 		this.detachElement = $(this.detachElement).detach();
 		var element = this.$el.find("#faculty-list-item-full-name");
-		$(element).addClass('h3');
+		$(element).addClass('h4');
 	
 		
 		
@@ -1217,7 +1217,11 @@ app.Views.FacultyItem  =  Backbone.View.extend({
 	
 		
 	confirmDelete: function(){
-		
+		if(faculty.id === this.model.get('id') ){
+				var message = "<strong>Error:</strong> You cannot delete your <strong>own account</strong>. ";
+				this.displayMessage( message, app.Global.alertType[0] );
+				return false;
+		}
 		var element = this.$el.find("#faculty-list-item-full-name");
 		$(element).removeClass('hide');
 		$(element).removeClass('h4');
@@ -1500,5 +1504,126 @@ app.Views.activityModel = Backbone.View.extend({
       return this;
     }
 });
+
+
+
+//--------------------------------------------VIEW FOR SETTINGS-------------------------------------------------------
+
+app.Views.settings  = Backbone.View.extend({
+	initialize: function(){
+		//Setting the current views....
+		app.Global.Router.currentView = this;
+		this.template   =  _.template( $("#template-reset-settings").html() );
+
+	},
+	
+	
+	events:{
+	  "click #settings-delete-btn"   :  "confirmDelete",
+	  "click #alert_modal_save_btn"  :  "confirmPassBtn"
+	},
+	
+	// Re-render the setting page....
+    render: function() {
+		
+	  this.$el.html(this.template());
+      
+      return this;
+    },
+	
+	//Loading the  
+	confirmDelete:function()
+	{
+		var modalTemplate = _.template( $("#alert-password-confirm-modal").html() );
+		this.$el.append( modalTemplate() );
+		//Now load the modal..
+		//$('#myModal').modal(options)
+		var modalElement = this.$el.find("#myModal");
+		$('#myModal').modal('show');
+	},
+	
+	
+	
+	confirmPassBtn: function(){
+		//get the inputed password...
+		var getPassElement = this.$el.find("#pass-confirm");
+		var getPass = $(getPassElement).val();
+		if(getPass === '')
+		{
+			console.warn("Pass must be entered");
+			return false;	
+		}
+		//Getting the pass md5 hash
+		var hash = CryptoJS.MD5(getPass);
+		console.log("Confirm Password is " + hash.toString());
+		var that = this;
+		//First send an delete request to the server...
+		$.ajax({
+    		url: '/Manage/modules/department.php/settings',
+    		type: 'DELETE',
+    		success: function(result) {
+        		// Do something with the result
+				console.info("Succesfullty reset entry");
+				that.displayMessage("Data entry <strong>successfully deleted.</strong>", app.Global.alertType[1]);
+				
+    		},
+			error:function(){
+				that.displayMessage("<strong>Error wrong password.</strong> Please type your <strong>password correctly</strong>.", app.Global.alertType[3]);
+			},
+			
+			headers:{
+				password   : hash.toString(),
+				faculty_id : faculty.id
+			}
+		});
+		//Now closing the modal...
+		var modalElement = this.$el.find("#myModal");
+		$('#myModal').modal('hide');
+	},
+	
+	
+	
+	
+	//Function for diplaying result and console screen...
+	displayMessage : function(message, type){
+		var Template = _.template( $("#display-info").html() );
+		this.display =  Template( {"message": message, "typeInfo": type } );
+		//Callback for success 
+		//Now adding this info to form display ..
+		var displayElement = this.$el.find("#settings-delete-info");
+		$(displayElement).html(this.display);
+	}
+	
+	
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

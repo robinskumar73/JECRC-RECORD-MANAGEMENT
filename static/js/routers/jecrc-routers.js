@@ -11,7 +11,8 @@ app.Routers = Backbone.Router.extend({
 		"department/:name" 															 : "showDepartment",
 		"report/department/:dept_name" 												 : "showDepartmentReport"	,
 		"report/department/:dept_name/:year" 										 : "showYearReport",
-		"report/department/:dept_name/semester/:semester_name/section/:section_name" : "showBranchReport"
+		"report/department/:dept_name/semester/:semester_name/section/:section_name" : "showBranchReport",
+		"settings"																	 : "showSettings"
 	},
 	
 	
@@ -20,7 +21,6 @@ app.Routers = Backbone.Router.extend({
 	{
 		//Unbinding any previous selected scroll events...
 		$(window).unbind('scroll');
-		
 		this.closePreviousViews();
 		
 		if(this.DepartmentElementObj && this.DepartmentElementObj.length ){
@@ -36,6 +36,29 @@ app.Routers = Backbone.Router.extend({
 		logs.render();
 		//Now loading the element...
 		$("#jecrc-main-screen").html(logs.el);
+		
+	},
+	
+	//For showing the  settings page..
+	showSettings: function(){
+		//doing some necessary actions...
+		//Unbinding any previous selected scroll events...
+		$(window).unbind('scroll');
+		this.closePreviousViews();
+		if(!this.DepartmentElementObj ){
+			this.DepartmentElementObj = $("#admin-department").detach();
+		}
+		else{
+			if(!this.DepartmentElementObj.length){
+				this.DepartmentElementObj = $("#admin-department").detach();
+			}
+		}
+		
+		
+		var settings = new app.Views.settings();
+		//Loading to main screen..
+		//Now loading the element...
+		$("#jecrc-main-screen").html( settings.render().el );
 		
 	},
 	

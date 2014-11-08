@@ -21,6 +21,7 @@ var faculty = {
 	"department_id" : department_id,	
 }
 
+
 </script>
 
 <!--script area-->
@@ -40,5 +41,6 @@ var faculty = {
 <script type="text/javascript" src="static/js/routers/jecrc-routers.js"></script>
 <script type="text/javascript" src="static/js/app-main/jecrc-app-main.js"></script>    
 <script type="text/javascript" src="static/customscript/myscript.js"></script>
+<script type="text/javascript" src="static/md5/md5-google.js"></script>
 </body>
 </html>

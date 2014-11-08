@@ -72,6 +72,12 @@
 	$app->get('/branch/', 'getBranch');
 	$app->post('/branch/', 'addBranch');
 	
+	
+	
+	//-----------------------------RESET DATA--------------------------------------
+	//DELETE
+	$app->delete('/settings','resetEntry');
+	
 	//KACHRA-----------------------------------------------------------------------------------------------------------------------
 	$app->get('/department/:deptId/semester/:semId','getSemesterById');
 	$app->get('/department/:deptId/semester/:semId/section','getAllSection');
@@ -1007,6 +1013,50 @@
 			echo '{"error":{"text":'. 'Property Name \'faculty_id\' must be provided with the Header. ' .'}}';
 		}
 	}//Function ends for delete entry..
+	
+	
+	
+	//Route for deleting the entry....
+	function resetEntry(){
+		$request       = \Slim\Slim::getInstance()->request();
+		$faculty_id    = $request->headers->get('faculty_id');
+		$confirmPass   = $request->headers->get('password');
+		if($faculty_id && $confirmPass)
+		{
+				$check =  checkFacultyPassword($faculty_id, $confirmPass);
+				if($check)
+				{
+					$faculty_info = getMemberById( $faculty_id );
+					$deptName     = getDepartmentNameById( $faculty_info->department_id );
+				
+					$sql = "DELETE FROM  `days_entry`  WHERE `department_id` = :dept_id ";
+					try {
+						$db = getConnection();
+						$stmt = $db->prepare($sql);
+						$stmt->bindParam("dept_id",  $faculty_info->department_id );
+						$stmt->execute();
+						$db = null;
+					} catch(PDOException $e) {
+						header ('Server Error');
+						echo '{"error":{"text":'. $e->getMessage() .'}}';
+					}
+					
+					//Now writing the logs...
+					$message  = "Data records deleted for $deptName department  ";
+					$sub_info = $deptName ;
+					entry_admin_log('delete', $faculty_id, $message, $sub_info, 'NULL' );
+						
+				}
+				else{
+					echo "Pass Matched fails";
+					header ('Server Error');
+					//echo '{"error":{"text":'. $e->getMessage() .'}}';
+					return false;	
+				}
+			
+		}
+		
+	}//Function ends for delete entry....
 	
 	
 	

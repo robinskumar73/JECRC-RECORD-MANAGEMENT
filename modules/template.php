@@ -41,6 +41,18 @@
 </script>
 
 
+<!---template for adding the settings--->
+<script type="text/template" id="template-reset-settings">
+	<!--DIV FOR ADDING FACULTY-->
+    <div class="col-sm-12" id="reset-settings">
+			<div id="settings-delete-info"></div>
+			<h4 class="blue-text semAddHeading" style="margin-bottom:18px;" > Do you want to reset entry? </h4>
+			<button type="button" id="settings-delete-btn"  class="btn btn-danger">Delete</button>
+		    <a href="#"><button type="button" id="settings-cancel-btn" style="margin-left:15px;"  class="btn btn-success">Get me out of here</button></a>
+	</div>
+</script>
+
+
 <!--TEMPLATE FOR FACULTY LIST-->
 <script id="faculty-list-item" type="text/template">
 	
@@ -109,6 +121,41 @@
 			<button type="button" id="entry-action-btn" class="btn btn-danger"> Delete </button>
   		</p>
   	</div>
+</script>
+
+
+<script id="delete-entry-alert-body" type="text/template">
+	<div class="settings-delete-info">
+  		<h4> Do you want to reset entry. </h4>
+  		<p>
+			<button type="button" id="entry-action-btn" class="btn btn-danger"> Delete </button>
+  		</p>
+  	</div>
+</script>
+
+
+
+<script id="alert-password-confirm-modal" type="text/template">
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  	<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+		   	<h4 class="modal-title" id="myModalLabel">
+		  		 Confirm your password to proceed
+		   	</h4>
+		</div>
+		<div class="modal-body">
+		  <!--Modal body --->
+		   <input type="password" id="pass-confirm" class="form-control  jecrc-dept-entry" placeholder="Confirm password">
+		</div>
+		<div class="modal-footer">
+		  <button id="alert_modal_save_btn" type="button" class="btn btn-primary">Confirm Password</button>
+		</div>
+	  </div>
+	</div>
+  </div>
 </script>
 
 

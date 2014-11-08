@@ -483,6 +483,30 @@
 				echo '{"error":{"text":'. $e->getMessage() .'}}';
 			}	
 	}
+	
+	//Getting the faculty name
+	function checkFacultyPassword($id, $password){
+		$sql = "SELECT password FROM faculty WHERE id = :id ";
+			try {
+				$db = getConnection();
+				$stmt = $db->prepare($sql);
+				$stmt->bindParam("id", $id);
+				$stmt->execute();
+				$dept = $stmt->fetchObject();
+				$db = null;
+				if( $dept->password == $password )
+				{
+					return true;	
+				}
+				else{
+					return false;	
+				}
+			}
+			catch(PDOException $e) 
+			{
+				echo '{"error":{"text":'. $e->getMessage() .'}}';
+			}	
+	}
 		
 	
 	
