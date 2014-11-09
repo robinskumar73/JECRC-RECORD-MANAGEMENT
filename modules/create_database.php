@@ -27,6 +27,7 @@
 				forgot VARCHAR(100),
 				last_loggedin DATETIME,
 				user_level INT,
+				admin_type enum ('admin','hod'),
 				PRIMARY KEY(id)
 			);";
 	$result = mysqli_query($dbc,$query);

@@ -6,20 +6,27 @@ $last_name     = $_SESSION['last_name'];
 $id            = $_SESSION['id'];
 $username      = $_SESSION['username'];
 $department_id = $_SESSION['department_id'];
+$admin         = $_SESSION['admin'];
+$admin_type    = $_SESSION['admin_type'];
 ?>
 var first_name = "<?php echo $first_name ; ?>" ;
 var last_name = "<?php echo $last_name ; ?>" ;
 var id = "<?php echo $id ; ?>" ;
 var username = "<?php echo $username ; ?>" ;
 var department_id = "<?php echo $department_id ; ?>" ;
+var admin  = "<?php echo $admin ?>";
+var admin_type  = "<?php echo $admin_type ?>";
 
 var faculty = {
 	"id": id,
 	"first_name": 	first_name,
 	"last_name": last_name,
 	"username" : username,
-	"department_id" : department_id,	
+	"department_id" : department_id,
+	"admin"          : admin,
+	"admin_type"       : admin_type	
 }
+
 
 
 </script>
@@ -42,5 +49,6 @@ var faculty = {
 <script type="text/javascript" src="Manage/static/js/app-main/jecrc-app-main.min.js"></script>    
 <script type="text/javascript" src="Manage/static/customscript/myscript.min.js"></script>
 <script type="text/javascript" src="Manage/static/md5/md5-google.js"></script>
+
 </body>
 </html>

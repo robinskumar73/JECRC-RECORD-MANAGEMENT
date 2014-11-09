@@ -22,13 +22,16 @@ app.Routers = Backbone.Router.extend({
 		//Unbinding any previous selected scroll events...
 		$(window).unbind('scroll');
 		this.closePreviousViews();
-		
-		if(this.DepartmentElementObj && this.DepartmentElementObj.length ){
+		//SHOW ONLY IF PRIVILAGE IS ADMIN
+		if(this.DepartmentElementObj && this.DepartmentElementObj.length  ){
 			$("#right-side-hook").html( this.DepartmentElementObj );
 			//this.DepartmentElementObj = null;
 		}
-		//Now showing the department...
-		$("#admin-department").removeClass('hide');
+		if(faculty.admin_type === "admin")
+		{
+			//Now showing the department...
+			$("#admin-department").removeClass('hide');
+		}
 		
 		console.log("Loading the activity logs");
 		//Loading the activity view...

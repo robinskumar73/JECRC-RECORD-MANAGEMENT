@@ -143,6 +143,7 @@ class Login_Process {
 			$_SESSION['user_level']    = $query['result']['user_level'];
 			$_SESSION['password']      = $query['result']['password'];
 			$_SESSION['admin']         = $query['result']['admin'];
+			$_SESSION['admin_type']    = $query['result']['admin_type'];
 			
 
 	}	

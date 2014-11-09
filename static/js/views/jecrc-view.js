@@ -21,9 +21,9 @@ app.Views.Department = Backbone.View.extend({
 	
     events: {
 	  //Event for thumb-up
-      "click #create-dept"   : "createDepartment",
+      "click #create-dept"     : "createDepartment",
 	  "keypress #Department"   : "handleKeyPress",
-	  "click #Dept-Cancel" : "cancel_department",
+	  "click #Dept-Cancel"     : "cancel_department",
 	 
     },
 	
@@ -95,10 +95,27 @@ app.Views.Department = Backbone.View.extend({
 		var len = app.Global.Department.length;
 		for(var i = 0; i< len ; i++)
 		{
-			$("#nav-dept-bar").append('<li><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
+			if( faculty.admin_type === "admin" )
+			{
+				
+				//SHOW ALL DEPT IN FACULTY CASE..
+				$("#nav-dept-bar").append('<li><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
+				//Adding to collapse nav bar..
+				$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
+			 //collapse-nav-bar
+			}
+			else{
+				
+			
+					if(faculty.department_id ===  app.Global.Department.at(i).get("id") )
+					{
+						
+						//SHOW ONLY RELATED DEPARTMENT..
+						$("#nav-dept-bar").append('<li><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
 			//Adding to collapse nav bar..
-			$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
-			//collapse-nav-bar
+						$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
+					}
+			}
 			
 		}
 		return this;
@@ -173,8 +190,28 @@ app.Views.Department = Backbone.View.extend({
 	displayNavigationBar: function(model_){
 		//First save this model to the server..
 		value = model_.get('name');
-		$("#nav-dept-bar").append('<li><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
-		$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
+		//IF FACULTY IS NOT ADMIN
+		if( faculty.admin_type === "admin" )
+		{
+			
+			$("#nav-dept-bar").append('<li><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
+			$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
+		}
+		else
+		{
+				//IF FACULTY IS HOD..
+				if(faculty.admin_type === "hod")
+				{
+					
+					//SHOW ONLY RELATED DEPARTMENT...
+					if(faculty.department_id ===   model_.get('id') )
+					{
+						$("#nav-dept-bar").append('<li><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
+						$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
+					}
+				}
+				
+		}
 	},
 	//END of display navigation function...
 	
@@ -1640,6 +1677,10 @@ app.Views.settings  = Backbone.View.extend({
 	
 	
 });
+
+
+
+
 
 
 
