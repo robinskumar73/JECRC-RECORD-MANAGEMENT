@@ -174,6 +174,7 @@ app.Views.Department = Backbone.View.extend({
 		//First save this model to the server..
 		value = model_.get('name');
 		$("#nav-dept-bar").append('<li><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
+		$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
 	},
 	//END of display navigation function...
 	
@@ -775,6 +776,36 @@ app.Views.Branch = Backbone.View.extend({
 		this.year = ["I YEAR", "II YEAR", "III YEAR", "IV YEAR"];
 		this.branchTemplate =  _.template( $("#branch-template").html() );	
 		app.Global.dept = false;
+		this.editButton = false;
+	},
+	
+	
+	events:{
+		//"click #branch-remove-icon" : "removeBranch",
+		//"click .branch-edit-icon"   : "showEditBranchIcons"
+	},
+	
+	
+	
+	removeBranch:function(){
+		
+	},
+	
+	
+	
+	showEditBranchIcons: function(){
+		if(!this.editButton)
+		{
+			//hide icons...
+			$(".branch-remove-icons").removeClass('hide');	
+			this.editButton = true;	
+		}
+		else{
+			//hide icons...
+			$(".branch-remove-icons").addClass('hide');	
+			this.editButton = false;		
+		}
+		
 	},
 	
 	
@@ -881,7 +912,20 @@ app.Views.Branch = Backbone.View.extend({
 			}
 		}
 		return branch_array;
+	},
+	
+	
+	
+	//Function for diplaying result and console screen...
+	displayMessage : function(message, type){
+		var Template = _.template( $("#display-info").html() );
+		this.display =  Template( {"message": message, "typeInfo": type } );
+		//Callback for success 
+		//Now adding this info to form display ..
+		var displayElement = this.$el.find("#display-info-box");
+		$(displayElement).html(this.display);
 	}
+
 	
 	
 

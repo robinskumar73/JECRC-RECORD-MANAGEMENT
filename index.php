@@ -51,7 +51,7 @@ include_once 'modules/loadingbar.php';
             
                 
                 <!--DIV FOR CREATING DEPT AND OTHER FIELDS-->
-                <div id="right-side-hook" class="col-sm-4">
+                <div id="right-side-hook" class="col-md-4">
                 	<!--Adding right hook here--->
                     <?php
 						//Adding navbar here..

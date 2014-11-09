@@ -71,6 +71,7 @@
 	//GET
 	$app->get('/branch/', 'getBranch');
 	$app->post('/branch/', 'addBranch');
+	$app->post('/branch', 'addBranch');
 	
 	
 	

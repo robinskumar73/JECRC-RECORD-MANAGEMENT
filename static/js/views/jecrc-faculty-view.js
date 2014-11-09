@@ -94,6 +94,8 @@ app.Views.Department = Backbone.View.extend({
 		for(var i = 0; i< len ; i++)
 		{
 			$("#nav-dept-bar").append('<li><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
+			
+			$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + app.Global.Department.at(i).get("name")  +  '"  >' + app.Global.Department.at(i).get("name") + '</a></li>');
 		}
 		return this;
 		
@@ -163,6 +165,7 @@ app.Views.Department = Backbone.View.extend({
 		//First save this model to the server..
 		value = model_.get('name');
 		$("#nav-dept-bar").append('<li><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
+		$("#collapse-nav-bar").append('<li class="jecrc-nav-hide"><a href="#department/' + value  +  '"  >' + value	+ '</a></li>');
 	},
 	//END of display navigation function...
 	
@@ -1325,7 +1328,8 @@ app.Views.logAlertBox = Backbone.View.extend({
 	//Function for rendering the logAlertBox...
 	render:function(){
 		//app.Views.alertBod
-		if( parseInt(this.delete) === 1 )
+		var value = parseInt(this.delete);
+		if( value === 1 )
 		{
 			//Delete button was clicked ...
 			//Get the alert box modal..

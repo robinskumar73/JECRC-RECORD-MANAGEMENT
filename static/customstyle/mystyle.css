@@ -457,6 +457,15 @@ ul.log li {
 }
 
 
+@media (max-width: 500px){
+	.print-icon{
+		display:none;
+	
+	}	
+}
+
+
+
 .log-entry-icon{
 	margin-top:10px;
 	font-size:12px; 
@@ -469,6 +478,31 @@ ul.log li {
 
 .log-entry-icon:hover{
 	color:#111111;
+}
+
+
+.branch-remove-icons{
+	margin-left:10px;
+		
+}
+
+.branch-edit-icon{
+	float:right;
+	color:#777777;
+	font-size:14px;
+	margin-top:10px;
+	padding:0px;
+	cursor:pointer;
+	
+}
+
+
+.branch-edit-icon:hover{
+	float:right;
+	color:#111111;
+	font-size:14px;
+	
+		
 }
 
 

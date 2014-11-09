@@ -113,7 +113,7 @@ class Login_Process {
 			 $page = Script_Path."index.php"; 
 			 if( $query['result']['admin'] == 0)
 			 {
-				 $page = Script_Path."modules/faculty.php";
+				 $page = Script_Path."Manage/modules/faculty.php";
 			 }
 		}
 			

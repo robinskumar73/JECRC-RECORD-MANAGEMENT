@@ -37,12 +37,12 @@ include_once 'loadingbar.php';
           				</button>
           				<a class="navbar-brand" href="#">DAILY RECORD MANAGEMENT</a>
         			</div>
-        			<div class="navbar-collapse collapse" >
-          				<ul class="nav navbar-nav navbar-right">
-            				<li class="jecrc-nav-hide"><a href="#">Dashboard</a></li>
-            				<li class="jecrc-nav-hide"><a href="#">Settings</a></li>
-            				<li class="jecrc-nav-hide"><a href="#">Profile</a></li>
-          				</ul> 
+        			 <div class="navbar-collapse collapse" >
+                          <ul id="collapse-nav-bar" class="nav navbar-nav navbar-right">
+                              <h3 class="navbar-text jecrc-nav-hide ">Departments</h3>
+               
+                          </ul> 
+                   
                         <a id="Login" class="navbar-text navbar-right jecrc-nav-dept" href="loginscript/include/processes.php?log_out=true">Logout</a>
                         <a href="#" class="navbar-text navbar-right jecrc-nav-dept  " style="margin-right:20px"  onclick="window.print(); return false;"><span class="glyphicon glyphicon-print" style="color:#428bca"></span></a>
           			</div>

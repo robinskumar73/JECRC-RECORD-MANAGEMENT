@@ -294,5 +294,5 @@ app.Global.render_department =  function(name){
 
 $(document).ready(function(e) {
     app.Global.Router = new app.Routers();
-	Backbone.history.start({root: "/Manage/"}); 
+	Backbone.history.start({root: "/"}); 
 });

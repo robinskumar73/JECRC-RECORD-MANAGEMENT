@@ -13,12 +13,12 @@
                 <div class="navbar-collapse collapse" >
                     <ul id="collapse-nav-bar" class="nav navbar-nav navbar-right">
                         <h3 class="navbar-text jecrc-nav-hide ">Departments</h3>
-                <!--		<li class="jecrc-nav-hide"><a href="#">Settings</a></li>-->
+                        <li class="jecrc-nav-hide"><a href="#settings">Settings</a></li>
                     </ul> 
                    
-                    <a id="Login" class="navbar-text navbar-right jecrc-nav-dept" href="modules/loginscript/include/processes.php?log_out=true">Logout</a>
+                    <a id="Login" class="navbar-text navbar-right jecrc-nav-dept" href="Manage/modules/loginscript/include/processes.php?log_out=true">Logout</a>
                     
-                     <a href="#" class="navbar-text h4 navbar-right jecrc-nav-dept " style="margin-right:40px"  onclick="window.print(); return false;"><span class="glyphicon glyphicon-print"><span style="padding-left:6px">Print</span></span></a>
+                     <a href="#" class="navbar-text h4 navbar-right print-icon jecrc-nav-dept " style="margin-right:40px"  onclick="window.print(); return false;"><span class="glyphicon glyphicon-print"><span style="padding-left:6px"></span></span></a>
                     <!--<a class="navbar-text navbar-right jecrc-nav-dept" href="#">+ Create Department </a>-->
                 </div>
             </div><!--End of NAVBAR ROW DIV-->
