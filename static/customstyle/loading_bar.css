@@ -16,6 +16,21 @@ height:90px;
 	bottom: 50% !important;
 }
 
+
+@media (max-width: 400px) {
+	
+	.center{
+		position: fixed;
+		/*margin: -100px 0 0 -200px;*/
+		z-index:2500;
+		top: 50% !important;
+		left: 40% !important;	
+		bottom: 50% !important;
+	}
+	
+	
+}
+
 .windows8 .wBall {
 position: absolute;
 width: 86px;
