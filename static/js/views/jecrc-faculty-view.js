@@ -647,7 +647,6 @@ app.Views.FacultyEntry = Backbone.View.extend({
 		else{
 			this.days_entry_id = "";	
 		}
-		console.log("getting out app.Views.FacultyEntry constructor");
 	},
 	
 	
@@ -674,7 +673,6 @@ app.Views.FacultyEntry = Backbone.View.extend({
 	
 	
 	render:function(){
-		console.log("app.Views.FacultyEntry view rendering");
 		$(this.el).empty();
 		//Appending the form to the el element...
 		$(this.el).append(this.form);
@@ -791,7 +789,6 @@ app.Views.FacultyEntry = Backbone.View.extend({
 
 
 	saveEntry : function(){
-		console.log("Inside save entry method!");
 		var EntryValue = this.getEntryValue();
 		if (EntryValue === null){
 			return null;	
@@ -816,18 +813,20 @@ app.Views.FacultyEntry = Backbone.View.extend({
 					success: function(){
 						//Undelecating the events..
 						that.undelegateEvents();
-						
 						that.displayMessage("<strong>Successfully</strong> saved entry to database.", app.Global.alertType[1]);
-						
 						//NOW display Batches.. of department..
 						fetchBranch(that.model.get("department_name"));
 						//UPdating the URL..
-						app.Global.Router.navigate('department/' + that["dept_name"],{trigger:true});
+						//app.Global.Router.navigate('department/' + that["dept_name"],{trigger:true});
 						//Removing the view..
-						that.destroy_view();
+						//that.destroy_view();
 						
 					}
 				});
+				//UPdating the URL..
+				app.Global.Router.navigate('department/' + that["dept_name"],{trigger:true});
+				//Removing the view..
+				that.destroy_view();
 			}//End of if for checking the this.update
 			else{
 				console.log("Updating the data.");
@@ -1176,6 +1175,8 @@ app.Views.logAlertBox = Backbone.View.extend({
 			var that = this;
 			//Fetch the period entry model...
 			var periodEntry = new app.Model.periodEntry({ "id": this.model.get('info_entry_id') });
+			var parentBox = context.$el.find("#dept-display-box");
+			$(parentBox).addClass('hide');
 			//Now send delete request to the server the periodEntry Model
 			periodEntry.destroy({ 
 				headers:{
@@ -1183,7 +1184,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 					"facultyLogId" :    that.model.get("id")
 				},
 				success: function( model, response, options ){
-					console.log("Successfully deleted period entry from server!");
+					$(parentBox).removeClass('hide');
 					var message = "Successfully deleted period entry from server!";
 					//update the activity log...
 					var logEntry = app.Global.entryLogCollection.get(response.id);
@@ -1217,7 +1218,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 				error: function( model, response, options ){
 					console.log("Error deleting period entry from server!");
 					var message = "Error deleting subject entry from server!";
-					
+					$(parentBox).removeClass('hide');
 					//Updating the log.
 					//Undelecating the events..
 					that.displayMessage(message, that, app.Global.alertType[3]);
@@ -1244,6 +1245,9 @@ app.Views.logAlertBox = Backbone.View.extend({
 			var subjectEntry = new app.Model.Subject({ "id": this.model.get('info_entry_id') });
 			//Now send delete request to the server the subjectEntry Model
 			//Now send delete request to the server the periodEntry Model
+			//Hide the kalert-box first...
+			var parentBox = context.$el.find("#dept-display-box");
+			$(parentBox).addClass('hide');
 			subjectEntry.destroy({ 
 				headers:{
 					"faculty_id" : 	that.model.get('faculty_id'),
@@ -1251,10 +1255,11 @@ app.Views.logAlertBox = Backbone.View.extend({
 					"facultyLogId" : this.model.get("id")
 				},
 				success: function(){
-					console.log("Successfully deleted subject entry from server!");
+				
 					var message = "Successfully deleted subject entry from server!";
 					//Updating the log.
 					//Undelecating the events..
+					$(parentBox).removeClass('hide');
 					that.displayMessage(message, that, app.Global.alertType[1]);
 					//that.undelegateEvents();
 					//getting the date...
@@ -1275,6 +1280,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 					
 				},
 				error: function( model, response, options ){
+					$(parentBox).removeClass('hide');
 					console.log("Error deleting subject entry from server!");
 					//"errorCode": "#0000"
 					var message = "<strong>Subject cannot be deleted</strong> . You can only <strong>rename</strong> the subject until all its related subject enteries are deleted.";
