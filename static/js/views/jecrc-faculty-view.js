@@ -823,10 +823,12 @@ app.Views.FacultyEntry = Backbone.View.extend({
 						
 					}
 				});
-				//UPdating the URL..
-				app.Global.Router.navigate('department/' + that["dept_name"],{trigger:true});
+				
 				//Removing the view..
 				that.destroy_view();
+				//UPdating the URL..
+				app.Global.Router.navigate('department/' + that["dept_name"],{trigger:true});
+				
 			}//End of if for checking the this.update
 			else{
 				console.log("Updating the data.");
@@ -894,6 +896,8 @@ app.Views.FacultyEntry = Backbone.View.extend({
 						that.destroy_view();
 					}
 				});
+				//Removing the view..
+				that.destroy_view();
 			}//End of else of update statement
 		}
 		
@@ -1175,7 +1179,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 			var that = this;
 			//Fetch the period entry model...
 			var periodEntry = new app.Model.periodEntry({ "id": this.model.get('info_entry_id') });
-			var parentBox = context.$el.find("#dept-display-box");
+			var parentBox = this.$el.find("#dept-display-box");
 			$(parentBox).addClass('hide');
 			//Now send delete request to the server the periodEntry Model
 			periodEntry.destroy({ 
@@ -1198,22 +1202,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 					//Updating the log.
 					//Undelecating the events..
 					that.displayMessage(message, that, app.Global.alertType[1]);
-					/*
-					that.undelegateEvents();
-					//getting the date...
-					var d = new Date();
-					var time = d.getTime();
-					that.model.save({
-						 last_update_type: 'delete',
-						 last_updated_time: time,
-						 headers:{
-							 //Sending the faculty headers with headers..
-							faculty_id : that.model.get('faculty_id'),
-						 }, 
-					});
-					//Removing the view..
-					//that.destroy_view();
-					*/
+					
 				},
 				error: function( model, response, options ){
 					console.log("Error deleting period entry from server!");
@@ -1222,20 +1211,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 					//Updating the log.
 					//Undelecating the events..
 					that.displayMessage(message, that, app.Global.alertType[3]);
-					/*
-					that.undelegateEvents();
-					//getting the date...
-					var d = new Date();
-					var time = d.getTime();
-					that.model.save({
-						 last_update_type: 'error',
-						 last_updated_time: time,
-						 headers:{
-							 //Sending the faculty headers with headers..
-							faculty_id : that.model.get('faculty_id'),
-						 }, 
-					});
-					*/	
+					
 				}
 			});//END OF periodEntry.destroy
 		}
@@ -1246,7 +1222,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 			//Now send delete request to the server the subjectEntry Model
 			//Now send delete request to the server the periodEntry Model
 			//Hide the kalert-box first...
-			var parentBox = context.$el.find("#dept-display-box");
+			var parentBox = this.$el.find("#dept-display-box");
 			$(parentBox).addClass('hide');
 			subjectEntry.destroy({ 
 				headers:{
@@ -1261,22 +1237,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 					//Undelecating the events..
 					$(parentBox).removeClass('hide');
 					that.displayMessage(message, that, app.Global.alertType[1]);
-					//that.undelegateEvents();
-					//getting the date...
-					//var d = new Date();
-					//var time = d.getTime();
-					/*
-					that.model.save({
-						 last_update_type: 'delete',
-						 last_updated_time: time,
-						 headers:{
-							 //Sending the faculty headers with headers..
-							faculty_id : that.model.get('faculty_id'),
-						 }, 
-					});
-					*/
-					//Removing the view..
-					//that.destroy_view();
+					
 					
 				},
 				error: function( model, response, options ){
@@ -1288,20 +1249,7 @@ app.Views.logAlertBox = Backbone.View.extend({
 					//Updating the log.
 					//Undelecating the events..
 					that.displayMessage(message, that, app.Global.alertType[3]);
-					//that.undelegateEvents();
-					//getting the date...
-					//var d = new Date();
-					//var time = d.getTime();
-					/*
-					that.model.save({
-						 last_update_type: 'error',
-						 last_updated_time: time,
-						 headers:{
-							//Sending the faculty headers with headers..
-							faculty_id : that.model.get('faculty_id')
-						 }, 
-					});
-					*/
+					
 						
 				}
 			});//END OF subjectEntry.destroy

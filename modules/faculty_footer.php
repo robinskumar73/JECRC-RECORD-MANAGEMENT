@@ -53,12 +53,12 @@ var faculty = {
 
 
 <!--Now loading MVC related files -->
-<script type="text/javascript" src="../static/js/models/jecrc-model.min.js"></script>
-<script type="text/javascript" src="../static/js/collections/jecrc-collection.min.js"></script>
-<script type="text/javascript"  src="../static/js/views/app-pages.min.js"></script>
-<script type="text/javascript" src="../static/js/views/jecrc-faculty-view.min.js"></script>
-<script type="text/javascript" src="../static/js/routers/faculty-routers.min.js"></script>
-<script type="text/javascript" src="../static/js/app-main/jecrc-app-main.min.js"></script>    
-<script type="text/javascript" src="../static/customscript/myfacultyscript.min.js"></script>
+<script type="text/javascript" src="../static/js/models/jecrc-model.js"></script>
+<script type="text/javascript" src="../static/js/collections/jecrc-collection.js"></script>
+<script type="text/javascript"  src="../static/js/views/app-pages.js"></script>
+<script type="text/javascript" src="../static/js/views/jecrc-faculty-view.js"></script>
+<script type="text/javascript" src="../static/js/routers/faculty-routers.js"></script>
+<script type="text/javascript" src="../static/js/app-main/jecrc-app-main.js"></script>    
+<script type="text/javascript" src="../static/customscript/myfacultyscript.js"></script>
 </body>
 </html>
