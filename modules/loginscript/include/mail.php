@@ -17,7 +17,7 @@ function Mail_Reset_Password($username, $code, $email) {
 	
 	Your password for the '.Site_Name.' has been requested.
 	To reset your password please follow the link below.
-	'.Script_URL.Script_Path.'modules/loginscript/forgotpassword.php?username='.$username.'&code='.$code.'
+	'.Script_URL.Script_Path.'Manage/modules/loginscript/forgotpassword.php?username='.$username.'&code='.$code.'
 	If you didnt request your password please delete this email.
 	
 	Thanks 

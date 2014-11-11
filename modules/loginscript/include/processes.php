@@ -1,7 +1,7 @@
 <?php
 error_reporting (E_ERROR | 0);
-include 'loginscript/include/mail.php';
-include 'loginscript/include/constants.php';
+include '/Manage/modules/loginscript/include/mail.php';
+include '/Manage/modules/loginscript/include/constants.php';
 
 if(isset($_GET['log_out'])) {
 	$Login_Process = new Login_Process;
@@ -48,10 +48,24 @@ class Login_Process {
 
 		if(isset($_COOKIE[$this->cookie_user]) && isset($_COOKIE[$this->cookie_pass])){
 			$this->log_in($_COOKIE[$this->cookie_user], $_COOKIE[$this->cookie_pass], 'true', $page, 'cookie'); 
-		} else if(isset($_SESSION['username'])) { 	
-			if(!$page) { $page = Script_Path."index.php"; }
-					header("Location: http://".$_SERVER['HTTP_HOST'].$page); 
+		} else if(isset($_SESSION['username'])) {
+			echo $_SESSION['admin']; 	
+			if( $_SESSION['admin'] == 1 )
+			{
+				if(!$page ) 
+				{
+					 $page = Script_Path."admin.php"; 
+				}
+			}
+			else{
+				if(!$page) 
+				{
+					 $page = Script_Path."Manage/modules/faculty.php"; 
+				}
+			}
+			header("Location: http://".$_SERVER['HTTP_HOST'].$page); 
 		} else {
+			
 		    return true;
 		}
 	}
@@ -63,7 +77,8 @@ class Login_Process {
 
 		if(!isset($_SESSION['username'])  ){
 			//echo "http://".$_SERVER['HTTP_HOST'].$page;
-			header("Location: http://".$_SERVER['HTTP_HOST']."/Manage/modules/login.php?page=".$page); 
+			//Redirecting to the login page...
+			header("Location: http://".$_SERVER['HTTP_HOST']."/index.php?page=".$page); 
 		}
 		else 
 			return true;
@@ -84,47 +99,55 @@ class Login_Process {
 
 	function log_in($username, $password, $remember, $page, $submit) {
 		
-		if(isset($submit)) {
-
-		if($submit !== "cookie") {
-			$password = md5($password);
-		}
-
-		$query = $this->query("SELECT * FROM ".DBTBLE." WHERE username='$username' AND password='$password'");
-
-		if($query['num_rows'] == 1) {
-
-			if ($query['result']['status'] == "suspended") {
-				return "Account Suspended, <br /> Contact System Administrator.";
+		if(isset($submit))
+		{
+			if($submit !== "cookie") {
+				$password = md5($password);
 			}
-			if ($query['result']['status'] == "pending") {
-				return "Account Pending, <br /> Administrator has not yet approved your account.";
-			}
+			$query = $this->query("SELECT * FROM ".DBTBLE." WHERE username='$username' AND password='$password'");
+			if($query['num_rows'] == 1) {
+				if ($query['result']['status'] == "suspended") 
+				{
+					return "Account Suspended, <br /> Contact System Administrator.";
+				}
+				if ($query['result']['status'] == "pending") 
+				{
+					return "Account Pending, <br /> Administrator has not yet approved your account.";
+				}
 				$this->set_session($username, $password);	
 				if(isset($remember)) 
-				{ $this->set_cookie($username, $password, '+');	}
-							
-		} else {
-				return "Username or Password not reconised.";
-		}			
+				{ 
+				  $this->set_cookie($username, $password, '+');
+				}
+			} 
+			else 
+			{
+					return "Username or Password not reconised.";
+			}
+					  
 			$this->query("UPDATE ".DBTBLE." SET last_loggedin = '".date ("d/m/y G:i:s")."' WHERE username = '$username'");
-		
-		if(!$page) {
-			 $page = Script_Path."index.php"; 
-			 if( $query['result']['admin'] == 0)
-			 {
-				 $page = Script_Path."Manage/modules/faculty.php";
-			 }
-		}
 			
-			
-		if ($page == 'false') {
-				return true;
-		} else {
-				header("Location: http://".$_SERVER['HTTP_HOST'].$page); 
+			if(!$page) {  
+				  
+				 $page = Script_Path."admin.php"; 
+				 if( $query['result']['admin'] == 0)
+				 {
+					 $page = Script_Path."Manage/modules/faculty.php";
+				 }
+				 else{
+					  $page = Script_Path."admin.php";
+				 }
 				
-		}
-		
+			}
+				
+				
+			if ($page == 'false') {
+					return true;
+			} 
+			else 
+			{
+					header("Location: http://".$_SERVER['HTTP_HOST'].$page); 		
+			}
 		}
 	}
 	
@@ -168,7 +191,7 @@ class Login_Process {
     	$this->set_cookie($username, $password, '-');
 
 		if(!isset($header)) {
-			header('Location: ../../login.php');
+			header('Location: ../../../../index.php');
 		} else {
 			return true;
 		}

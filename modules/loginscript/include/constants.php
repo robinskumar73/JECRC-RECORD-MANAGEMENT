@@ -19,7 +19,7 @@ define("DBTBLE","faculty");
 // Path of script with trailing slashes
 define("Script_Path","/");
 // URL of script (no trailing slash)
-define("Script_URL","http://localhost");
+define("Script_URL","http://booklite.in");
 
 # System Infomation
 

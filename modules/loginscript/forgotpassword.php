@@ -63,7 +63,7 @@ switch($Check) {
 ?>
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
-<div class="right" style="margin-top:-8px; margin-right:-6px;"><a href="../login.php">Log In</a></div>
+<div class="right" style="margin-top:-8px; margin-right:-6px;"><a href="../../../index.php">Log In</a></div>
 <h1>Request Password Reset</h1>
 <br />
 <div class="red bg-danger"><?php  echo $Check.$Request; ?></div>
