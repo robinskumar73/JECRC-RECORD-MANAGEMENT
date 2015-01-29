@@ -1,7 +1,7 @@
 <?php
 error_reporting (E_ERROR | 0);
 include '/Manage/modules/loginscript/include/mail.php';
-include '/Manage/modules/loginscript/include/constants.php';
+include 'constants.php';
 
 if(isset($_GET['log_out'])) {
 	$Login_Process = new Login_Process;
@@ -60,7 +60,7 @@ class Login_Process {
 			else{
 				if(!$page) 
 				{
-					 $page = Script_Path."Manage/modules/faculty.php"; 
+					 $page = Script_Path."modules/faculty.php"; 
 				}
 			}
 			header("Location: http://".$_SERVER['HTTP_HOST'].$page); 
@@ -132,7 +132,7 @@ class Login_Process {
 				 $page = Script_Path."admin.php"; 
 				 if( $query['result']['admin'] == 0)
 				 {
-					 $page = Script_Path."Manage/modules/faculty.php";
+					 $page = Script_Path."modules/faculty.php";
 				 }
 				 else{
 					  $page = Script_Path."admin.php";
@@ -191,7 +191,7 @@ class Login_Process {
     	$this->set_cookie($username, $password, '-');
 
 		if(!isset($header)) {
-			header('Location: ../../../../index.php');
+			header('Location: ../../../index.php');
 		} else {
 			return true;
 		}

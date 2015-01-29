@@ -223,13 +223,33 @@
 	//Route for updating subject...
 	//'/subject/:id', 'updateSubject'
 	function updateSubject($id){
-		$request = \Slim\Slim::getInstance()->request();
-		$dept = json_decode($request->getBody());
-		$faculty_id     = $request->headers->get('faculty_id');
-		$oldSubjectName = $request->headers->get('Oldsubject');
-		$facultyLogId   = $request->headers->get('facultyLogId');
+		//$request = \Slim\Slim::getInstance()->request();
+				
+		$requestHeaders   = apache_request_headers();
+		$request          = \Slim\Slim::getInstance()->request();
+
+		if ($requestHeaders){
+			$faculty_id      = $requestHeaders['faculty_id'];
+			$oldSubjectName  = $requestHeaders['Oldsubject'];
+			$facultyLogId    = $requestHeaders['facultyLogId'];
+
+		}
+		else{
 		
+			$faculty_id     = $request->headers->get('faculty_id');
+			$oldSubjectName = $request->headers->get('Oldsubject');
+			$facultyLogId   = $request->headers->get('facultyLogId');
+				
+		}
+
+
+		$dept = json_decode($request->getBody());
+				
 		$subjectId = checkSubjectExists( $dept->subject );
+
+
+
+
 		//Now checking ..if updated subject name already present..
 		if($faculty_id)
 		{
@@ -328,9 +348,29 @@
 	
 	//subject/:id','deleteSubject'
 	function deleteSubject($id){
-		$request      = \Slim\Slim::getInstance()->request();
-		$faculty_id   = $request->headers->get('faculty_id');
-		$facultyLogId = $request->headers->get('facultyLogId');
+		
+		//$request      = \Slim\Slim::getInstance()->request();
+
+				
+		$requestHeaders   = apache_request_headers();
+		$request          = \Slim\Slim::getInstance()->request();
+
+		if ($requestHeaders){
+			$faculty_id    = $requestHeaders['faculty_id'];
+			$facultyLogId  = $requestHeaders['facultyLogId'];
+
+		}
+		else{
+			$faculty_id    = $request->headers->get('faculty_id');
+			$facultyLogId = $request->headers->get('facultyLogId');
+
+				
+		}
+
+		//$faculty_id   = $request->headers->get('faculty_id');
+		//$facultyLogId = $request->headers->get('facultyLogId');
+		
+
 		if($faculty_id)
 		{
 			$subjectName = getSubjectName($id);
@@ -662,8 +702,16 @@
 
 	//function to add department start here
 	function addDepartment() {
+		$requestHeaders = apache_request_headers();
 		$request       = \Slim\Slim::getInstance()->request();
-		$faculty_id    = $request->headers->get('faculty_id');
+
+		if ($requestHeaders){
+		    $faculty_id =  $requestHeaders['faculty_id'];
+		}
+		else{
+		    $faculty_id    = $request->headers->get('faculty_id');
+		}
+
 		$dept          = json_decode($request->getBody());
 		$sql = "INSERT INTO department (id,name) VALUES (:id, :name)";
 		try {
@@ -819,9 +867,19 @@
 
     //Add batch to database..
 	function addBranch(){
+
 		$request = \Slim\Slim::getInstance()->request();
-    	$dept = json_decode($request->getBody());	
-		
+		$dept = json_decode($request->getBody());
+	        //$request    = \Slim\Slim::getInstance()->request();
+		/*
+		$requestHeaders = apache_request_headers();
+		if ($requestHeaders){
+		    $faculty_id =  $requestHeaders['faculty_id'];
+		}
+		else{
+		   $faculty_id    = $request->headers->get('faculty_id');
+		}
+		 */
 		//Now inserting to branch table...
 		$sql = "INSERT INTO  `branch` (department_id, semester_id, section_name, batch_id) VALUES (:department_id, :semester_id, :section_name, :batch_id)";
 		
@@ -869,10 +927,21 @@
 	}//function to update department end here
 
 	function deleteDepartment($deptId){
+		$requestHeaders = apache_request_headers();
 		$request       = \Slim\Slim::getInstance()->request();
-		$faculty_id    = $request->headers->get('faculty_id');
+
+		if ($requestHeaders){
+		    $faculty_id =  $requestHeaders['faculty_id'];
+		}
+		else{
+		    $faculty_id    = $request->headers->get('faculty_id');
+		}
+
+
+		//$request       = \Slim\Slim::getInstance()->request();
+		//$faculty_id    = $request->headers->get('faculty_id');
+
 		$dept_name     = getDepartmentNameById($deptId); 
-		
 		
 		$sql = "DELETE FROM department WHERE id=:id";
 		$sql_1 = "DELETE FROM branch WHERE department_id=:id";
@@ -976,9 +1045,22 @@
 	//function for deleting the period entry...
 	function deleteEntry($id)
 	{
+		$requestHeaders = apache_request_headers();
 		$request       = \Slim\Slim::getInstance()->request();
-		$faculty_id    = $request->headers->get('faculty_id');
-		$facultyLogId  = $request->headers->get('facultyLogId');
+
+		if ($requestHeaders){
+			$faculty_id    = $requestHeaders['faculty_id'];
+			$facultyLogId  = $requestHeaders['facultyLogId'];
+		}
+		else{
+			$faculty_id    = $request->headers->get('faculty_id');
+			$facultyLogId  = $request->headers->get('facultyLogId');
+		}
+
+
+		//$request       = \Slim\Slim::getInstance()->request();
+		//$faculty_id    = $request->headers->get('faculty_id');
+		
 		
 		if($faculty_id)
 		{
@@ -1019,17 +1101,33 @@
 	
 	//Route for deleting the entry....
 	function resetEntry(){
+		//$request       = \Slim\Slim::getInstance()->request();
+		
+		$requestHeaders = apache_request_headers();
 		$request       = \Slim\Slim::getInstance()->request();
-		$faculty_id    = $request->headers->get('faculty_id');
-		$confirmPass   = $request->headers->get('password');
+
+		if ($requestHeaders){
+			$faculty_id    = $requestHeaders['faculty_id'];
+			//$facultyLogId  = $requestHeaders['facultyLogId'];
+	                $confirmPass   = $requestHeaders['password'];
+		}
+		else{
+			$faculty_id    = $request->headers->get('faculty_id');
+			$confirmPass   = $request->headers->get('password');
+		}
+
+
+	        //$faculty_id    = $request->headers->get('faculty_id');
+	
 		if($faculty_id && $confirmPass)
 		{
 				$check =  checkFacultyPassword($faculty_id, $confirmPass);
 				if($check)
 				{
-					$faculty_info = getMemberById( $faculty_id );
+					$faculty_info = getMemberById($faculty_id);
 					$deptName     = getDepartmentNameById( $faculty_info->department_id );
-				
+
+
 					$sql = "DELETE FROM  `days_entry`  WHERE `department_id` = :dept_id ";
 					try {
 						$db = getConnection();
@@ -1067,10 +1165,28 @@
 	// faculty_id is send through header..
 	function updateEntry($id)
 	{
-		$request = \Slim\Slim::getInstance()->request();
+		
+				
+		//$faculty_id   = $request->headers->get('faculty_id');
+		//$facultyLogId = $request->headers->get('facultyLogId');
+			
+		$requestHeaders = apache_request_headers();
+		$request       = \Slim\Slim::getInstance()->request();
+
+		if ($requestHeaders){
+			$faculty_id    = $requestHeaders['faculty_id'];
+			$facultyLogId  = $requestHeaders['facultyLogId'];
+	                //$confirmPass   = $requestHeaders['password'];
+		}
+		else{
+			$faculty_id    = $request->headers->get('faculty_id');
+		        $facultyLogId = $request->headers->get('facultyLogId');
+				
+		}
+
 		$dept = json_decode($request->getBody());
-		$faculty_id   = $request->headers->get('faculty_id');
-		$facultyLogId = $request->headers->get('facultyLogId');
+
+
 		if($faculty_id && $facultyLogId)
 		{
 			$sql = "UPDATE `period_entry` SET 
@@ -1151,9 +1267,25 @@
 	//NEW ROUTE faculty/activity/:entryId','updateLog'
 	function updateLog( $entryId )
 	{
+		//$request       = \Slim\Slim::getInstance()->request();
+						
+		$requestHeaders = apache_request_headers();
 		$request       = \Slim\Slim::getInstance()->request();
 		$dept          = json_decode($request->getBody());
-		$faculty_id    = $request->headers->get('faculty_id');
+
+		if ($requestHeaders){
+			$faculty_id    = $requestHeaders['faculty_id'];
+		      //	$facultyLogId  = $requestHeaders['facultyLogId'];
+	                //$confirmPass   = $requestHeaders['password'];
+		}
+		else{
+			$faculty_id    = $request->headers->get('faculty_id');
+		      //  $facultyLogId = $request->headers->get('facultyLogId');
+				
+		}
+
+
+		//$faculty_id    = $request->headers->get('faculty_id');
 		if( matchSubjectName( $dept->last_update_type ) && $faculty_id )
 		{
 			//Perform update operation...
@@ -1290,9 +1422,24 @@
 	//$app->post('/memebers',"addFaculty");
 	function addFaculty(){
 		$request          = \Slim\Slim::getInstance()->request();
-		$admin_id       = $request->headers->get('faculty_id');
-    	$dept             = json_decode($request->getBody());
-		
+		//$admin_id       = $request->headers->get('faculty_id');
+    	        $dept             = json_decode($request->getBody());
+				
+		$requestHeaders = apache_request_headers();
+		$request       = \Slim\Slim::getInstance()->request();
+
+		if ($requestHeaders){
+			$admin_id    = $requestHeaders['faculty_id'];
+			//$facultyLogId  = $requestHeaders['facultyLogId'];
+	                //$confirmPass   = $requestHeaders['password'];
+		}
+		else{
+			$admin_id    = $request->headers->get('faculty_id');
+		        //$facultyLogId = $request->headers->get('facultyLogId');
+				
+		}
+
+
 		//proceed only if user is admin...
 		if( $_SESSION['admin'] )
 		{	
@@ -1404,9 +1551,23 @@
 	
 	//$app->put('members/:id','updateFaculty');
 	function updateFaculty( $id ){
-		$request          = \Slim\Slim::getInstance()->request();
+		
+	        //	$request          = \Slim\Slim::getInstance()->request();
 		$dept             = json_decode($request->getBody());
-		$faculty_id       = $request->headers->get('faculty_id');
+	
+					
+		$requestHeaders   = apache_request_headers();
+		$request          = \Slim\Slim::getInstance()->request();
+
+		if ($requestHeaders){
+			$faculty_id    = $requestHeaders['faculty_id'];
+		}
+		else{
+			$faculty_id    = $request->headers->get('faculty_id');
+				
+		}
+	
+
 		$facultyOldName   = getFacultyName($id);
 		
 		if( $_SESSION['admin'] )
@@ -1494,7 +1655,20 @@
 	//$app->delete('/members/:id','deleteFaculty');
 	function deleteFaculty( $id ){
 	  $request       = \Slim\Slim::getInstance()->request();
-	  $faculty_id    = $request->headers->get('faculty_id');
+	  
+	  				
+	  $requestHeaders   = apache_request_headers();
+	  $request          = \Slim\Slim::getInstance()->request();
+
+          if ($requestHeaders){
+	  	$faculty_id    = $requestHeaders['faculty_id'];
+	  }
+	  else{
+		$faculty_id    = $request->headers->get('faculty_id');		
+	  }				
+					
+	  // $faculty_id    = $request->headers->get('faculty_id');
+
 	  $facultyName   = getFacultyName($id);
 	  
 	  if( $_SESSION['admin'] )

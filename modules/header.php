@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <title>JECRC</title>
-<link href="Manage/static/customstyle/typeahead.css" rel="stylesheet">
-<link href="Manage/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="Manage/static/customstyle/mystyle.css" rel="stylesheet">
-<link href="Manage/static/customstyle/loading_bar.css" rel="stylesheet">
+<link href="static/customstyle/typeahead.css" rel="stylesheet">
+<link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="static/customstyle/mystyle.css" rel="stylesheet">
+<link href="static/customstyle/loading_bar.css" rel="stylesheet">
 <link rel="icon" type="image/png" href="#" >
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <!--Adjusting for Mobile View-->

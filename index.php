@@ -1,5 +1,5 @@
 <?php
-include_once 'Manage/modules/loginscript/include/processes.php';
+include_once 'modules/loginscript/include/processes.php';
 $Login_Process = new Login_Process;
 $Login_Process->check_login($_GET['page']);
 $Login = $Login_Process->log_in($_POST['user'], $_POST['pass'], $_POST['remember'], $_POST['page'], $_POST['submit']); 
@@ -12,7 +12,7 @@ $Login = $Login_Process->log_in($_POST['user'], $_POST['pass'], $_POST['remember
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Login</title>
 <?php
-	require_once('Manage/modules/css.php');
+	require_once('modules/css.php');
 ?>
 </head>
 
@@ -20,7 +20,7 @@ $Login = $Login_Process->log_in($_POST['user'], $_POST['pass'], $_POST['remember
 	<div class="container-fluid">
     	<div class="row">
         	<div class="col-md-12 col-xs-12">
-            	<img src="Manage/images/logo.jpg">
+            	<img src="images/logo.jpg">
             </div><!--Div for Image end here--> 
         </div><!--Div for first row end here-->
 
@@ -41,7 +41,7 @@ $Login = $Login_Process->log_in($_POST['user'], $_POST['pass'], $_POST['remember
                     </fieldset>
                    
 					<div class="center">
-						<a href="Manage/modules/loginscript/forgotpassword.php">Password Recovery</a> | <a href="Manage/modules/loginscript/register.php">Sign Up</a>
+						<a href="modules/loginscript/forgotpassword.php">Password Recovery</a> | <a href="modules/loginscript/register.php">Sign Up</a>
 					</div>
                      <br />
                     <div class="right">

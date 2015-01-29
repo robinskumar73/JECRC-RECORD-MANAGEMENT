@@ -33,22 +33,22 @@ var faculty = {
 
 <!--script area-->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="Manage/static/jquery/jquery-1.7.2.min.js"></script>
+<script src="static/jquery/jquery-1.7.2.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script type="text/javascript" src="Manage/static/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="static/bootstrap/js/bootstrap.min.js"></script>
 
-<script type="text/javascript" src="Manage/static/dependencies/underscore-min.js"></script>
-<script type="text/javascript" src="Manage/static/dependencies/backbone-min.js"></script>
-<script type="text/javascript" src="Manage/static/typeahead.min.js"></script>
+<script type="text/javascript" src="static/dependencies/underscore-min.js"></script>
+<script type="text/javascript" src="static/dependencies/backbone-min.js"></script>
+<script type="text/javascript" src="static/typeahead.min.js"></script>
 <!--Now loading MVC related files -->
-<script type="text/javascript" src="Manage/static/js/models/jecrc-model.min.js"></script>
-<script type="text/javascript" src="Manage/static/js/collections/jecrc-collection.min.js"></script>
-<script type="text/javascript"  src="Manage/static/js/views/app-pages.min.js"></script>
-<script type="text/javascript" src="Manage/static/js/views/jecrc-view.min.js"></script>
-<script type="text/javascript" src="Manage/static/js/routers/jecrc-routers.min.js"></script>
-<script type="text/javascript" src="Manage/static/js/app-main/jecrc-app-main.min.js"></script>    
-<script type="text/javascript" src="Manage/static/customscript/myscript.min.js"></script>
-<script type="text/javascript" src="Manage/static/md5/md5-google.js"></script>
+<script type="text/javascript" src="static/js/models/jecrc-model.js"></script>
+<script type="text/javascript" src="static/js/collections/jecrc-collection.min.js"></script>
+<script type="text/javascript" src="static/js/views/app-pages.js"></script>
+<script type="text/javascript" src="static/js/views/jecrc-view.js"></script>
+<script type="text/javascript" src="static/js/routers/jecrc-routers.js"></script>
+<script type="text/javascript" src="static/js/app-main/jecrc-app-main.js"></script>    
+<script type="text/javascript" src="static/customscript/myscript.js"></script>
+<script type="text/javascript" src="static/md5/md5-google.js"></script>
 
 </body>
 </html>

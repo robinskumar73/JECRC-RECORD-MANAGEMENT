@@ -40,7 +40,7 @@
 				id INT AUTO_INCREMENT NOT NULL ,
 				department_id INT NOT NULL,
 				semester_id INT NOT NULL,
-				section_name INT NOT NULL,
+				section_name CHAR  NOT NULL,
 			 	batch_id INT NOT NULL,
 				PRIMARY KEY(id)
 			);";
@@ -121,7 +121,7 @@
 					ON DELETE SET NULL,
 					
 				FOREIGN KEY (subject_id)
-					REFERENCES subject(id),	
+					REFERENCES subject(id)
 					ON DELETE CASCADE,
 				
 				PRIMARY KEY(id)

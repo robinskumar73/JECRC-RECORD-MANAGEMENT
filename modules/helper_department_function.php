@@ -2,7 +2,8 @@
  
  
 	
-	function getDepartmentNameById($deptId) {
+function getDepartmentNameById($deptId) {
+
 		$sql = "SELECT name FROM department WHERE id=:deptId";
 		try {
 			$db = getConnection();

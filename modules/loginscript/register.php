@@ -43,7 +43,7 @@ $_SESSION['register'] = "test";
 
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
-<div class="right" style="margin-top:-8px; margin-right:-6px;"><a href="../../../index.php">Log In</a></div>
+<div class="right" style="margin-top:-8px; margin-right:-6px;"><a href="../../index.php">Log In</a></div>
 <h1>Register</h1>
 
 <div class="red bg-danger">
@@ -104,7 +104,7 @@ customDepartmentSelectize = function(elementObj){
 		load: function(query, callback) {
 			if (!query.length) return callback();
 			$.ajax({
-				url: 'http://booklite.in/Manage/modules/department.php/department?key='+query,
+				url: '/Manage/modules/department.php/department?key='+query,
 				type: 'GET',
 				dataType: 'json',
 				error: function() {

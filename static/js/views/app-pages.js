@@ -13,8 +13,8 @@ app.Global = app.Global || {};
 app.Global.Department     			= new app.Collection.Department;
 app.Global.Branch         			= new app.Collection.Branch;
 app.Global.Subjects       			= new app.Collection.Subject;
-app.Global.entryLogCollection 		= new app.Collection.faculty_entry;
-app.Global.facultyList              = new app.Collection.Faculty;
+app.Global.entryLogCollection 		        = new app.Collection.faculty_entry;
+app.Global.facultyList                          = new app.Collection.Faculty;
 
 
 //Other global values related to admin page..
@@ -85,7 +85,7 @@ customSubjectSelectize = function(elementObj){
 		load: function(query, callback) {
 			if (!query.length) return callback();
 			$.ajax({
-				url: 'http://localhost/Manage/modules/department.php/subject?key='+query,
+				url: '/Manage/modules/department.php/subject?key='+query,
 				type: 'GET',
 				dataType: 'json',
 				error: function() {
@@ -159,7 +159,7 @@ customDepartmentSelectize = function(elementObj){
 		load: function(query, callback) {
 			if (!query.length) return callback();
 			$.ajax({
-				url: 'http://localhost/Manage/modules/department.php/department?key='+query,
+				url: '/Manage/modules/department.php/department?key='+query,
 				type: 'GET',
 				dataType: 'json',
 				error: function() {
@@ -216,7 +216,8 @@ var getYear = function(id){
 
 
 var parseBranch = function(branchName){
-	var patt = /([0-9])\s*\-\s*([a-zA-Z]+)\s*\-\s*([a-zA-Z])/
+	//console.log(branchName);
+	var patt = /([0-9])\s*\-\s*([a-zA-Z.]+)\s*\-\s*([a-zA-Z.])/
 	var value = patt.exec(	branchName );
 	value = value.splice(1);
 	return value;
@@ -231,24 +232,26 @@ var parseDate = function(date){
 
 var getMonth = function(month){
 	var x = {
-		1:"January",
-		2:"Fabuary",
-		3:"March",
-		4:"April",
-		5:"May",
-		6:"June",
-		7:"July",
-		8:"August",
-		9:"September",
-		10:"October",
-		11:"November",
-		12:"December"	
+		"01":"January",
+		"02":"Fabuary",
+		"03":"March",
+		"04":"April",
+		"05":"May",
+		"06":"June",
+		"07":"July",
+		"08":"August",
+		"09":"September",
+		"10":"October",
+		"11":"November",
+		"12":"December"	
 	}
 	return x[month];
 }
 
 var convertDate = function(date){
+	console.log(date);
 	var par_date = parseDate(date);
+
 	return getMonth(par_date[1]) + " " + par_date[2]; 	
 }
 

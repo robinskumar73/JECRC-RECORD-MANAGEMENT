@@ -288,7 +288,7 @@ app.Views.Semester = Backbone.View.extend({
 
 	
 	updateInfoBox: function(dept,sem){
-		$(".infoScreenHeader").html('' + sem + '' +dept + '');	
+		$(".infoScreenHeader").html('' + sem + ' ' +dept + '');	
 	}
 	
 });
@@ -314,7 +314,7 @@ $(document).on('change','#section-btn input[name=options]',function(){
 		//Now schowing section..
 		showBatch();
 		//Updating the info screen..
-		$(".infoScreenHeader").html( sem + dept + id_  );
+		$(".infoScreenHeader").html( sem + " " + dept +" "+ id_  );
 });
 
 var showBatch =  function(){	
@@ -359,7 +359,7 @@ app.Views.Batch = Backbone.View.extend({
 				//getting department model..
 				var model_ = app.Global.selDeptModel;
 				var dept =  model_.get('name');
-				$('.infoScreenSubHeader').append('<span class="h4">' + app.Global.semester_id + dept + app.Global.section_id + $(btn).data('wat') + '</span>');
+				$('.infoScreenSubHeader').append('<span class="h4">' + app.Global.semester_id +""+ dept + " "  + app.Global.section_id +"-" + $(btn).data('wat') + '</span>');
         	}
 			
 		});

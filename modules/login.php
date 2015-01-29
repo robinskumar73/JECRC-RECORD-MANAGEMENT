@@ -41,7 +41,7 @@ $Login = $Login_Process->log_in($_POST['user'], $_POST['pass'], $_POST['remember
                     </fieldset>
                    
 					<div class="center">
-						<a href="loginscript/forgotpassword.php">Password Recovery</a> | <a href="loginscript/register.php">Sign Up</a>
+						<a href="/Manage/modules/loginscript/forgotpassword.php">Password Recovery</a> | <a href="/Manage/modules/loginscript/register.php">Sign Up</a>
 					</div>
                      <br />
                     <div class="right">

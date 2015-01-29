@@ -17,9 +17,9 @@ define("DBTBLE","faculty");
 # Location Infomation
 
 // Path of script with trailing slashes
-define("Script_Path","/");
+define("Script_Path","/Manage/");
 // URL of script (no trailing slash)
-define("Script_URL","http://booklite.in");
+define("Script_URL","http://localhost");
 
 # System Infomation
 
@@ -28,9 +28,9 @@ define("Site_Name","JECRC RECORD MANAGEMENT");
 // Name on system emails
 define("Email_From","JECRC MAIL");                        
 // Webmaster email address
-define("Email_Address","services@booklite.in");          
+define("Email_Address","services@jecrc.ac.in");          
 // Dont reply email address
-define("Non_Reply","services@booklite.in");              
+define("Non_Reply","services@jecrc.ac.in");              
 
 # Session and Cookie Infomation
 

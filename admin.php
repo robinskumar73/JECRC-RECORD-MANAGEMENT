@@ -1,6 +1,6 @@
 <?php
 
-include_once 'Manage/modules/loginscript/include/processes.php';
+include_once 'modules/loginscript/include/processes.php';
 $Login_Process = new Login_Process;
 if($Login_Process->check_status($_SERVER['SCRIPT_NAME']))
 {
@@ -8,7 +8,7 @@ if($Login_Process->check_status($_SERVER['SCRIPT_NAME']))
 ?>
 
 <?php
-require_once 'Manage/modules/header.php';
+require_once 'modules/header.php';
 ?>
 
 <?php
@@ -18,7 +18,7 @@ require_once 'Manage/modules/header.php';
 ?>
 
 <?php
-include_once 'Manage/modules/loadingbar.php';
+include_once 'modules/loadingbar.php';
 
 ?>
 
@@ -27,16 +27,16 @@ include_once 'Manage/modules/loadingbar.php';
 	<div class="row ">
     
    		 <div class="col-sm-2 col-md-2 sidebar">
-          	<?
+          	 <?
 				//adding the left hook ....
-				include "Manage/modules/admin-left-hook.php";
-			?>
+				include "modules/admin-left-hook.php";
+		 ?>
         </div><!--End of sidebar-->
         <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 ">
         	
             <?
 				//Adding navbar here..
-				include "Manage/modules/admin-navbar.php";
+				include "modules/admin-navbar.php";
 			?>
             
             <!----Start of another row --->
@@ -55,7 +55,7 @@ include_once 'Manage/modules/loadingbar.php';
                 	<!--Adding right hook here--->
                     <?php
 						//Adding navbar here..
-						include "Manage/modules/admin-right-hook.php";
+						include "modules/admin-right-hook.php";
 					?>
             	</div><!--<!--DIV ENDS FOR CREATING DEPT AND OTHER FIELDS-->
 
@@ -68,8 +68,8 @@ include_once 'Manage/modules/loadingbar.php';
 
 
 <?php
-require_once 'Manage/modules/template.php';
-require_once 'Manage/modules/footer.php';
+require_once 'modules/template.php';
+require_once 'modules/footer.php';
 ?>
 
 <?php
